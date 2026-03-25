@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Read(//c/Users/nilov/.claude/**)",
+      "Read(//c/Users/nilov/.claude/skills/**)",
+      "Bash(gh auth:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git remote:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(curl -s -X GET \"https://developers.hostinger.com/api/vps/v1/virtual-machines\" -H \"Authorization: Bearer f25dp5SofZIHYh0PjcKJOtIFYAOkJjjZcVyksC6K25d514fa\" -H \"Content-Type: application/json\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s -X GET \"https://developers.hostinger.com/api/billing/v1/orders\" -H \"Authorization: Bearer f25dp5SofZIHYh0PjcKJOtIFYAOkJjjZcVyksC6K25d514fa\" -H \"Content-Type: application/json\")",
+      "Bash(curl -s -X GET \"https://developers.hostinger.com/api/vps/v1/data-centers\" -H \"Authorization: Bearer f25dp5SofZIHYh0PjcKJOtIFYAOkJjjZcVyksC6K25d514fa\" -H \"Content-Type: application/json\")",
+      "Bash(curl -s -X GET \"https://developers.hostinger.com/api/vps/v1/catalog\" -H \"Authorization: Bearer f25dp5SofZIHYh0PjcKJOtIFYAOkJjjZcVyksC6K25d514fa\" -H \"Content-Type: application/json\")",
+      "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(p.get\\(''''name'''',''''''''\\), p.get\\(''''price'''',{}\\).get\\(''''price_with_vat'''',''''''''\\), p.get\\(''''cpu_count'''',''''''''\\), p.get\\(''''memory'''',''''''''\\), p.get\\(''''disk'''',''''''''\\)\\) for p in data[:6]]\")",
+      "Bash(curl -s \"https://developers.hostinger.com/api/vps/v1/catalog\" -H \"Authorization: Bearer f25dp5SofZIHYh0PjcKJOtIFYAOkJjjZcVyksC6K25d514fa\")"
+    ]
+  }
+}
