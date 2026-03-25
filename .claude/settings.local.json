@@ -21,7 +21,14 @@
       "Bash(curl -s -X GET \"https://developers.hostinger.com/api/vps/v1/data-centers\" -H \"Authorization: Bearer f25dp5SofZIHYh0PjcKJOtIFYAOkJjjZcVyksC6K25d514fa\" -H \"Content-Type: application/json\")",
       "Bash(curl -s -X GET \"https://developers.hostinger.com/api/vps/v1/catalog\" -H \"Authorization: Bearer f25dp5SofZIHYh0PjcKJOtIFYAOkJjjZcVyksC6K25d514fa\" -H \"Content-Type: application/json\")",
       "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(p.get\\(''''name'''',''''''''\\), p.get\\(''''price'''',{}\\).get\\(''''price_with_vat'''',''''''''\\), p.get\\(''''cpu_count'''',''''''''\\), p.get\\(''''memory'''',''''''''\\), p.get\\(''''disk'''',''''''''\\)\\) for p in data[:6]]\")",
-      "Bash(curl -s \"https://developers.hostinger.com/api/vps/v1/catalog\" -H \"Authorization: Bearer f25dp5SofZIHYh0PjcKJOtIFYAOkJjjZcVyksC6K25d514fa\")"
+      "Bash(curl -s \"https://developers.hostinger.com/api/vps/v1/catalog\" -H \"Authorization: Bearer f25dp5SofZIHYh0PjcKJOtIFYAOkJjjZcVyksC6K25d514fa\")",
+      "Bash(sshpass -p 'Jerome200975@' ssh -o StrictHostKeyChecking=no root@72.60.233.11 'echo \"\"Connecté — $\\(uname -a\\)\"\"')",
+      "Bash(ssh -V)",
+      "Bash(apt-get install:*)",
+      "Bash(winget install:*)",
+      "Bash(pip install:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(python -c \":*)"
     ]
   }
 }
