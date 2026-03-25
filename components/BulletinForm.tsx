@@ -63,6 +63,41 @@ export default function BulletinForm() {
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
 
+  // ── Calcul automatique brut / heures / taux horaire ──
+  const r2 = (n: number) => Math.round(n * 100) / 100;
+
+  const handleBrut = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const brut = e.target.value;
+    setForm(f => {
+      const h = parseFloat(f.heuresMensuelles);
+      const b = parseFloat(brut);
+      if (b > 0 && h > 0) return { ...f, brutMensuel: brut, tauxHoraire: String(r2(b / h)) };
+      return { ...f, brutMensuel: brut };
+    });
+  };
+
+  const handleHeures = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const heures = e.target.value;
+    setForm(f => {
+      const h = parseFloat(heures);
+      const b = parseFloat(f.brutMensuel);
+      const t = parseFloat(f.tauxHoraire);
+      if (h > 0 && b > 0) return { ...f, heuresMensuelles: heures, tauxHoraire: String(r2(b / h)) };
+      if (h > 0 && t > 0) return { ...f, heuresMensuelles: heures, brutMensuel: String(r2(h * t)) };
+      return { ...f, heuresMensuelles: heures };
+    });
+  };
+
+  const handleTaux = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const taux = e.target.value;
+    setForm(f => {
+      const t = parseFloat(taux);
+      const h = parseFloat(f.heuresMensuelles);
+      if (t > 0 && h > 0) return { ...f, tauxHoraire: taux, brutMensuel: String(r2(t * h)) };
+      return { ...f, tauxHoraire: taux };
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -117,9 +152,9 @@ export default function BulletinForm() {
           {/* ── ONGLET PRINCIPAL ── */}
           {tab === 'principal' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field label="Salaire brut mensuel (€)" hint="Montant total avant déductions">
+              <Field label="Salaire brut mensuel (€)" hint="Calculé auto si heures + taux remplis">
                 <input type="number" min="1000" max="200000" step="0.01"
-                  value={form.brutMensuel} onChange={set('brutMensuel')}
+                  value={form.brutMensuel} onChange={handleBrut}
                   className={inp} placeholder="ex : 3 500,00" required />
               </Field>
 
@@ -155,14 +190,14 @@ export default function BulletinForm() {
                 </select>
               </Field>
 
-              <Field label="Heures mensuelles" hint="Temps plein légal = 151,67 h">
+              <Field label="Heures mensuelles" hint="Calculé auto si brut + taux remplis">
                 <input type="number" min="0" max="400" step="0.01"
-                  value={form.heuresMensuelles} onChange={set('heuresMensuelles')} className={inp} />
+                  value={form.heuresMensuelles} onChange={handleHeures} className={inp} />
               </Field>
 
-              <Field label="Taux horaire (€/h)" hint="Optionnel — pour affichage sur le bulletin">
+              <Field label="Taux horaire (€/h)" hint="Calculé auto si brut + heures remplis">
                 <input type="number" min="0" step="0.01"
-                  value={form.tauxHoraire} onChange={set('tauxHoraire')} className={inp} />
+                  value={form.tauxHoraire} onChange={handleTaux} className={inp} />
               </Field>
             </div>
           )}
