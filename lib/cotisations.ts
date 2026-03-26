@@ -5,6 +5,14 @@ export const PARAMS = {
   2026: { pmss: 4005, smicMensuel: 1801.80, smicAnnuel: 21621.60 },
 } as const;
 
+export interface ElementVariable {
+  intitule: string;
+  heures?: number;
+  taux?: number;    // taux horaire ou taux de majoration (ex: 25 pour 25%)
+  montant: number;  // montant brut total
+  exonereeIR?: boolean; // exonéré impôt sur le revenu (HS)
+}
+
 export interface InputBS {
   brutMensuel: number;
   statut: 'cadre' | 'non-cadre';
@@ -26,23 +34,34 @@ export interface InputBS {
   salariéPoste?: string;
   salariéCoefficient?: string;
   salariéMatricule?: string;
-  // Rémunération
+  salariéEntreeDate?: string;
+  // Rémunération de base
   heuresMensuelles?: number;
   tauxHoraire?: number;
+  // Heures supplémentaires / majorées
+  heuresSupp25?: number;   // nombre d'heures supp à 25%
+  heuresSupp50?: number;   // nombre d'heures supp à 50%
+  heuresCompl?: number;    // heures complémentaires (temps partiel, 10%)
+  heuresMajorees?: Array<{ intitule: string; heures: number; majoration: number }>; // nuit, dimanche, férié...
+  // Éléments variables
+  prime?: number;          // prime mensuelle
+  avantageNature?: number; // avantage en nature
+  acompte?: number;        // acompte déjà versé
 }
 
 export interface LigneBS {
   intitule: string;
   base: number;
-  tauxSalarial: number | null; // null = ligne patronale uniquement
+  tauxSalarial: number | null;
   montantSalarial: number;
-  tauxPatronal: number | null; // null = ligne salariale uniquement
+  tauxPatronal: number | null;
   montantPatronal: number;
   section?: 'retraite' | 'chomage' | 'sante' | 'famille' | 'csg' | 'autre';
 }
 
 export interface ResultBS {
   lignes: LigneBS[];
+  elementsSalaire: ElementVariable[];  // lignes salaire (base + HS + prime...)
   totaux: {
     brutMensuel: number;
     totalCotisationsSalariales: number;
@@ -51,28 +70,148 @@ export interface ResultBS {
     netAvantPAS: number;
     tauxPAS: number;
     montantPAS: number;
+    montantExonereeIR: number; // HS exonérées IR
     netAPayer: number;
     coutEmployeur: number;
+    acompte: number;
+    netAPayerApresAcompte: number;
   };
   params: { pmss: number; smicMensuel: number; annee: number; mois: number };
   input: InputBS;
 }
 
 export function calculerBS(input: InputBS): ResultBS {
-  const { brutMensuel, statut, effectif, tauxPAS } = input;
+  const { statut, effectif, tauxPAS } = input;
   const annee = input.annee ?? 2026;
   const mois = input.mois ?? new Date().getMonth() + 1;
   const { pmss, smicMensuel, smicAnnuel } = PARAMS[annee] ?? PARAMS[2026];
+  const heures = input.heuresMensuelles ?? 151.67;
+  const tauxH = input.tauxHoraire ?? 0;
 
   const r = (n: number) => Math.round(n * 100) / 100;
-  const T1 = Math.min(brutMensuel, pmss);            // Tranche 1 (≤ PMSS)
-  const T2 = Math.max(0, Math.min(brutMensuel, 8 * pmss) - pmss); // T2 (PMSS → 8×PMSS)
-  const T2chom = Math.max(0, Math.min(brutMensuel, 4 * pmss) - pmss); // T2 chômage (PMSS → 4×PMSS)
+
+  // ── Calcul des éléments de salaire ──
+  const elementsSalaire: ElementVariable[] = [];
+
+  // Salaire de base
+  const salaireBase = r(tauxH > 0 ? tauxH * heures : input.brutMensuel);
+  if (tauxH > 0) {
+    elementsSalaire.push({
+      intitule: `Salaire de base (${heures.toFixed(2)} h × ${tauxH.toFixed(4)} €/h)`,
+      heures,
+      taux: tauxH,
+      montant: salaireBase,
+      exonereeIR: false,
+    });
+  }
+
+  // Heures supplémentaires 25%
+  let montantHS25 = 0;
+  if (input.heuresSupp25 && input.heuresSupp25 > 0 && tauxH > 0) {
+    montantHS25 = r(input.heuresSupp25 * tauxH * 1.25);
+    elementsSalaire.push({
+      intitule: `Heures supplémentaires 25% (${input.heuresSupp25}h × ${tauxH.toFixed(4)} × 1,25)`,
+      heures: input.heuresSupp25,
+      taux: 25,
+      montant: montantHS25,
+      exonereeIR: true,
+    });
+  }
+
+  // Heures supplémentaires 50%
+  let montantHS50 = 0;
+  if (input.heuresSupp50 && input.heuresSupp50 > 0 && tauxH > 0) {
+    montantHS50 = r(input.heuresSupp50 * tauxH * 1.50);
+    elementsSalaire.push({
+      intitule: `Heures supplémentaires 50% (${input.heuresSupp50}h × ${tauxH.toFixed(4)} × 1,50)`,
+      heures: input.heuresSupp50,
+      taux: 50,
+      montant: montantHS50,
+      exonereeIR: true,
+    });
+  }
+
+  // Heures complémentaires (temps partiel, majoration 10%)
+  let montantHC = 0;
+  if (input.heuresCompl && input.heuresCompl > 0 && tauxH > 0) {
+    montantHC = r(input.heuresCompl * tauxH * 1.10);
+    elementsSalaire.push({
+      intitule: `Heures complémentaires 10% (${input.heuresCompl}h)`,
+      heures: input.heuresCompl,
+      taux: 10,
+      montant: montantHC,
+      exonereeIR: false,
+    });
+  }
+
+  // Heures majorées (nuit, dimanche, férié)
+  let montantHM = 0;
+  if (input.heuresMajorees && input.heuresMajorees.length > 0 && tauxH > 0) {
+    for (const hm of input.heuresMajorees) {
+      if (hm.heures > 0) {
+        const m = r(hm.heures * tauxH * (1 + hm.majoration / 100));
+        montantHM += m;
+        elementsSalaire.push({
+          intitule: `${hm.intitule} (${hm.heures}h, maj. ${hm.majoration}%)`,
+          heures: hm.heures,
+          taux: hm.majoration,
+          montant: m,
+          exonereeIR: false,
+        });
+      }
+    }
+    montantHM = r(montantHM);
+  }
+
+  // Prime
+  let montantPrime = 0;
+  if (input.prime && input.prime > 0) {
+    montantPrime = r(input.prime);
+    elementsSalaire.push({
+      intitule: 'Prime',
+      montant: montantPrime,
+      exonereeIR: false,
+    });
+  }
+
+  // Avantage en nature
+  let montantAN = 0;
+  if (input.avantageNature && input.avantageNature > 0) {
+    montantAN = r(input.avantageNature);
+    elementsSalaire.push({
+      intitule: 'Avantage en nature',
+      montant: montantAN,
+      exonereeIR: false,
+    });
+  }
+
+  // ── Brut total ──
+  let brutMensuel: number;
+  if (tauxH > 0) {
+    brutMensuel = r(salaireBase + montantHS25 + montantHS50 + montantHC + montantHM + montantPrime + montantAN);
+  } else {
+    brutMensuel = r(input.brutMensuel + montantPrime + montantAN);
+    if (elementsSalaire.length === 0) {
+      elementsSalaire.unshift({
+        intitule: `Salaire de base (${heures.toFixed(2)} h)`,
+        heures,
+        montant: input.brutMensuel,
+        exonereeIR: false,
+      });
+    }
+  }
+
+  // Montant exonéré IR (HS)
+  const montantExonereeIR = r(montantHS25 + montantHS50);
+
+  const T1 = Math.min(brutMensuel, pmss);
+  const T2 = Math.max(0, Math.min(brutMensuel, 8 * pmss) - pmss);
+  const T2chom = Math.max(0, Math.min(brutMensuel, 4 * pmss) - pmss);
   const assietteCsg = r(brutMensuel * 0.9825);
 
   const lignes: LigneBS[] = [];
 
-  // ── Maladie / Sécurité sociale (patronal uniquement)
+  // ── Maladie / SS
   lignes.push({
     intitule: 'Maladie – maternité – invalidité – décès',
     base: brutMensuel, tauxSalarial: null, montantSalarial: 0,
@@ -89,11 +228,10 @@ export function calculerBS(input: InputBS): ResultBS {
   });
 
   // ── Vieillesse déplafonnée
-  const tauxVDeplatPatronal = annee >= 2026 ? 2.02 : 2.02; // 2.02% standard (2.11% observé = conv. BTP)
   lignes.push({
     intitule: 'Assurance vieillesse déplafonnée',
     base: brutMensuel, tauxSalarial: 0.40, montantSalarial: r(brutMensuel * 0.004),
-    tauxPatronal: tauxVDeplatPatronal, montantPatronal: r(brutMensuel * tauxVDeplatPatronal / 100),
+    tauxPatronal: 2.02, montantPatronal: r(brutMensuel * 0.0202),
     section: 'retraite',
   });
 
@@ -106,7 +244,7 @@ export function calculerBS(input: InputBS): ResultBS {
     section: 'famille',
   });
 
-  // ── Accidents du travail (taux moyen)
+  // ── Accidents du travail
   lignes.push({
     intitule: 'Accidents du travail – maladies professionnelles',
     base: brutMensuel, tauxSalarial: null, montantSalarial: 0,
@@ -122,7 +260,6 @@ export function calculerBS(input: InputBS): ResultBS {
     section: 'retraite',
   });
 
-  // ── AGIRC-ARRCO T2 (si brut > PMSS)
   if (T2 > 0) {
     lignes.push({
       intitule: 'AGIRC-ARRCO Tranche 2',
@@ -140,7 +277,6 @@ export function calculerBS(input: InputBS): ResultBS {
     section: 'retraite',
   });
 
-  // ── CEG T2 (si brut > PMSS)
   if (T2 > 0) {
     lignes.push({
       intitule: 'CEG Tranche 2',
@@ -150,7 +286,7 @@ export function calculerBS(input: InputBS): ResultBS {
     });
   }
 
-  // ── CET (Contribution Exceptionnelle Temporaire)
+  // ── CET
   lignes.push({
     intitule: 'CET',
     base: brutMensuel, tauxSalarial: 0.14, montantSalarial: r(brutMensuel * 0.0014),
@@ -158,12 +294,11 @@ export function calculerBS(input: InputBS): ResultBS {
     section: 'retraite',
   });
 
-  // ── Assurance chômage (patronal uniquement depuis 10/2018)
-  const assietteChomT1 = T1;
+  // ── Assurance chômage
   lignes.push({
     intitule: 'Assurance chômage – Tranche A',
-    base: assietteChomT1, tauxSalarial: null, montantSalarial: 0,
-    tauxPatronal: 4.00, montantPatronal: r(assietteChomT1 * 0.04),
+    base: T1, tauxSalarial: null, montantSalarial: 0,
+    tauxPatronal: 4.00, montantPatronal: r(T1 * 0.04),
     section: 'chomage',
   });
 
@@ -204,15 +339,14 @@ export function calculerBS(input: InputBS): ResultBS {
   });
 
   // ── Formation professionnelle
-  const tauxFP = effectif === '>=50' ? 1.00 : 1.00; // simplifié : 1% (<11 sal) / 1,68% (≥11 sal à préc.)
   lignes.push({
     intitule: 'Contribution formation professionnelle',
     base: brutMensuel, tauxSalarial: null, montantSalarial: 0,
-    tauxPatronal: tauxFP, montantPatronal: r(brutMensuel * tauxFP / 100),
+    tauxPatronal: 1.00, montantPatronal: r(brutMensuel * 0.01),
     section: 'autre',
   });
 
-  // ── APEC (cadres uniquement)
+  // ── APEC (cadres)
   if (statut === 'cadre') {
     const assietteAPEC = Math.min(brutMensuel, 4 * pmss);
     lignes.push({
@@ -239,7 +373,7 @@ export function calculerBS(input: InputBS): ResultBS {
     section: 'csg',
   });
 
-  // ── Réduction Fillon (allègement général)
+  // ── Réduction Fillon
   const brutAnnuel = brutMensuel * 12;
   const T_fillon = effectif === '>=50' ? 0.3233 : 0.3193;
   const limiteHaute = 1.6 * smicAnnuel;
@@ -256,12 +390,17 @@ export function calculerBS(input: InputBS): ResultBS {
   const totalPatronal = r(totalPatronalBrut - reductionFillon);
 
   const netAvantPAS = r(brutMensuel - totalSalarial);
-  const montantPAS = r(netAvantPAS * tauxPAS / 100);
+  // Assiette PAS = net - montant exonéré HS
+  const assiettePAS = r(netAvantPAS - montantExonereeIR);
+  const montantPAS = r(assiettePAS * tauxPAS / 100);
+  const acompte = r(input.acompte ?? 0);
   const netAPayer = r(netAvantPAS - montantPAS);
+  const netAPayerApresAcompte = r(netAPayer - acompte);
   const coutEmployeur = r(brutMensuel + totalPatronal);
 
   return {
     lignes,
+    elementsSalaire,
     totaux: {
       brutMensuel,
       totalCotisationsSalariales: totalSalarial,
@@ -270,8 +409,11 @@ export function calculerBS(input: InputBS): ResultBS {
       netAvantPAS,
       tauxPAS,
       montantPAS,
+      montantExonereeIR,
       netAPayer,
       coutEmployeur,
+      acompte,
+      netAPayerApresAcompte,
     },
     params: { pmss, smicMensuel, annee, mois },
     input,

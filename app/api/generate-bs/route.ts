@@ -8,8 +8,10 @@ export async function POST(req: NextRequest) {
     annee, mois,
     entrepriseNom, entrepriseSiret, entrepriseAdresse, entrepriseNaf, entrepriseConvention,
     salariéNom, salariéPrenom, salariéNss, salariéAdresse, salariéPoste,
-    salariéCoefficient, salariéMatricule,
+    salariéCoefficient, salariéMatricule, salariéEntreeDate,
     heuresMensuelles, tauxHoraire,
+    heuresSupp25, heuresSupp50, heuresCompl, heuresMajorees,
+    prime, avantageNature, acompte,
   } = body;
 
   const brut = parseFloat(brutMensuel);
@@ -26,9 +28,16 @@ export async function POST(req: NextRequest) {
     mois: parseInt(mois) || new Date().getMonth() + 1,
     entrepriseNom, entrepriseSiret, entrepriseAdresse, entrepriseNaf, entrepriseConvention,
     salariéNom, salariéPrenom, salariéNss, salariéAdresse, salariéPoste,
-    salariéCoefficient, salariéMatricule,
+    salariéCoefficient, salariéMatricule, salariéEntreeDate,
     heuresMensuelles: heuresMensuelles ? parseFloat(heuresMensuelles) : undefined,
     tauxHoraire: tauxHoraire ? parseFloat(tauxHoraire) : undefined,
+    heuresSupp25: heuresSupp25 ? parseFloat(heuresSupp25) : undefined,
+    heuresSupp50: heuresSupp50 ? parseFloat(heuresSupp50) : undefined,
+    heuresCompl: heuresCompl ? parseFloat(heuresCompl) : undefined,
+    heuresMajorees: Array.isArray(heuresMajorees) ? heuresMajorees : undefined,
+    prime: prime ? parseFloat(prime) : undefined,
+    avantageNature: avantageNature ? parseFloat(avantageNature) : undefined,
+    acompte: acompte ? parseFloat(acompte) : undefined,
   });
 
   return NextResponse.json(result);
