@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import ChatWidget from '@/components/ChatWidget';
 
 const BASE = 'https://bulletinfacile.fr';
 
@@ -123,7 +124,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="bg-white min-h-screen">{children}</body>
+      <body className="bg-white min-h-screen">{children}<ChatWidget /></body>
     </html>
   );
 }
