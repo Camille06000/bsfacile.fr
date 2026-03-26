@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getDb } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.SUMUP_API_KEY;
@@ -12,22 +13,32 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const amount: number = body.amount ?? 8.90;
   const description: string = body.description ?? 'Bulletin Facile — Bulletin de salaire';
+  const email: string = (body.email ?? '').trim().toLowerCase();
+
+  const checkoutRef = `bf-${Date.now()}`;
 
   try {
+    const payload: Record<string, unknown> = {
+      checkout_reference: checkoutRef,
+      amount,
+      currency: 'EUR',
+      merchant_code: merchantCode,
+      description,
+      return_url: `${baseUrl}/success`,
+    };
+
+    // Inclure l'email dans personal_details pour que le webhook le reçoive
+    if (email) {
+      payload.personal_details = { email };
+    }
+
     const checkoutRes = await fetch('https://api.sumup.com/v0.1/checkouts', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        checkout_reference: `bf-${Date.now()}`,
-        amount,
-        currency: 'EUR',
-        merchant_code: merchantCode,
-        description,
-        return_url: `${baseUrl}/success`,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!checkoutRes.ok) {
@@ -37,6 +48,24 @@ export async function POST(req: NextRequest) {
     }
 
     const checkout = await checkoutRes.json();
+
+    // Stocker l'email en DB (table pending_checkouts) pour fiabiliser le webhook
+    if (email && checkout.id) {
+      try {
+        const db = getDb();
+        db.exec(`CREATE TABLE IF NOT EXISTS pending_checkouts (
+          checkout_id TEXT PRIMARY KEY,
+          email TEXT NOT NULL,
+          amount_cents INTEGER NOT NULL,
+          created_at INTEGER NOT NULL DEFAULT (unixepoch())
+        )`);
+        db.prepare('INSERT OR REPLACE INTO pending_checkouts (checkout_id, email, amount_cents) VALUES (?, ?, ?)')
+          .run(checkout.id, email, Math.round(amount * 100));
+      } catch (dbErr) {
+        console.error('pending_checkouts insert error:', dbErr);
+      }
+    }
+
     const paymentUrl = `https://pay.sumup.com/b2c/CHECKOUT/${checkout.id}`;
     return NextResponse.json({ url: paymentUrl, checkoutId: checkout.id });
   } catch (err) {

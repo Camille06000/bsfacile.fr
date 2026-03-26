@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { findOrCreateUser, createSubscription } from '@/lib/db';
+import { findOrCreateUser, createSubscription, getDb } from '@/lib/db';
 
 // Webhook SumUp — reçoit les événements de paiement
 // Configurer dans SumUp Dashboard → Developers → Webhooks
@@ -76,8 +76,8 @@ export async function POST(req: NextRequest) {
   ) {
     const checkoutId: string = body.payload?.id ?? `unknown-${Date.now()}`;
 
-    // Récupère l'email depuis les différents champs possibles de SumUp
-    const email: string =
+    // Récupère l'email : d'abord dans le payload SumUp, sinon dans pending_checkouts
+    let email: string =
       body.payload?.personal_details?.email ||
       body.payload?.customer?.email ||
       body.payload?.customer_id ||
@@ -85,16 +85,31 @@ export async function POST(req: NextRequest) {
       '';
 
     // Récupère le montant en centimes
-    const amountCents: number = Math.round(
+    let amountCents: number = Math.round(
       (body.payload?.amount ?? body.payload?.transaction_amount ?? 0) * 100,
     );
+
+    // Fallback : chercher dans pending_checkouts si email absent du payload
+    if (!email && checkoutId) {
+      try {
+        const db = getDb();
+        const row = db.prepare('SELECT email, amount_cents FROM pending_checkouts WHERE checkout_id = ?').get(checkoutId) as { email: string; amount_cents: number } | undefined;
+        if (row) {
+          email = row.email;
+          if (!amountCents) amountCents = row.amount_cents;
+          console.log(`[Webhook] Email récupéré depuis pending_checkouts: ${email}`);
+        }
+      } catch (dbErr) {
+        console.error('[Webhook] Erreur pending_checkouts lookup:', dbErr);
+      }
+    }
 
     console.log(
       `[Webhook] Paiement confirmé — checkout: ${checkoutId}, email: ${email}, montant: ${amountCents} cts`,
     );
 
     if (!email) {
-      console.warn('[Webhook] Email absent du payload SumUp — abonnement non créé.');
+      console.warn('[Webhook] Email absent du payload SumUp et de pending_checkouts — abonnement non créé.');
       return NextResponse.json({ received: true, warning: 'email_absent' });
     }
 
@@ -119,7 +134,12 @@ export async function POST(req: NextRequest) {
         `[Webhook] Abonnement créé — userId: ${user.id}, type: ${meta.type}`,
       );
 
-      // 4. Envoie le lien magique de connexion
+      // 4. Nettoie pending_checkouts
+      try {
+        getDb().prepare('DELETE FROM pending_checkouts WHERE checkout_id = ?').run(checkoutId);
+      } catch { /* non bloquant */ }
+
+      // 5. Envoie le lien magique de connexion
       const baseUrl =
         process.env.NEXT_PUBLIC_BASE_URL || 'https://bulletinfacile.fr';
       await fetch(`${baseUrl}/api/auth/magic-link`, {
