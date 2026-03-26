@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // Clés à définir dans .env.local :
 // SUMUP_API_KEY=your_sumup_api_key
 // SUMUP_MERCHANT_CODE=your_merchant_code
-// NEXT_PUBLIC_BASE_URL=https://bsfacile.fr
+// NEXT_PUBLIC_BASE_URL=https://bulletinfacile.fr
 
 const PRICE = 49.00; // € TTC
 
@@ -26,11 +26,11 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        checkout_reference: `bsfacile-${Date.now()}`,
+        checkout_reference: `bulletinfacile-${Date.now()}`,
         amount: PRICE,
         currency: 'EUR',
         merchant_code: merchantCode,
-        description: 'BS Facile — Accès à vie',
+        description: 'Bulletin Facile — Accès à vie',
         return_url: `${baseUrl}/success`,
       }),
     });

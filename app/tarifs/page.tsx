@@ -79,7 +79,7 @@ export default function TarifsPage() {
       {/* NAV */}
       <nav className="bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <a href="/" className="text-blue-800 font-extrabold text-xl tracking-tight">BS Facile</a>
+          <a href="/" className="text-blue-800 font-extrabold text-xl tracking-tight">Bulletin Facile</a>
           <div className="flex items-center gap-6 text-sm">
             <a href="/generateur" className="text-gray-600 hover:text-blue-700">Bulletin de paie</a>
             <a href="/contrat" className="text-gray-600 hover:text-blue-700">Contrat de travail</a>

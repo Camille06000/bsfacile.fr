@@ -42,7 +42,8 @@
       "WebFetch(domain:openpaye.co)",
       "WebFetch(domain:www.quickpaie.com)",
       "WebFetch(domain:who.is)",
-      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"feat: landing page refaite avec pricing 4 tiers + noms domaine recherchés\")"
+      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"feat: landing page refaite avec pricing 4 tiers + noms domaine recherchés\")",
+      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"rebrand: BS Facile → Bulletin Facile + domaine bulletinfacile.fr partout\")"
     ]
   }
 }

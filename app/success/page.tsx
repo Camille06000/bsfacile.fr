@@ -9,7 +9,7 @@ export default function SuccessPage() {
           Paiement confirmé !
         </h1>
         <p className="text-gray-500 mb-8">
-          Votre accès à vie à BS Facile est activé. Vous pouvez maintenant générer
+          Votre accès à vie à Bulletin Facile est activé. Vous pouvez maintenant générer
           des bulletins de salaire illimités.
         </p>
         <Link href="/generateur"

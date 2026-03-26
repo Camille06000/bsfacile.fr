@@ -258,7 +258,7 @@ export default function BulletinForm() {
           <span className="font-bold text-blue-800 text-sm px-3 py-1 bg-blue-50 rounded-full border border-blue-200">Bulletin de paie</span>
           <a href="/contrat" className="text-sm text-gray-500 hover:text-blue-700 px-3 py-1 rounded-full hover:bg-gray-50 transition-colors">Contrat de travail →</a>
         </div>
-        <h1 className="text-4xl font-extrabold text-blue-800 mb-2">BS Facile</h1>
+        <h1 className="text-4xl font-extrabold text-blue-800 mb-2">Bulletin Facile</h1>
         <p className="text-gray-500 text-lg">Générateur de bulletin de salaire français — Droit social 2025 / 2026</p>
       </div>
 

@@ -43,7 +43,7 @@ export default function LandingPage() {
       {/* ── NAV ── */}
       <nav className="fixed top-0 w-full bg-white/95 backdrop-blur border-b border-gray-100 z-50" aria-label="Navigation principale">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <span className="text-blue-800 font-extrabold text-xl tracking-tight">BS Facile</span>
+          <span className="text-blue-800 font-extrabold text-xl tracking-tight">Bulletin Facile</span>
           <div className="flex items-center gap-4">
             <a href="/contrat" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Contrat de travail</a>
             <a href="/generateur" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Bulletin de paie</a>
@@ -116,7 +116,7 @@ export default function LandingPage() {
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-red-50 border border-red-100 rounded-2xl p-6">
-              <div className="font-bold text-red-700 mb-3">❌ Avant BS Facile</div>
+              <div className="font-bold text-red-700 mb-3">❌ Avant Bulletin Facile</div>
               <ul className="space-y-2 text-sm text-gray-600">
                 {['Formules Excel interminables', 'Taux URSSAF à chercher manuellement', 'Réduction Fillon complexe à calculer', 'Bulletin peu présentable', 'Risque d\'erreur sur les montants'].map(i => (
                   <li key={i} className="flex items-center gap-2"><span className="text-red-400">✗</span>{i}</li>
@@ -124,7 +124,7 @@ export default function LandingPage() {
               </ul>
             </div>
             <div className="bg-green-50 border border-green-100 rounded-2xl p-6">
-              <div className="font-bold text-green-700 mb-3">✅ Avec BS Facile</div>
+              <div className="font-bold text-green-700 mb-3">✅ Avec Bulletin Facile</div>
               <ul className="space-y-2 text-sm text-gray-600">
                 {['Saisir le brut — tout le reste est calculé', 'Tous les taux 2025/2026 intégrés', 'Fillon calculé automatiquement', 'Bulletin structuré prêt à imprimer', 'Conformité légale garantie'].map(i => (
                   <li key={i} className="flex items-center gap-2"><span className="text-green-500">✓</span>{i}</li>
@@ -200,7 +200,7 @@ export default function LandingPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { name: 'Marie L.', role: 'Responsable RH, PME 12 salariés', stars: 5, text: 'J\'utilisais Excel depuis 5 ans. BS Facile m\'a fait gagner 2h par mois dès la première fiche de paie. Les taux sont toujours à jour.' },
+              { name: 'Marie L.', role: 'Responsable RH, PME 12 salariés', stars: 5, text: 'J\'utilisais Excel depuis 5 ans. Bulletin Facile m\'a fait gagner 2h par mois dès la première fiche de paie. Les taux sont toujours à jour.' },
               { name: 'Thomas R.', role: 'Gérant, SARL BTP', stars: 5, text: 'Réduction Fillon calculée automatiquement, c\'est ce qui m\'a convaincu. Économie nette sur le coût employeur visible immédiatement.' },
               { name: 'Sandrine M.', role: 'Expert-comptable indépendante', stars: 5, text: 'Je l\'utilise pour mes petits clients qui n\'ont pas de logiciel de paie. Simple, rapide, bulletin présentable. Excellent rapport qualité/prix.' },
             ].map(t => (
@@ -371,23 +371,23 @@ export default function LandingPage() {
           <h2 id="faq-heading" className="text-3xl font-extrabold text-center text-gray-900 mb-4">
             Questions fréquentes sur la génération de bulletins de salaire
           </h2>
-          <p className="text-center text-gray-500 mb-10">Tout ce que vous devez savoir sur BS Facile et le calcul des cotisations sociales.</p>
+          <p className="text-center text-gray-500 mb-10">Tout ce que vous devez savoir sur Bulletin Facile et le calcul des cotisations sociales.</p>
           <div className="space-y-4">
             {[
               {
                 q: 'Comment calculer le salaire net à partir du brut en 2026 ?',
-                a: 'Avec BS Facile, saisissez simplement le salaire brut mensuel. Le net à payer est calculé automatiquement après déduction de toutes les cotisations salariales (vieillesse, AGIRC-ARRCO, CSG/CRDS…) et du prélèvement à la source (PAS). Pour 2026 : PMSS 4 005 €, SMIC 1 801,80 €.',
+                a: 'Avec Bulletin Facile, saisissez simplement le salaire brut mensuel. Le net à payer est calculé automatiquement après déduction de toutes les cotisations salariales (vieillesse, AGIRC-ARRCO, CSG/CRDS…) et du prélèvement à la source (PAS). Pour 2026 : PMSS 4 005 €, SMIC 1 801,80 €.',
               },
               {
                 q: 'Les taux URSSAF et AGIRC-ARRCO 2026 sont-ils intégrés ?',
                 a: 'Oui. Tous les taux officiels 2025 et 2026 sont intégrés : vieillesse plafonnée (6,90% / 8,55%), AGIRC-ARRCO T1 (3,15% / 4,72%), T2 (8,64% / 12,95%), CEG, CET (0,14% / 0,21%), CSG déductible (6,80%), CSG/CRDS non déductible (2,90%), allocations familiales, AT/MP, chômage, AGS.',
               },
               {
-                q: 'Comment fonctionne la réduction Fillon dans BS Facile ?',
+                q: 'Comment fonctionne la réduction Fillon dans Bulletin Facile ?',
                 a: 'La réduction Fillon (allègement général de cotisations patronales) est calculée automatiquement si le salaire brut est inférieur à 1,6 × SMIC annuel. Le coefficient et le montant apparaissent dans le tableau des cotisations patronales.',
               },
               {
-                q: 'BS Facile gère-t-il les heures supplémentaires et les absences ?',
+                q: 'Bulletin Facile gère-t-il les heures supplémentaires et les absences ?',
                 a: 'Oui. Les heures supplémentaires 25%/50% sont calculées avec exonération IR (Loi TEPA). Les absences (maladie, AT, CP, RTT, sans solde) sont déduites automatiquement avec calcul de l\'IJSS en cas de maintien de salaire.',
               },
               {
@@ -434,7 +434,7 @@ export default function LandingPage() {
       <footer className="bg-gray-900 text-gray-400 text-sm py-8 px-6">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
-            <span className="font-bold text-white">BS Facile</span>
+            <span className="font-bold text-white">Bulletin Facile</span>
             <span className="ml-2">· Générateur de bulletin de salaire français</span>
           </div>
           <div className="flex gap-6">
@@ -443,7 +443,7 @@ export default function LandingPage() {
             <a href="/tarifs" className="hover:text-white transition-colors">Tarifs</a>
             <a href="#faq-heading" className="hover:text-white transition-colors">FAQ</a>
           </div>
-          <p>© {new Date().getFullYear()} BS Facile · Conformité URSSAF 2025/2026</p>
+          <p>© {new Date().getFullYear()} Bulletin Facile · Conformité URSSAF 2025/2026</p>
         </div>
       </footer>
     </div>

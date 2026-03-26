@@ -1,24 +1,24 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
-const BASE = 'https://bsfacile.fr';
+const BASE = 'https://bulletinfacile.fr';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   title: {
-    default: 'BS Facile — Générateur de Bulletin de Salaire France 2025/2026',
-    template: '%s | BS Facile',
+    default: 'Bulletin Facile — Générateur de Bulletin de Salaire France 2025/2026',
+    template: '%s | Bulletin Facile',
   },
-  description: 'Générez vos bulletins de salaire français en 30 secondes. Cotisations URSSAF, AGIRC-ARRCO, CSG/CRDS calculées automatiquement. Conforme droit social 2025/2026. Accès à vie 49€.',
+  description: 'Générez vos bulletins de salaire français en 30 secondes. Cotisations URSSAF, AGIRC-ARRCO, CSG/CRDS calculées automatiquement. Conforme droit social 2025/2026. Dès 8,90€.',
   keywords: [
     'bulletin de salaire', 'fiche de paie', 'générateur bulletin de salaire',
     'cotisations sociales', 'URSSAF 2025', 'AGIRC-ARRCO', 'CSG CRDS',
     'réduction Fillon', 'salaire brut net', 'calcul cotisations patronales',
     'logiciel paie gratuit', 'bulletin de salaire en ligne',
   ],
-  authors: [{ name: 'BS Facile', url: BASE }],
-  creator: 'BS Facile',
-  publisher: 'BS Facile',
+  authors: [{ name: 'Bulletin Facile', url: BASE }],
+  creator: 'Bulletin Facile',
+  publisher: 'Bulletin Facile',
   robots: {
     index: true,
     follow: true,
@@ -28,14 +28,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'fr_FR',
     url: BASE,
-    siteName: 'BS Facile',
-    title: 'BS Facile — Générateur de Bulletin de Salaire France 2025/2026',
-    description: 'Générez vos bulletins de salaire français en 30 secondes. URSSAF, AGIRC-ARRCO, CSG/CRDS. Conforme 2025/2026. Accès à vie 49€.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'BS Facile — Générateur de bulletin de salaire' }],
+    siteName: 'Bulletin Facile',
+    title: 'Bulletin Facile — Générateur de Bulletin de Salaire France 2025/2026',
+    description: 'Générez vos bulletins de salaire français en 30 secondes. URSSAF, AGIRC-ARRCO, CSG/CRDS. Conforme 2025/2026. Dès 8,90€.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Bulletin Facile — Générateur de bulletin de salaire' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'BS Facile — Bulletin de Salaire France en 30 secondes',
+    title: 'Bulletin Facile — Bulletin de Salaire France en 30 secondes',
     description: 'Cotisations URSSAF, AGIRC-ARRCO, CSG/CRDS calculées automatiquement. Conforme 2025/2026.',
     images: ['/og-image.png'],
   },
@@ -55,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'SoftwareApplication',
-              name: 'BS Facile',
+              name: 'Bulletin Facile',
               url: BASE,
               description: 'Générateur de bulletin de salaire français conforme au droit social 2025/2026. Calcul automatique des cotisations URSSAF, AGIRC-ARRCO, CSG/CRDS et réduction Fillon.',
               applicationCategory: 'BusinessApplication',
@@ -104,7 +104,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 },
                 {
                   '@type': 'Question',
-                  name: 'BS Facile fonctionne-t-il pour les cadres et les non-cadres ?',
+                  name: 'Bulletin Facile fonctionne-t-il pour les cadres et les non-cadres ?',
                   acceptedAnswer: {
                     '@type': 'Answer',
                     text: 'Oui. Cadres : APEC, tranches AGIRC-ARRCO T2, CEG T2. Non-cadres : taux standards. Effectif < 50 ou ≥ 50 salariés également pris en compte.',
@@ -115,7 +115,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   name: 'Comment fonctionne le paiement à vie ?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Vous payez 49€ une seule fois et accédez à BS Facile sans limite de durée, y compris toutes les futures mises à jour légales.',
+                    text: 'Vous payez 49€ une seule fois et accédez à Bulletin Facile sans limite de durée, y compris toutes les futures mises à jour légales.',
                   },
                 },
               ],

@@ -332,7 +332,7 @@ export default function ContratDisplay({ data }: { data: ContratData }) {
 
       {/* ══ PIED DE PAGE ══ */}
       <div style={{ marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '8px', fontSize: '8px', color: '#aaa', textAlign: 'center' }}>
-        Document généré par BS Facile — À titre indicatif uniquement. Consultez un professionnel du droit pour validation.
+        Document généré par Bulletin Facile — À titre indicatif uniquement. Consultez un professionnel du droit pour validation.
       </div>
 
     </div>
