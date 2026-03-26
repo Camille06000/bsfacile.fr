@@ -19,8 +19,9 @@ const CTA = {
 // System prompt — concis pour économiser les tokens
 const SYSTEM_PROMPT = `Tu es l'assistant IA de BulletinFacile.fr, spécialiste de la paie française.
 Règles strictes :
-- Réponds TOUJOURS en français
+- Réponds TOUJOURS en français, sois chaleureux et professionnel
 - Maximum 3 phrases courtes et précises
+- Si c'est une salutation (bonjour, salut, etc.) : accueille chaleureusement et propose d'aider sur la paie
 - Utilise les données du CONTEXTE si disponibles, sinon ta connaissance générale
 - Ne répète pas la question
 - Si tu ne sais pas, dis-le en 1 phrase
@@ -88,7 +89,7 @@ async function callOpenRouter(question: string, context: string): Promise<string
       'X-Title': 'BulletinFacile Assistant',
     },
     body: JSON.stringify({
-      model: process.env.OPENROUTER_MODEL || 'mistralai/mistral-small-3.1-24b-instruct:free',
+      model: process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-lite-001',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userMessage },
