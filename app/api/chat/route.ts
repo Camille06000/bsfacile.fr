@@ -16,6 +16,16 @@ const CTA = {
   url: 'https://bulletinfacile.fr/generateur',
 };
 
+// System prompt — concis pour économiser les tokens
+const SYSTEM_PROMPT = `Tu es l'assistant IA de BulletinFacile.fr, spécialiste de la paie française.
+Règles strictes :
+- Réponds TOUJOURS en français
+- Maximum 3 phrases courtes et précises
+- Utilise les données du CONTEXTE si disponibles, sinon ta connaissance générale
+- Ne répète pas la question
+- Si tu ne sais pas, dis-le en 1 phrase
+- Termine TOUJOURS par : "👉 Créez votre bulletin sur BulletinFacile.fr"`;
+
 let kb: KnowledgeEntry[] | null = null;
 
 function loadKB(): KnowledgeEntry[] {
@@ -31,7 +41,7 @@ function loadKB(): KnowledgeEntry[] {
 
 function tokenize(text: string): string[] {
   return text.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove accents
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/)
     .filter(t => t.length > 2);
@@ -42,9 +52,59 @@ function scoreEntry(entry: KnowledgeEntry, tokens: string[]): number {
   let score = 0;
   for (const t of tokens) {
     if (haystack.some(h => h.includes(t) || t.includes(h))) score += 1;
-    if (tokenize(entry.topic).some(h => h.includes(t))) score += 2; // topic bonus
+    if (tokenize(entry.topic).some(h => h.includes(t))) score += 2;
   }
   return score;
+}
+
+function buildContext(entries: KnowledgeEntry[], tokens: string[]): string {
+  const scored = entries
+    .map(e => ({ entry: e, score: scoreEntry(e, tokens) }))
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+
+  if (scored.length === 0) return '';
+
+  return scored.map(({ entry }) =>
+    `[${entry.topic}] ${entry.q}\n${entry.a.slice(0, 300)}`
+  ).join('\n\n');
+}
+
+async function callOpenRouter(question: string, context: string): Promise<string> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error('OPENROUTER_API_KEY manquant');
+
+  const userMessage = context
+    ? `CONTEXTE:\n${context}\n\nQUESTION: ${question}`
+    : question;
+
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://bulletinfacile.fr',
+      'X-Title': 'BulletinFacile Assistant',
+    },
+    body: JSON.stringify({
+      model: process.env.OPENROUTER_MODEL || 'mistralai/mistral-small-3.1-24b-instruct:free',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userMessage },
+      ],
+      max_tokens: 200,
+      temperature: 0.3,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`OpenRouter error ${res.status}: ${err}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '';
 }
 
 export async function POST(req: NextRequest) {
@@ -56,35 +116,37 @@ export async function POST(req: NextRequest) {
 
     const entries = loadKB();
     const tokens = tokenize(question);
+    const context = buildContext(entries, tokens);
 
-    // Score all entries
+    // Top related topics for UI chips
     const scored = entries
       .map(e => ({ entry: e, score: scoreEntry(e, tokens) }))
       .filter(x => x.score > 0)
       .sort((a, b) => b.score - a.score);
 
-    if (scored.length === 0 || scored[0].score < 2) {
-      return NextResponse.json({
-        answer: "Je ne trouve pas de réponse précise à cette question dans ma base de connaissances. Vous pouvez consulter nos guides sur le site, ou utiliser notre générateur de bulletin de salaire.",
-        source: null,
-        confidence: 'low',
-        cta: CTA,
-      });
-    }
-
-    const best = scored[0].entry;
-
-    // Include top-3 related topics if multiple good matches
     const related = scored.slice(1, 4)
       .filter(x => x.score >= 2)
       .map(x => ({ topic: x.entry.topic, url: x.entry.url || null }));
 
+    const source = scored[0]?.entry?.url || null;
+
+    let answer: string;
+    try {
+      answer = await callOpenRouter(question, context);
+    } catch (err) {
+      console.error('[Chat] OpenRouter error:', err);
+      // Fallback FTS si OpenRouter est down
+      if (scored.length > 0 && scored[0].score >= 2) {
+        answer = scored[0].entry.a;
+      } else {
+        answer = "Je n'ai pas trouvé de réponse précise. 👉 Créez votre bulletin sur BulletinFacile.fr";
+      }
+    }
+
     return NextResponse.json({
-      answer: best.a,
-      source: best.url || null,
-      sourceTopic: best.topic,
+      answer,
+      source,
       related,
-      confidence: scored[0].score >= 4 ? 'high' : 'medium',
       cta: CTA,
     });
   } catch (err) {

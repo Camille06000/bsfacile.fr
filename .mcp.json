@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "bsfacile": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["C:/Users/nilov/Desktop/bsfacile.fr/scripts/mcp-bsfacile.mjs"],
+      "env": {
+        "BSFACILE_URL": "https://bulletinfacile.fr"
+      }
+    }
+  }
+}
