@@ -1,6 +1,13 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import ContratDisplay from './ContratDisplay';
+
+interface EntrepriseResult {
+  nom_complet: string;
+  siren: string;
+  siege?: { siret?: string; adresse?: string; activite_principale?: string; code_postal?: string; commune?: string };
+  activite_principale?: string;
+}
 
 const inp = 'border border-gray-300 rounded-md px-3 py-2 w-full text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none';
 const sel = inp;
@@ -115,6 +122,54 @@ export default function ContratForm() {
   const [generated, setGenerated] = useState(false);
   const displayRef = useRef<HTMLDivElement>(null);
 
+  // Autocomplete entreprise
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<EntrepriseResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const searchEntreprise = useCallback(async (q: string) => {
+    if (q.length < 2) { setSuggestions([]); return; }
+    setSearching(true);
+    try {
+      const res = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(q)}&page=1&per_page=8`);
+      const data = await res.json();
+      setSuggestions(data.results || []);
+      setShowSuggestions(true);
+    } catch { setSuggestions([]); }
+    finally { setSearching(false); }
+  }, []);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => searchEntreprise(val), 400);
+  };
+
+  const selectEntreprise = (e: EntrepriseResult) => {
+    const adresse = [e.siege?.adresse, e.siege?.code_postal, e.siege?.commune].filter(Boolean).join(', ') || '';
+    setForm(f => ({
+      ...f,
+      employeurNom: e.nom_complet || '',
+      employeurSiret: e.siege?.siret || '',
+      employeurAdresse: adresse,
+      employeurNaf: e.siege?.activite_principale || e.activite_principale || '',
+    }));
+    setSearchQuery(''); setSuggestions([]); setShowSuggestions(false);
+  };
+
+  useEffect(() => {
+    const handler = (ev: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(ev.target as Node))
+        setShowSuggestions(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const set = (k: keyof ContratData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
 
@@ -205,6 +260,49 @@ export default function ContratForm() {
 
           {/* ── EMPLOYEUR ── */}
           {tab === 'employeur' && (
+            <div className="space-y-4">
+
+              {/* Recherche autocomplete */}
+              <div ref={searchRef} className="relative">
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Rechercher une entreprise (nom ou SIRET)
+                </label>
+                <div className="relative">
+                  <input type="text" value={searchQuery} onChange={handleSearchChange}
+                    onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                    className={`${inp} pr-10`} placeholder="Tapez le nom ou le SIRET de l'employeur…" autoComplete="off" />
+                  {searching && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <svg className="animate-spin h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute z-50 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-72 overflow-y-auto">
+                    {suggestions.map((e, i) => (
+                      <button key={e.siren + i} type="button" onMouseDown={() => selectEntreprise(e)}
+                        className="w-full text-left px-4 py-2.5 hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors">
+                        <div className="font-semibold text-sm text-gray-900">{e.nom_complet}</div>
+                        <div className="text-xs text-gray-500 mt-0.5 flex gap-3 flex-wrap">
+                          {e.siege?.siret && <span>SIRET : {e.siege.siret}</span>}
+                          {(e.siege?.activite_principale || e.activite_principale) && <span>NAF : {e.siege?.activite_principale || e.activite_principale}</span>}
+                          {e.siege?.adresse && <span className="truncate">{e.siege.adresse}</span>}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 text-xs text-gray-400">
+                <div className="flex-1 border-t border-gray-200" />
+                <span>ou remplissez manuellement</span>
+                <div className="flex-1 border-t border-gray-200" />
+              </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Field label="Raison sociale *">
                 <input required value={form.employeurNom} onChange={set('employeurNom')} className={inp} />
@@ -234,6 +332,20 @@ export default function ContratForm() {
                   <option>Responsable RH</option>
                 </select>
               </Field>
+            </div>
+
+            {/* Preview si rempli */}
+            {form.employeurNom && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md px-4 py-3 text-sm">
+                <div className="font-semibold text-blue-800">{form.employeurNom}</div>
+                {form.employeurAdresse && <div className="text-gray-600 text-xs mt-0.5">{form.employeurAdresse}</div>}
+                <div className="flex gap-4 text-xs text-gray-500 mt-1 flex-wrap">
+                  {form.employeurSiret && <span>SIRET : {form.employeurSiret}</span>}
+                  {form.employeurNaf && <span>NAF : {form.employeurNaf}</span>}
+                  {form.employeurRepresentant && <span>Représentant : {form.employeurRepresentant}</span>}
+                </div>
+              </div>
+            )}
             </div>
           )}
 
