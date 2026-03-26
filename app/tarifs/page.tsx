@@ -60,7 +60,7 @@ export default function TarifsPage() {
           Tarifs de Bulletin Facile
         </h1>
         <p style={{ color: '#6b7280', fontSize: 17, maxWidth: 520, margin: '0 auto' }}>
-          Sans engagement ou avec abonnement — aperçu gratuit avant tout paiement.
+          Sans engagement ou avec abonnement — accès immédiat après paiement.
         </p>
       </div>
 
@@ -191,19 +191,12 @@ export default function TarifsPage() {
         <div style={{ marginTop: 32, background: 'white', border: '1px solid #e5e7eb', borderRadius: 16, padding: '24px 32px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 32, fontSize: 14, color: '#374151' }}>
             <span>🛡️ <strong>Satisfait ou remboursé</strong> 30 jours</span>
-            <span>👁️ <strong>Aperçu gratuit</strong> avant tout paiement</span>
+            <span>⚡ <strong>Accès immédiat</strong> après paiement</span>
             <span>🔒 <strong>Paiement sécurisé</strong> SumUp</span>
             <span>✓ <strong>Taux légaux</strong> URSSAF 2025/2026</span>
           </div>
         </div>
 
-        {/* ESSAI GRATUIT */}
-        <div style={{ marginTop: 24, textAlign: 'center' }}>
-          <p style={{ color: '#9ca3af', marginBottom: 12, fontSize: 14 }}>Pas encore décidé ?</p>
-          <a href="/generateur" style={{ display: 'inline-block', border: '2px solid #2563eb', color: '#2563eb', fontWeight: 700, padding: '12px 32px', borderRadius: 12, textDecoration: 'none', fontSize: 15 }}>
-            Essayer gratuitement →
-          </a>
-        </div>
       </div>
 
       <Footer />

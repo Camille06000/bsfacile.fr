@@ -135,14 +135,14 @@ export default function LandingPage() {
             Pour les RH, TPE/PME et cabinets comptables.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginBottom: 24 }}>
-            <a href="#pricing" style={{ background: '#fbbf24', color: '#0f172a', fontWeight: 800, fontSize: 16, padding: '14px 36px', borderRadius: 10, textDecoration: 'none' }}>
-              Voir les tarifs — dès 8,90 €
+            <a href="/tarifs" style={{ background: '#fbbf24', color: '#0f172a', fontWeight: 800, fontSize: 16, padding: '14px 36px', borderRadius: 10, textDecoration: 'none' }}>
+              Créer mon bulletin — dès 8,90 €
             </a>
-            <a href="/generateur" style={{ border: '1px solid rgba(255,255,255,0.3)', color: 'white', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 10, textDecoration: 'none' }}>
-              Tester gratuitement
+            <a href="/dashboard" style={{ border: '1px solid rgba(255,255,255,0.3)', color: 'white', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 10, textDecoration: 'none' }}>
+              Mon espace →
             </a>
           </div>
-          <p style={{ fontSize: 12, color: '#475569' }}>Aperçu gratuit sans inscription · Paiement sécurisé · Satisfait ou remboursé 30 jours</p>
+          <p style={{ fontSize: 12, color: '#475569' }}>Paiement sécurisé · Accès immédiat · Satisfait ou remboursé 30 jours</p>
         </div>
       </section>
 
@@ -237,8 +237,8 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-          <a href="/generateur" style={{ display: 'inline-block', marginTop: 48, background: '#f1f5f9', color: '#1e40af', fontWeight: 700, fontSize: 15, padding: '12px 28px', borderRadius: 10, textDecoration: 'none', border: '1px solid #e2e8f0' }}>
-            Essayer le générateur gratuitement →
+          <a href="/tarifs" style={{ display: 'inline-block', marginTop: 48, background: '#2563eb', color: 'white', fontWeight: 700, fontSize: 15, padding: '14px 32px', borderRadius: 10, textDecoration: 'none' }}>
+            Choisir mon offre →
           </a>
         </div>
       </section>
@@ -287,7 +287,7 @@ export default function LandingPage() {
             Toujours <strong style={{ color: '#1e40af' }}>1 € moins cher</strong> que la concurrence.
           </p>
           <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 13, marginBottom: 52 }}>
-            Aperçu gratuit illimité · Paiement sécurisé · Satisfait ou remboursé 30 jours
+            Accès immédiat après paiement · Paiement sécurisé · Satisfait ou remboursé 30 jours
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
             {/* SANS ENGAGEMENT */}
@@ -390,7 +390,7 @@ export default function LandingPage() {
           <div style={{ marginTop: 24, background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '18px 32px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 28 }}>
             {[
               { t: 'Satisfait ou remboursé', s: '30 jours sans conditions' },
-              { t: 'Aperçu gratuit', s: 'Avant tout paiement' },
+              { t: 'Accès immédiat', s: 'Dès le paiement validé' },
               { t: 'Paiement sécurisé', s: 'Via SumUp' },
               { t: 'Taux légaux 2026', s: 'URSSAF officiels' },
             ].map(g => (
@@ -437,14 +437,14 @@ export default function LandingPage() {
             Rejoignez les RH, gérants de TPE/PME et comptables qui gagnent du temps chaque mois.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
-            <a href="/generateur" style={{ background: '#fbbf24', color: '#0f172a', fontWeight: 800, fontSize: 17, padding: '15px 40px', borderRadius: 12, textDecoration: 'none' }}>
-              Essayer gratuitement
+            <a href="/tarifs" style={{ background: '#fbbf24', color: '#0f172a', fontWeight: 800, fontSize: 17, padding: '15px 40px', borderRadius: 12, textDecoration: 'none' }}>
+              Créer mon premier bulletin →
             </a>
-            <a href="/tarifs" style={{ border: '1px solid rgba(255,255,255,0.25)', color: 'white', fontWeight: 600, fontSize: 17, padding: '15px 32px', borderRadius: 12, textDecoration: 'none' }}>
-              Voir les tarifs
+            <a href="/dashboard" style={{ border: '1px solid rgba(255,255,255,0.25)', color: 'white', fontWeight: 600, fontSize: 17, padding: '15px 32px', borderRadius: 12, textDecoration: 'none' }}>
+              Déjà client ? Se connecter
             </a>
           </div>
-          <p style={{ color: '#475569', fontSize: 12, marginTop: 20 }}>Aperçu gratuit · Dès 8,90 € · Conforme droit social 2026</p>
+          <p style={{ color: '#475569', fontSize: 12, marginTop: 20 }}>Dès 8,90 € · Accès immédiat · Conforme droit social 2026</p>
         </div>
       </section>
 
