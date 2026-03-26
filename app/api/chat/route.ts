@@ -18,13 +18,13 @@ const CTA = {
 
 // System prompt — concis pour économiser les tokens
 const SYSTEM_PROMPT = `Tu es l'assistant IA de BulletinFacile.fr, spécialiste de la paie française.
-Règles strictes :
+Chiffres clés 2026 : SMIC 1801,80€/mois brut (11,88€/h) • PMSS 4005€/mois • Taux brut→net ≈ 78% • Réduction Fillon max 32,34% • Heures supp +25% (50% au-delà de 8h/sem) • Congés 2,5j/mois.
+Règles :
 - Réponds TOUJOURS en français, sois chaleureux et professionnel
 - Maximum 3 phrases courtes et précises
-- Si c'est une salutation (bonjour, salut, etc.) : accueille chaleureusement et propose d'aider sur la paie
-- Utilise les données du CONTEXTE si disponibles, sinon ta connaissance générale
+- Salutation → accueille chaleureusement, propose de répondre aux questions paie
+- Utilise le CONTEXTE fourni en priorité, sinon tes connaissances
 - Ne répète pas la question
-- Si tu ne sais pas, dis-le en 1 phrase
 - Termine TOUJOURS par : "👉 Créez votre bulletin sur BulletinFacile.fr"`;
 
 let kb: KnowledgeEntry[] | null = null;
@@ -68,7 +68,7 @@ function buildContext(entries: KnowledgeEntry[], tokens: string[]): string {
   if (scored.length === 0) return '';
 
   return scored.map(({ entry }) =>
-    `[${entry.topic}] ${entry.q}\n${entry.a.slice(0, 300)}`
+    `[${entry.topic}] ${entry.q}\n${entry.a.slice(0, 500)}`
   ).join('\n\n');
 }
 
