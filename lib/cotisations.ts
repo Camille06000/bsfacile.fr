@@ -44,9 +44,22 @@ export interface InputBS {
   heuresCompl?: number;    // heures complémentaires (temps partiel, 10%)
   heuresMajorees?: Array<{ intitule: string; heures: number; majoration: number }>; // nuit, dimanche, férié...
   // Éléments variables
-  prime?: number;          // prime mensuelle
-  avantageNature?: number; // avantage en nature
-  acompte?: number;        // acompte déjà versé
+  prime?: number;
+  avantageNature?: number;
+  acompte?: number;
+  // Absences
+  absences?: Absence[];
+}
+
+export interface Absence {
+  motif: string;           // 'Maladie', 'AT', 'Maternité/Paternité', 'Sans solde', 'Injustifiée', 'CP pris', 'RTT', 'Autre'
+  jours?: number;          // nb jours (méthode 30e ou ouvrés)
+  heures?: number;         // OU nb heures
+  methode: '30e' | 'ouvres' | 'heures';
+  joursOuvresMois?: number;// nb jours ouvrés du mois (méthode ouvrés, défaut 22)
+  carence: number;         // jours de carence non indemnisés (3 maladie, 0 AT/maternité)
+  maintienSalaire: boolean;// subrogation : employeur maintient et récupère IJSS
+  tauxIJSS: number;        // taux IJSS en % (50 maladie, 66.67 AT/maternité)
 }
 
 export interface LigneBS {
@@ -59,18 +72,31 @@ export interface LigneBS {
   section?: 'retraite' | 'chomage' | 'sante' | 'famille' | 'csg' | 'autre';
 }
 
+export interface LigneAbsence {
+  motif: string;
+  jours: number;
+  heures: number;
+  deduction: number;       // montant déduit du brut
+  ijss: number;            // IJSS estimée (si maintien)
+  maintienSalaire: boolean;
+}
+
 export interface ResultBS {
   lignes: LigneBS[];
-  elementsSalaire: ElementVariable[];  // lignes salaire (base + HS + prime...)
+  elementsSalaire: ElementVariable[];
+  lignesAbsences: LigneAbsence[];
   totaux: {
-    brutMensuel: number;
+    brutMensuel: number;           // brut avant absences
+    brutApresAbsences: number;     // brut net d'absences
+    totalDeductionsAbsences: number;
+    totalIJSS: number;
     totalCotisationsSalariales: number;
     totalCotisationsPatronales: number;
     reductionFillon: number;
     netAvantPAS: number;
     tauxPAS: number;
     montantPAS: number;
-    montantExonereeIR: number; // HS exonérées IR
+    montantExonereeIR: number;
     netAPayer: number;
     coutEmployeur: number;
     acompte: number;
@@ -204,18 +230,67 @@ export function calculerBS(input: InputBS): ResultBS {
   // Montant exonéré IR (HS)
   const montantExonereeIR = r(montantHS25 + montantHS50);
 
-  const T1 = Math.min(brutMensuel, pmss);
-  const T2 = Math.max(0, Math.min(brutMensuel, 8 * pmss) - pmss);
-  const T2chom = Math.max(0, Math.min(brutMensuel, 4 * pmss) - pmss);
-  const assietteCsg = r(brutMensuel * 0.9825);
+  // ── Absences ──
+  const lignesAbsences: LigneAbsence[] = [];
+  let totalDeductionsAbsences = 0;
+  let totalIJSS = 0;
+
+  if (input.absences && input.absences.length > 0) {
+    for (const abs of input.absences) {
+      const joursAbs = abs.jours ?? 0;
+      const heuresAbs = abs.heures ?? 0;
+      const joursOuvres = abs.joursOuvresMois ?? 22;
+
+      // Calcul de la déduction
+      let deduction = 0;
+      let heuresEquiv = heuresAbs;
+      let joursEquiv = joursAbs;
+
+      if (abs.methode === '30e' && joursAbs > 0) {
+        deduction = r(brutMensuel / 30 * joursAbs);
+        heuresEquiv = r(joursAbs * heures / 30);
+      } else if (abs.methode === 'ouvres' && joursAbs > 0) {
+        deduction = r(brutMensuel / joursOuvres * joursAbs);
+        heuresEquiv = r(joursAbs * heures / joursOuvres);
+      } else if (abs.methode === 'heures' && heuresAbs > 0) {
+        const tauxCalc = tauxH > 0 ? tauxH : brutMensuel / heures;
+        deduction = r(tauxCalc * heuresAbs);
+        joursEquiv = r(heuresAbs / (heures / joursOuvres));
+      }
+
+      // IJSS estimée (jours indemnisables = max(0, jours - carence))
+      let ijss = 0;
+      if (abs.maintienSalaire && deduction > 0) {
+        const joursIndemnisables = Math.max(0, joursEquiv - abs.carence);
+        const salJournalier = brutMensuel * 12 / 365;
+        ijss = r(salJournalier * (abs.tauxIJSS / 100) * joursIndemnisables);
+        // Plafond IJSS (1.8× PMSS / 30.42)
+        const plafondIJSSJour = r(pmss * 1.8 / 30.42);
+        ijss = Math.min(ijss, r(plafondIJSSJour * joursIndemnisables));
+      }
+
+      totalDeductionsAbsences = r(totalDeductionsAbsences + deduction);
+      totalIJSS = r(totalIJSS + ijss);
+      lignesAbsences.push({ motif: abs.motif, jours: joursEquiv, heures: heuresEquiv, deduction, ijss, maintienSalaire: abs.maintienSalaire });
+    }
+  }
+
+  // Brut soumis aux cotisations = brut - déductions absences + IJSS (subrogation)
+  const brutApresAbsences = r(Math.max(0, brutMensuel - totalDeductionsAbsences + totalIJSS));
+  const brutCotisations = brutApresAbsences;
+
+  const T1 = Math.min(brutCotisations, pmss);
+  const T2 = Math.max(0, Math.min(brutCotisations, 8 * pmss) - pmss);
+  const T2chom = Math.max(0, Math.min(brutCotisations, 4 * pmss) - pmss);
+  const assietteCsg = r(brutCotisations * 0.9825);
 
   const lignes: LigneBS[] = [];
 
   // ── Maladie / SS
   lignes.push({
     intitule: 'Maladie – maternité – invalidité – décès',
-    base: brutMensuel, tauxSalarial: null, montantSalarial: 0,
-    tauxPatronal: 7, montantPatronal: r(brutMensuel * 0.07),
+    base: brutCotisations, tauxSalarial: null, montantSalarial: 0,
+    tauxPatronal: 7, montantPatronal: r(brutCotisations * 0.07),
     section: 'sante',
   });
 
@@ -230,25 +305,25 @@ export function calculerBS(input: InputBS): ResultBS {
   // ── Vieillesse déplafonnée
   lignes.push({
     intitule: 'Assurance vieillesse déplafonnée',
-    base: brutMensuel, tauxSalarial: 0.40, montantSalarial: r(brutMensuel * 0.004),
-    tauxPatronal: 2.02, montantPatronal: r(brutMensuel * 0.0202),
+    base: brutCotisations, tauxSalarial: 0.40, montantSalarial: r(brutCotisations * 0.004),
+    tauxPatronal: 2.02, montantPatronal: r(brutCotisations * 0.0202),
     section: 'retraite',
   });
 
   // ── Allocations familiales
-  const tauxAF = brutMensuel <= 3.5 * smicMensuel ? 3.45 : 5.25;
+  const tauxAF = brutCotisations <= 3.5 * smicMensuel ? 3.45 : 5.25;
   lignes.push({
     intitule: 'Allocations familiales',
-    base: brutMensuel, tauxSalarial: null, montantSalarial: 0,
-    tauxPatronal: tauxAF, montantPatronal: r(brutMensuel * tauxAF / 100),
+    base: brutCotisations, tauxSalarial: null, montantSalarial: 0,
+    tauxPatronal: tauxAF, montantPatronal: r(brutCotisations * tauxAF / 100),
     section: 'famille',
   });
 
   // ── Accidents du travail
   lignes.push({
     intitule: 'Accidents du travail – maladies professionnelles',
-    base: brutMensuel, tauxSalarial: null, montantSalarial: 0,
-    tauxPatronal: 2.22, montantPatronal: r(brutMensuel * 0.0222),
+    base: brutCotisations, tauxSalarial: null, montantSalarial: 0,
+    tauxPatronal: 2.22, montantPatronal: r(brutCotisations * 0.0222),
     section: 'sante',
   });
 
@@ -289,8 +364,8 @@ export function calculerBS(input: InputBS): ResultBS {
   // ── CET
   lignes.push({
     intitule: 'CET',
-    base: brutMensuel, tauxSalarial: 0.14, montantSalarial: r(brutMensuel * 0.0014),
-    tauxPatronal: 0.21, montantPatronal: r(brutMensuel * 0.0021),
+    base: brutCotisations, tauxSalarial: 0.14, montantSalarial: r(brutCotisations * 0.0014),
+    tauxPatronal: 0.21, montantPatronal: r(brutCotisations * 0.0021),
     section: 'retraite',
   });
 
@@ -312,7 +387,7 @@ export function calculerBS(input: InputBS): ResultBS {
   }
 
   // ── AGS / FNGS
-  const assietteAGS = Math.min(brutMensuel, 4 * pmss);
+  const assietteAGS = Math.min(brutCotisations, 4 * pmss);
   lignes.push({
     intitule: 'AGS – Garantie des salaires (FNGS)',
     base: assietteAGS, tauxSalarial: null, montantSalarial: 0,
@@ -322,7 +397,7 @@ export function calculerBS(input: InputBS): ResultBS {
 
   // ── FNAL
   const tauxFNAL = effectif === '>=50' ? 0.50 : 0.10;
-  const baseFNAL = effectif === '>=50' ? brutMensuel : T1;
+  const baseFNAL = effectif === '>=50' ? brutCotisations : T1;
   lignes.push({
     intitule: 'FNAL (Fonds National Aide au Logement)',
     base: baseFNAL, tauxSalarial: null, montantSalarial: 0,
@@ -333,22 +408,22 @@ export function calculerBS(input: InputBS): ResultBS {
   // ── Taxe apprentissage
   lignes.push({
     intitule: 'Taxe d\'apprentissage',
-    base: brutMensuel, tauxSalarial: null, montantSalarial: 0,
-    tauxPatronal: 0.68, montantPatronal: r(brutMensuel * 0.0068),
+    base: brutCotisations, tauxSalarial: null, montantSalarial: 0,
+    tauxPatronal: 0.68, montantPatronal: r(brutCotisations * 0.0068),
     section: 'autre',
   });
 
   // ── Formation professionnelle
   lignes.push({
     intitule: 'Contribution formation professionnelle',
-    base: brutMensuel, tauxSalarial: null, montantSalarial: 0,
-    tauxPatronal: 1.00, montantPatronal: r(brutMensuel * 0.01),
+    base: brutCotisations, tauxSalarial: null, montantSalarial: 0,
+    tauxPatronal: 1.00, montantPatronal: r(brutCotisations * 0.01),
     section: 'autre',
   });
 
   // ── APEC (cadres)
   if (statut === 'cadre') {
-    const assietteAPEC = Math.min(brutMensuel, 4 * pmss);
+    const assietteAPEC = Math.min(brutCotisations, 4 * pmss);
     lignes.push({
       intitule: 'APEC',
       base: assietteAPEC, tauxSalarial: 0.024, montantSalarial: r(assietteAPEC * 0.00024),
@@ -373,8 +448,8 @@ export function calculerBS(input: InputBS): ResultBS {
     section: 'csg',
   });
 
-  // ── Réduction Fillon
-  const brutAnnuel = brutMensuel * 12;
+  // ── Réduction Fillon (basée sur brut avant absences pour le coefficient)
+  const brutAnnuel = brutCotisations * 12;
   const T_fillon = effectif === '>=50' ? 0.3233 : 0.3193;
   const limiteHaute = 1.6 * smicAnnuel;
   let coeffFillon = 0;
@@ -382,27 +457,30 @@ export function calculerBS(input: InputBS): ResultBS {
     coeffFillon = (T_fillon / 0.6) * ((1.6 * smicAnnuel / brutAnnuel) - 1);
     coeffFillon = Math.max(0, Math.min(coeffFillon, T_fillon));
   }
-  const reductionFillon = r(coeffFillon * brutMensuel);
+  const reductionFillon = r(coeffFillon * brutCotisations);
 
   // ── Totaux
   const totalSalarial = r(lignes.reduce((s, l) => s + l.montantSalarial, 0));
   const totalPatronalBrut = r(lignes.reduce((s, l) => s + l.montantPatronal, 0));
   const totalPatronal = r(totalPatronalBrut - reductionFillon);
 
-  const netAvantPAS = r(brutMensuel - totalSalarial);
-  // Assiette PAS = net - montant exonéré HS
+  const netAvantPAS = r(brutCotisations - totalSalarial);
   const assiettePAS = r(netAvantPAS - montantExonereeIR);
   const montantPAS = r(assiettePAS * tauxPAS / 100);
   const acompte = r(input.acompte ?? 0);
   const netAPayer = r(netAvantPAS - montantPAS);
   const netAPayerApresAcompte = r(netAPayer - acompte);
-  const coutEmployeur = r(brutMensuel + totalPatronal);
+  const coutEmployeur = r(brutCotisations + totalPatronal);
 
   return {
     lignes,
     elementsSalaire,
+    lignesAbsences,
     totaux: {
       brutMensuel,
+      brutApresAbsences,
+      totalDeductionsAbsences,
+      totalIJSS,
       totalCotisationsSalariales: totalSalarial,
       totalCotisationsPatronales: totalPatronal,
       reductionFillon,

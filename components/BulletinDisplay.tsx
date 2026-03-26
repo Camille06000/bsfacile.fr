@@ -183,8 +183,9 @@ const fmt2 = (n: number) => String(n).padStart(2, '0');
 
 export default function BulletinDisplay({ data }: { data: ResultBS }) {
   const [showDSN, setShowDSN] = useState(false);
-  const { lignes, elementsSalaire, totaux, params, input } = data;
+  const { lignes, elementsSalaire, lignesAbsences, totaux, params, input } = data;
   const { mois, annee, pmss } = params;
+  const hasAbsences = lignesAbsences && lignesAbsences.length > 0;
   const last = lastDay(mois, annee);
   const periodeDebut = `01/${fmt2(mois)}/${annee}`;
   const periodeFin   = `${last}/${fmt2(mois)}/${annee}`;
@@ -323,6 +324,43 @@ export default function BulletinDisplay({ data }: { data: ResultBS }) {
               <tr style={{ backgroundColor: '#d8ecf9', fontWeight: 'bold', borderBottom: '1px solid #bbd4e8' }}>
                 <td style={{ padding: '4px 8px' }}>SALAIRE BRUT</td>
                 <td style={{ padding: '4px 8px', textAlign: 'right' }}>{euro(totaux.brutMensuel)}</td>
+                <td></td><td></td><td></td><td></td>
+              </tr>
+            </>
+          )}
+
+          {/* ── Absences ── */}
+          {hasAbsences && (
+            <>
+              <tr style={{ backgroundColor: '#fef2f2', borderTop: '1px solid #fca5a5' }}>
+                <td colSpan={6} style={{ padding: '3px 8px', fontWeight: 'bold', fontSize: '10px', color: '#991b1b' }}>
+                  ABSENCES
+                </td>
+              </tr>
+              {lignesAbsences.map((ab, i) => (
+                <tr key={'abs' + i} style={{ backgroundColor: i % 2 === 0 ? '#fff5f5' : '#fef9f9' }}>
+                  <td style={{ padding: '3px 8px 3px 16px', color: '#7f1d1d' }}>
+                    Absence — {ab.motif}
+                    <span style={{ marginLeft: '6px', fontSize: '9px', color: '#999' }}>
+                      {ab.jours > 0 ? `${ab.jours} j` : ''}{ab.heures > 0 ? ` / ${ab.heures} h` : ''}
+                    </span>
+                  </td>
+                  <td style={{ padding: '3px 8px', textAlign: 'right', color: '#991b1b' }}>− {euro(ab.deduction)}</td>
+                  <td></td><td></td><td></td><td></td>
+                </tr>
+              ))}
+              {totaux.totalIJSS > 0 && lignesAbsences.filter(ab => ab.maintienSalaire && ab.ijss > 0).map((ab, i) => (
+                <tr key={'ijss' + i} style={{ backgroundColor: '#f0fdf4' }}>
+                  <td style={{ padding: '3px 8px 3px 16px', color: '#166534', fontStyle: 'italic' }}>
+                    IJSS estimée — {ab.motif} (subrogation)
+                  </td>
+                  <td style={{ padding: '3px 8px', textAlign: 'right', color: '#166534' }}>+ {euro(ab.ijss)}</td>
+                  <td></td><td></td><td></td><td></td>
+                </tr>
+              ))}
+              <tr style={{ backgroundColor: '#fce7e7', fontWeight: 'bold', borderBottom: '1px solid #fca5a5' }}>
+                <td style={{ padding: '4px 8px', color: '#991b1b' }}>BRUT SOUMIS AUX COTISATIONS</td>
+                <td style={{ padding: '4px 8px', textAlign: 'right', color: '#991b1b' }}>{euro(totaux.brutApresAbsences)}</td>
                 <td></td><td></td><td></td><td></td>
               </tr>
             </>

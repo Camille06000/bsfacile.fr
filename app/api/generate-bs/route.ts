@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
     heuresMensuelles, tauxHoraire,
     heuresSupp25, heuresSupp50, heuresCompl, heuresMajorees,
     prime, avantageNature, acompte,
+    absences,
   } = body;
 
   const brut = parseFloat(brutMensuel);
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
     prime: prime ? parseFloat(prime) : undefined,
     avantageNature: avantageNature ? parseFloat(avantageNature) : undefined,
     acompte: acompte ? parseFloat(acompte) : undefined,
+    absences: Array.isArray(absences) ? absences : undefined,
   });
 
   return NextResponse.json(result);

@@ -31,7 +31,33 @@ interface EntrepriseResult {
 
 interface HeureMajoree { intitule: string; heures: string; majoration: string }
 
-type TabType = 'principal' | 'entreprise' | 'salarie' | 'elements';
+interface AbsenceForm {
+  motif: string;
+  jours: string;
+  heures: string;
+  methode: '30e' | 'ouvres' | 'heures';
+  joursOuvresMois: string;
+  carence: string;
+  maintienSalaire: boolean;
+  tauxIJSS: string;
+}
+
+const ABSENCE_DEFAULTS: Record<string, { carence: number; tauxIJSS: number; maintienSalaire: boolean }> = {
+  'Maladie':             { carence: 3,  tauxIJSS: 50,    maintienSalaire: true },
+  'Accident du travail': { carence: 0,  tauxIJSS: 66.67, maintienSalaire: true },
+  'Maternité/Paternité': { carence: 0,  tauxIJSS: 66.67, maintienSalaire: true },
+  'CP pris':             { carence: 0,  tauxIJSS: 0,     maintienSalaire: false },
+  'RTT':                 { carence: 0,  tauxIJSS: 0,     maintienSalaire: false },
+  'Sans solde':          { carence: 0,  tauxIJSS: 0,     maintienSalaire: false },
+  'Injustifiée':         { carence: 0,  tauxIJSS: 0,     maintienSalaire: false },
+};
+
+const newAbsence = (motif = 'Maladie'): AbsenceForm => {
+  const d = ABSENCE_DEFAULTS[motif] || ABSENCE_DEFAULTS['Maladie'];
+  return { motif, jours: '', heures: '', methode: '30e', joursOuvresMois: '22', carence: String(d.carence), maintienSalaire: d.maintienSalaire, tauxIJSS: String(d.tauxIJSS) };
+};
+
+type TabType = 'principal' | 'entreprise' | 'salarie' | 'elements' | 'absences';
 
 export default function BulletinForm() {
   const [form, setForm] = useState({
@@ -65,6 +91,7 @@ export default function BulletinForm() {
   });
 
   const [heureMajorees, setHeureMajorees] = useState<HeureMajoree[]>([]);
+  const [absences, setAbsences] = useState<AbsenceForm[]>([]);
   const [result, setResult] = useState<ResultBS | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -158,6 +185,19 @@ export default function BulletinForm() {
   const updateHeureMajoree = (i: number, k: keyof HeureMajoree, v: string) =>
     setHeureMajorees(h => h.map((hm, j) => j === i ? { ...hm, [k]: v } : hm));
 
+  // Absences
+  const addAbsence = () => setAbsences(a => [...a, newAbsence()]);
+  const removeAbsence = (i: number) => setAbsences(a => a.filter((_, j) => j !== i));
+  const updateAbsence = (i: number, k: keyof AbsenceForm, v: string | boolean) =>
+    setAbsences(a => a.map((ab, j) => {
+      if (j !== i) return ab;
+      if (k === 'motif' && typeof v === 'string') {
+        const d = ABSENCE_DEFAULTS[v] || ABSENCE_DEFAULTS['Maladie'];
+        return { ...ab, motif: v, carence: String(d.carence), maintienSalaire: d.maintienSalaire, tauxIJSS: String(d.tauxIJSS) };
+      }
+      return { ...ab, [k]: v };
+    }));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true); setError('');
@@ -167,6 +207,18 @@ export default function BulletinForm() {
         heuresMajorees: heureMajorees
           .filter(hm => parseFloat(hm.heures) > 0)
           .map(hm => ({ intitule: hm.intitule, heures: parseFloat(hm.heures), majoration: parseFloat(hm.majoration) || 100 })),
+        absences: absences
+          .filter(ab => (ab.methode !== 'heures' ? parseFloat(ab.jours) > 0 : parseFloat(ab.heures) > 0))
+          .map(ab => ({
+            motif: ab.motif,
+            jours: ab.methode !== 'heures' ? parseFloat(ab.jours) || 0 : undefined,
+            heures: ab.methode === 'heures' ? parseFloat(ab.heures) || 0 : undefined,
+            methode: ab.methode,
+            joursOuvresMois: ab.methode === 'ouvres' ? parseInt(ab.joursOuvresMois) || 22 : undefined,
+            carence: parseInt(ab.carence) || 0,
+            maintienSalaire: ab.maintienSalaire,
+            tauxIJSS: parseFloat(ab.tauxIJSS) || 0,
+          })),
       };
       const res = await fetch('/api/generate-bs', {
         method: 'POST',
@@ -197,6 +249,7 @@ export default function BulletinForm() {
   // Indicateur de champs remplis dans "Éléments variables"
   const elementsCount = [form.heuresSupp25, form.heuresSupp50, form.heuresCompl, form.prime, form.avantageNature, form.acompte]
     .filter(v => v && parseFloat(v) > 0).length + heureMajorees.filter(hm => parseFloat(hm.heures) > 0).length;
+  const absencesCount = absences.filter(ab => ab.methode !== 'heures' ? parseFloat(ab.jours) > 0 : parseFloat(ab.heures) > 0).length;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -215,6 +268,7 @@ export default function BulletinForm() {
           <TabBtn t="entreprise" label="Entreprise" />
           <TabBtn t="salarie" label="Salarié" />
           <TabBtn t="elements" label="Éléments variables" badge={elementsCount > 0 ? String(elementsCount) : undefined} />
+          <TabBtn t="absences" label="Absences" badge={absencesCount > 0 ? String(absencesCount) : undefined} />
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
@@ -498,6 +552,94 @@ export default function BulletinForm() {
                   })()}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ── ONGLET ABSENCES ── */}
+          {tab === 'absences' && (
+            <div className="space-y-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-xs text-amber-800">
+                Les absences réduisent le brut soumis aux cotisations. En cas de <strong>maintien de salaire</strong> (subrogation), l&apos;IJSS versée par la CPAM vient compenser la déduction.
+              </div>
+
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-sm text-gray-700">Liste des absences du mois</h3>
+                <button type="button" onClick={addAbsence}
+                  className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md font-medium transition-colors">
+                  + Ajouter une absence
+                </button>
+              </div>
+
+              {absences.length === 0 && (
+                <p className="text-xs text-gray-400 italic">Aucune absence. Cliquez sur &quot;+ Ajouter une absence&quot; pour en saisir.</p>
+              )}
+
+              {absences.map((ab, i) => (
+                <div key={i} className="bg-red-50 border border-red-200 rounded-md p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-sm text-red-800">Absence {i + 1}</span>
+                    <button type="button" onClick={() => removeAbsence(i)} className="text-red-400 hover:text-red-600 text-lg font-bold leading-none">×</button>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="col-span-2 md:col-span-1">
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">Motif</label>
+                      <select value={ab.motif} onChange={e => updateAbsence(i, 'motif', e.target.value)} className={sel}>
+                        {Object.keys(ABSENCE_DEFAULTS).map(m => <option key={m}>{m}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">Méthode de calcul</label>
+                      <select value={ab.methode} onChange={e => updateAbsence(i, 'methode', e.target.value as '30e' | 'ouvres' | 'heures')} className={sel}>
+                        <option value="30e">1/30e (jours civils)</option>
+                        <option value="ouvres">Jours ouvrés</option>
+                        <option value="heures">Heures</option>
+                      </select>
+                    </div>
+                    {ab.methode !== 'heures' ? (
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">Nombre de jours</label>
+                        <input type="number" min="0" step="0.5" value={ab.jours}
+                          onChange={e => updateAbsence(i, 'jours', e.target.value)} className={inp} placeholder="0" />
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">Nombre d&apos;heures</label>
+                        <input type="number" min="0" step="0.5" value={ab.heures}
+                          onChange={e => updateAbsence(i, 'heures', e.target.value)} className={inp} placeholder="0" />
+                      </div>
+                    )}
+                    {ab.methode === 'ouvres' && (
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">Jours ouvrés du mois</label>
+                        <input type="number" min="18" max="24" step="1" value={ab.joursOuvresMois}
+                          onChange={e => updateAbsence(i, 'joursOuvresMois', e.target.value)} className={inp} placeholder="22" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">Jours de carence</label>
+                      <input type="number" min="0" max="10" step="1" value={ab.carence}
+                        onChange={e => updateAbsence(i, 'carence', e.target.value)} className={inp} placeholder="3" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">Taux IJSS (%)</label>
+                      <input type="number" min="0" max="100" step="0.01" value={ab.tauxIJSS}
+                        onChange={e => updateAbsence(i, 'tauxIJSS', e.target.value)} className={inp} placeholder="50" />
+                    </div>
+                    <div className="flex items-end pb-1">
+                      <label className="flex items-center gap-2 text-xs font-semibold text-gray-600 cursor-pointer">
+                        <input type="checkbox" checked={ab.maintienSalaire}
+                          onChange={e => updateAbsence(i, 'maintienSalaire', e.target.checked)}
+                          className="w-4 h-4 rounded accent-red-600" />
+                        Maintien de salaire (subrogation)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
