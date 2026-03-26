@@ -3,132 +3,203 @@ import { useState } from 'react';
 import PayButton from '@/components/PayButton';
 
 const PACK_OPTIONS = [
-  { label: '3 Fiches', total: 22.70, perFiche: 7.57 },
-  { label: '5 Fiches', total: 36.95, perFiche: 7.39 },
-  { label: '10 Fiches', total: 68.90, perFiche: 6.89 },
-  { label: '20 Fiches', total: 127.80, perFiche: 6.39 },
+  { label: '3 bulletins',  total: 22.70, perFiche: 7.57 },
+  { label: '5 bulletins',  total: 36.95, perFiche: 7.39 },
+  { label: '10 bulletins', total: 68.90, perFiche: 6.89 },
+  { label: '20 bulletins', total: 127.80, perFiche: 6.39 },
 ];
 
 const MENSUEL_OPTIONS = [
-  { label: '1 à 3 salariés', prix: 28.85 },
-  { label: '4 à 9 salariés', prix: 44.85 },
+  { label: '1 à 3 salariés',   prix: 28.85 },
+  { label: '4 à 9 salariés',   prix: 44.85 },
   { label: '10 à 24 salariés', prix: 74.85 },
   { label: '25 à 49 salariés', prix: 134.85 },
 ];
 
 const ANNUEL_OPTIONS = [
-  { label: '1 à 3 salariés', prix: 198.00, parMois: 16.50 },
-  { label: '4 à 9 salariés', prix: 328.00, parMois: 27.33 },
+  { label: '1 à 3 salariés',   prix: 198.00, parMois: 16.50 },
+  { label: '4 à 9 salariés',   prix: 328.00, parMois: 27.33 },
   { label: '10 à 24 salariés', prix: 598.00, parMois: 49.83 },
   { label: '25 à 49 salariés', prix: 998.00, parMois: 83.17 },
 ];
 
-const CheckIcon = () => (
-  <svg className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-  </svg>
-);
+function IconCheck({ color = '#16a34a' }: { color?: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
+      <circle cx="8" cy="8" r="8" fill={color} opacity="0.12" />
+      <path d="M4.5 8l2.5 2.5 4.5-4.5" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconX() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
+      <circle cx="8" cy="8" r="8" fill="#dc2626" opacity="0.1" />
+      <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#dc2626" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const FEATURES = [
+  {
+    title: 'Cotisations calculées automatiquement',
+    desc: 'Vieillesse, maladie, AGIRC-ARRCO T1/T2, CEG, CET, CSG/CRDS, AT/MP, allocations familiales, chômage, AGS, FNAL.',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round">
+        <rect x="2" y="3" width="20" height="18" rx="3"/><path d="M8 8h8M8 12h5M8 16h6"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'Paramètres légaux 2025 et 2026',
+    desc: 'PMSS 3 925 € (2025) / 4 005 € (2026), SMIC 1 801,80 €, réduction Fillon — tout bascule automatiquement.',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'Bulletin print-ready & PDF',
+    desc: 'Bulletin structuré en sections : brut, cotisations salariales, patronales, net avant/après PAS. Conforme L.3243-2.',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6M9 13h6M9 17h4"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'Cadre & Non-cadre',
+    desc: 'Cadres : APEC (0,024%/0,036%), tranche 2 AGIRC-ARRCO. Non-cadres : taux standards. Sélection en 1 clic.',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'Absences & Heures supplémentaires',
+    desc: 'Maladie, AT, CP, RTT, sans solde avec calcul IJSS. Heures supplémentaires 25%/50% exonérées IR (Loi TEPA).',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+        <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" strokeWidth="2"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'DSN & Contrats de travail',
+    desc: 'Export DSN Phase 3 pour Net-Entreprises. Générateur de contrats CDI, CDD, apprentissage, stage et intérim.',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+    ),
+  },
+];
 
 export default function LandingPage() {
-  const [packIdx, setPackIdx] = useState(0);
+  const [packIdx, setPackIdx]       = useState(1);
   const [mensuelIdx, setMensuelIdx] = useState(0);
-  const [annuelIdx, setAnnuelIdx] = useState(0);
+  const [annuelIdx, setAnnuelIdx]   = useState(0);
 
-  const pack = PACK_OPTIONS[packIdx];
+  const pack    = PACK_OPTIONS[packIdx];
   const mensuel = MENSUEL_OPTIONS[mensuelIdx];
-  const annuel = ANNUEL_OPTIONS[annuelIdx];
+  const annuel  = ANNUEL_OPTIONS[annuelIdx];
 
   return (
-    <div className="bg-white text-gray-900 font-sans">
+    <div style={{ fontFamily: '"Inter", system-ui, -apple-system, sans-serif', color: '#0f172a' }}>
 
-      {/* ── NAV ── */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur border-b border-gray-100 z-50" aria-label="Navigation principale">
-        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <span className="text-blue-800 font-extrabold text-xl tracking-tight">Bulletin Facile</span>
-          <div className="flex items-center gap-4">
-            <a href="/contrat" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Contrat de travail</a>
-            <a href="/generateur" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Bulletin de paie</a>
-            <a href="/tarifs" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Tarifs</a>
-            <a href="#pricing"
-              className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors">
-              Voir les tarifs
+      {/* NAV */}
+      <nav style={{ position: 'fixed', top: 0, width: '100%', zIndex: 100, background: 'rgba(255,255,255,0.96)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e2e8f0' }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <a href="/" style={{ fontWeight: 800, fontSize: 18, color: '#1e40af', textDecoration: 'none', letterSpacing: '-0.5px' }}>
+            Bulletin Facile
+          </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 28, fontSize: 14, fontWeight: 500 }}>
+            <a href="/generateur" style={{ color: '#475569', textDecoration: 'none' }}>Bulletin de paie</a>
+            <a href="/contrat" style={{ color: '#475569', textDecoration: 'none' }}>Contrat</a>
+            <a href="/tarifs" style={{ color: '#475569', textDecoration: 'none' }}>Tarifs</a>
+            <a href="/generateur" style={{ background: '#1e40af', color: 'white', fontWeight: 700, padding: '9px 20px', borderRadius: 8, textDecoration: 'none', fontSize: 14 }}>
+              Essai gratuit
             </a>
           </div>
         </div>
       </nav>
 
-      {/* ── HERO ── */}
-      <section className="pt-32 pb-20 px-6 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white text-center">
-        <div className="max-w-3xl mx-auto">
-          <div className="inline-block bg-white/10 text-white text-xs font-semibold px-3 py-1 rounded-full mb-6 border border-white/20">
-            ✓ Conforme URSSAF · AGIRC-ARRCO · Droit social 2025/2026
+      {/* HERO */}
+      <section style={{ paddingTop: 120, paddingBottom: 96, paddingLeft: 24, paddingRight: 24, background: 'linear-gradient(160deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%)', color: 'white' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 100, padding: '6px 16px', fontSize: 13, fontWeight: 600, marginBottom: 32, color: '#bfdbfe' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+            Conforme URSSAF · AGIRC-ARRCO · Droit social 2025/2026
           </div>
-
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
-            Générez votre{' '}
-            <span className="text-yellow-300">bulletin de salaire</span>
-            <br />en 30 secondes
+          <h1 style={{ fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 24, letterSpacing: '-1.5px' }}>
+            Bulletins de salaire<br />
+            <span style={{ color: '#fde68a' }}>conformes en 30 secondes</span>
           </h1>
-
-          <p className="text-lg md:text-xl text-blue-100 mb-4 max-w-2xl mx-auto">
-            Calcul automatique des cotisations salariales &amp; patronales 2025/2026.
-            AGIRC-ARRCO, CSG/CRDS, réduction Fillon — tout est intégré.
+          <p style={{ fontSize: 19, color: '#93c5fd', lineHeight: 1.7, marginBottom: 12, maxWidth: 620, margin: '0 auto 12px' }}>
+            Cotisations URSSAF, AGIRC-ARRCO, CSG/CRDS et réduction Fillon calculées automatiquement.
           </p>
-          <p className="text-blue-200 text-base mb-10">
-            Pour les RH, TPE/PME, auto-entrepreneurs et cabinets comptables.
+          <p style={{ fontSize: 15, color: '#64748b', marginBottom: 48 }}>
+            Pour les RH, TPE/PME et cabinets comptables.
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a href="#pricing"
-              className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold text-lg px-10 py-4 rounded-xl shadow-xl transition-all hover:scale-105">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginBottom: 24 }}>
+            <a href="#pricing" style={{ background: '#fbbf24', color: '#0f172a', fontWeight: 800, fontSize: 16, padding: '14px 36px', borderRadius: 10, textDecoration: 'none' }}>
               Voir les tarifs — dès 8,90 €
             </a>
-            <a href="/generateur"
-              className="border border-white/40 text-white hover:bg-white/10 font-semibold text-lg px-8 py-4 rounded-xl transition-colors">
-              Tester gratuitement →
+            <a href="/generateur" style={{ border: '1px solid rgba(255,255,255,0.3)', color: 'white', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 10, textDecoration: 'none' }}>
+              Tester gratuitement
             </a>
           </div>
-          <p className="text-blue-200 text-sm mt-4">Aperçu gratuit · Sans abonnement obligatoire · Bulletins illimités en abonnement</p>
+          <p style={{ fontSize: 12, color: '#475569' }}>Aperçu gratuit sans inscription · Paiement sécurisé · Satisfait ou remboursé 30 jours</p>
         </div>
       </section>
 
-      {/* ── TRUST BAR ── */}
-      <section className="bg-gray-50 border-b border-t py-8">
-        <div className="max-w-4xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      {/* TRUST BAR */}
+      <section style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '18px 24px' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, textAlign: 'center' }}>
           {[
-            { n: '< 30s', l: 'Bulletin généré' },
-            { n: '100%', l: 'Taux légaux 2026' },
-            { n: 'PMSS 4 005 €', l: 'Plafond SS 2026' },
-            { n: '30 jours', l: 'Garantie remboursement' },
+            { val: '< 30 s',       label: 'Bulletin généré' },
+            { val: '100 %',        label: 'Taux légaux 2026' },
+            { val: 'PMSS 4 005 €', label: 'Plafond SS 2026' },
+            { val: '30 jours',     label: 'Garantie remboursement' },
           ].map(s => (
-            <div key={s.n}>
-              <div className="text-2xl font-extrabold text-blue-800">{s.n}</div>
-              <div className="text-xs text-gray-500 mt-1">{s.l}</div>
+            <div key={s.val}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: '#1e40af' }}>{s.val}</div>
+              <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── PROBLÈME / SOLUTION ── */}
-      <section className="py-16 px-6 bg-white">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-8 text-center">
-            Calculer les cotisations sociales à la main, c'est terminé
+      {/* PROBLÈME / SOLUTION */}
+      <section style={{ padding: '80px 24px', background: 'white' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, textAlign: 'center', marginBottom: 48 }}>
+            La paie manuelle, c'est terminé
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-red-50 border border-red-100 rounded-2xl p-6">
-              <div className="font-bold text-red-700 mb-3">❌ Avant Bulletin Facile</div>
-              <ul className="space-y-2 text-sm text-gray-600">
-                {['Formules Excel interminables', 'Taux URSSAF à chercher manuellement', 'Réduction Fillon complexe à calculer', 'Bulletin peu présentable', 'Risque d\'erreur sur les montants'].map(i => (
-                  <li key={i} className="flex items-center gap-2"><span className="text-red-400">✗</span>{i}</li>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <div style={{ background: '#fff5f5', border: '1px solid #fecaca', borderRadius: 16, padding: 28 }}>
+              <div style={{ fontWeight: 700, color: '#dc2626', marginBottom: 16, fontSize: 13, borderBottom: '1px solid #fecaca', paddingBottom: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Sans Bulletin Facile
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {['Formules Excel à maintenir', 'Taux URSSAF à chercher manuellement', 'Réduction Fillon difficile à calculer', 'Bulletin peu présentable', 'Risque d\'erreur sur les montants'].map(i => (
+                  <li key={i} style={{ display: 'flex', gap: 10, fontSize: 14, color: '#374151', alignItems: 'flex-start' }}><IconX />{i}</li>
                 ))}
               </ul>
             </div>
-            <div className="bg-green-50 border border-green-100 rounded-2xl p-6">
-              <div className="font-bold text-green-700 mb-3">✅ Avec Bulletin Facile</div>
-              <ul className="space-y-2 text-sm text-gray-600">
-                {['Saisir le brut — tout le reste est calculé', 'Tous les taux 2025/2026 intégrés', 'Fillon calculé automatiquement', 'Bulletin structuré prêt à imprimer', 'Conformité légale garantie'].map(i => (
-                  <li key={i} className="flex items-center gap-2"><span className="text-green-500">✓</span>{i}</li>
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 16, padding: 28 }}>
+              <div style={{ fontWeight: 700, color: '#16a34a', marginBottom: 16, fontSize: 13, borderBottom: '1px solid #bbf7d0', paddingBottom: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Avec Bulletin Facile
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {['Saisir le brut — tout est calculé', 'Tous les taux 2025/2026 intégrés', 'Fillon calculé automatiquement', 'Bulletin structuré, prêt à imprimer', 'Conformité légale garantie'].map(i => (
+                  <li key={i} style={{ display: 'flex', gap: 10, fontSize: 14, color: '#374151', alignItems: 'flex-start' }}><IconCheck />{i}</li>
                 ))}
               </ul>
             </div>
@@ -136,83 +207,84 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section className="py-20 px-6 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-4">
-            Un générateur de fiche de paie complet et conforme
+      {/* FEATURES */}
+      <section style={{ padding: '80px 24px', background: '#f8fafc' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, textAlign: 'center', marginBottom: 12 }}>
+            Un générateur complet et conforme
           </h2>
-          <p className="text-center text-gray-500 mb-14 max-w-2xl mx-auto">
-            Toutes les cotisations du Code du travail français, calculées automatiquement selon les paramètres officiels URSSAF 2025 et 2026.
+          <p style={{ textAlign: 'center', color: '#64748b', marginBottom: 52, fontSize: 16, maxWidth: 540, margin: '0 auto 52px' }}>
+            Toutes les cotisations du Code du travail, calculées selon les paramètres officiels URSSAF 2026.
           </p>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { icon: '🧮', title: 'Cotisations calculées auto', desc: 'Vieillesse, maladie, AGIRC-ARRCO T1/T2, CEG, CET, CSG/CRDS, AT/MP, allocations familiales, chômage, AGS, FNAL.' },
-              { icon: '⚖️', title: 'Paramètres 2025 et 2026', desc: 'PMSS 3 925 € (2025) / 4 005 € (2026), SMIC 1 801,80 €, réduction Fillon — tout bascule automatiquement selon l\'année choisie.' },
-              { icon: '🖨️', title: 'Bulletin print-ready', desc: 'Bulletin de salaire complet structuré en sections : rémunération brute, cotisations salariales, patronales, net avant/après PAS.' },
-              { icon: '👔', title: 'Cadre & Non-cadre', desc: 'Cadres : APEC (0,024%/0,036%), tranche 2 AGIRC-ARRCO. Non-cadres : taux standards. Sélection en 1 clic.' },
-              { icon: '📋', title: 'Absences & Heures supp', desc: 'Maladie, AT, CP, RTT, sans solde. Heures supplémentaires 25%/50% exonérées IR (Loi TEPA), heures de nuit, dimanche, férié.' },
-              { icon: '📄', title: 'DSN & Contrats de travail', desc: 'Export DSN Phase 3 pour Net-Entreprises. Générateur de contrats CDI, CDD, apprentissage, stage et intérim.' },
-            ].map(f => (
-              <article key={f.title} className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all">
-                <div className="text-3xl mb-3">{f.icon}</div>
-                <h3 className="font-bold text-gray-900 mb-2 text-base">{f.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+            {FEATURES.map(f => (
+              <article key={f.title} style={{ background: 'white', borderRadius: 16, padding: 28, border: '1px solid #e2e8f0' }}>
+                <div style={{ width: 48, height: 48, background: '#eff6ff', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                  {f.icon}
+                </div>
+                <h3 style={{ fontWeight: 700, marginBottom: 8, fontSize: 15 }}>{f.title}</h3>
+                <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.65 }}>{f.desc}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section className="py-20 px-6 bg-white">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-4">
-            Générer un bulletin de salaire en 3 étapes
-          </h2>
-          <p className="text-gray-500 mb-12">Aucune formation requise. Aucun logiciel à installer.</p>
-          <div className="grid md:grid-cols-3 gap-8">
+      {/* HOW IT WORKS */}
+      <section style={{ padding: '80px 24px', background: 'white' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, marginBottom: 12 }}>3 étapes, 30 secondes</h2>
+          <p style={{ color: '#64748b', marginBottom: 56, fontSize: 16 }}>Aucune formation. Aucun logiciel à installer.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
             {[
-              { step: '1', title: 'Saisissez le salaire brut', desc: 'Entrez le brut mensuel, le statut (cadre / non-cadre), l\'effectif et le taux PAS.' },
-              { step: '2', title: 'Calcul instantané', desc: 'Toutes les cotisations URSSAF 2025/2026 apparaissent en temps réel — salariales et patronales.' },
-              { step: '3', title: 'Imprimez ou exportez PDF', desc: 'Un clic suffit. Bulletin conforme à l\'article L.3243-2 du Code du travail.' },
+              { n: '01', title: 'Saisissez le salaire brut', desc: 'Entrez le brut mensuel, le statut cadre/non-cadre, l\'effectif et le taux PAS.' },
+              { n: '02', title: 'Calcul instantané', desc: 'Toutes les cotisations 2025/2026 apparaissent — salariales et patronales — en temps réel.' },
+              { n: '03', title: 'Imprimez ou exportez PDF', desc: 'Un clic suffit. Bulletin conforme à l\'article L.3243-2 du Code du travail, prêt à envoyer.' },
             ].map(s => (
-              <div key={s.step} className="flex flex-col items-center">
-                <div className="w-14 h-14 rounded-full bg-blue-700 text-white text-2xl font-extrabold flex items-center justify-center mb-4 shadow-lg">
-                  {s.step}
+              <div key={s.n} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#1e40af', color: 'white', fontSize: 15, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, boxShadow: '0 4px 14px rgba(30,64,175,0.25)' }}>
+                  {s.n}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{s.title}</h3>
-                <p className="text-gray-500 text-sm">{s.desc}</p>
+                <h3 style={{ fontWeight: 700, marginBottom: 8, fontSize: 15 }}>{s.title}</h3>
+                <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.65 }}>{s.desc}</p>
               </div>
             ))}
           </div>
-          <a href="/generateur"
-            className="inline-block mt-10 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold px-8 py-3 rounded-xl transition-colors border border-blue-200">
+          <a href="/generateur" style={{ display: 'inline-block', marginTop: 48, background: '#f1f5f9', color: '#1e40af', fontWeight: 700, fontSize: 15, padding: '12px 28px', borderRadius: 10, textDecoration: 'none', border: '1px solid #e2e8f0' }}>
             Essayer le générateur gratuitement →
           </a>
         </div>
       </section>
 
-      {/* ── TÉMOIGNAGES ── */}
-      <section className="py-20 px-6 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-12">
-            Ce que disent nos utilisateurs
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
+      {/* TÉMOIGNAGES */}
+      <section style={{ padding: '80px 24px', background: '#f8fafc' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, textAlign: 'center', marginBottom: 48 }}>Ce que disent nos clients</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             {[
-              { name: 'Marie L.', role: 'Responsable RH, PME 12 salariés', stars: 5, text: 'J\'utilisais Excel depuis 5 ans. Bulletin Facile m\'a fait gagner 2h par mois dès la première fiche de paie. Les taux sont toujours à jour.' },
-              { name: 'Thomas R.', role: 'Gérant, SARL BTP', stars: 5, text: 'Réduction Fillon calculée automatiquement, c\'est ce qui m\'a convaincu. Économie nette sur le coût employeur visible immédiatement.' },
-              { name: 'Sandrine M.', role: 'Expert-comptable indépendante', stars: 5, text: 'Je l\'utilise pour mes petits clients qui n\'ont pas de logiciel de paie. Simple, rapide, bulletin présentable. Excellent rapport qualité/prix.' },
+              { name: 'Marie L.',     role: 'Responsable RH · PME 12 salariés', text: 'Bulletin Facile m\'a fait gagner 2 heures par mois dès la première fiche de paie. Les taux sont toujours à jour, je ne vérifie plus rien manuellement.', initial: 'M' },
+              { name: 'Thomas R.',   role: 'Gérant SARL · Secteur BTP',        text: 'La réduction Fillon calculée automatiquement, c\'est ce qui m\'a convaincu. Le coût employeur est visible immédiatement, sans Excel.', initial: 'T' },
+              { name: 'Sandrine M.', role: 'Expert-comptable indépendante',    text: 'Je l\'utilise pour mes petits clients sans logiciel de paie. Simple, rapide, bulletin présentable. Excellent rapport qualité/prix.', initial: 'S' },
             ].map(t => (
-              <figure key={t.name} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                <div className="flex gap-1 mb-3">
-                  {Array(t.stars).fill(0).map((_, i) => <span key={i} className="text-yellow-400">★</span>)}
+              <figure key={t.name} style={{ background: 'white', borderRadius: 16, padding: 28, border: '1px solid #e2e8f0', margin: 0 }}>
+                <div style={{ display: 'flex', gap: 2, marginBottom: 14 }}>
+                  {[0,1,2,3,4].map(i => (
+                    <svg key={i} width="14" height="14" viewBox="0 0 14 14" fill="#fbbf24">
+                      <path d="M7 1l1.8 3.6 3.9.6-2.8 2.8.7 3.9L7 9.8l-3.6 2.1.7-3.9-2.8-2.8 3.9-.6L7 1z"/>
+                    </svg>
+                  ))}
                 </div>
-                <blockquote className="text-gray-600 text-sm leading-relaxed mb-4">« {t.text} »</blockquote>
-                <figcaption>
-                  <div className="font-bold text-gray-900 text-sm">{t.name}</div>
-                  <div className="text-gray-400 text-xs">{t.role}</div>
+                <blockquote style={{ color: '#374151', fontSize: 14, lineHeight: 1.7, marginBottom: 20, margin: '0 0 20px' }}>
+                  « {t.text} »
+                </blockquote>
+                <figcaption style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#1e40af', color: 'white', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {t.initial}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 13 }}>{t.name}</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>{t.role}</div>
+                  </div>
                 </figcaption>
               </figure>
             ))}
@@ -220,225 +292,214 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── PRICING ── */}
-      <section className="py-20 px-6 bg-white" id="pricing">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 mb-3">
-            Tarifs transparents
-          </h2>
-          <p className="text-center text-gray-500 mb-2 text-lg">
-            Toujours <span className="font-bold text-blue-700">1 € moins cher</span> que la concurrence. Sans engagement ou avec abonnement.
+      {/* PRICING */}
+      <section id="pricing" style={{ padding: '80px 24px', background: 'white' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, textAlign: 'center', marginBottom: 8 }}>Tarifs transparents</h2>
+          <p style={{ textAlign: 'center', color: '#64748b', marginBottom: 4, fontSize: 17 }}>
+            Toujours <strong style={{ color: '#1e40af' }}>1 € moins cher</strong> que la concurrence.
           </p>
-          <p className="text-center text-gray-400 text-sm mb-12">Aperçu gratuit illimité — vous ne payez que pour télécharger</p>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-            {/* ── SANS ENGAGEMENT ── */}
-            <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6">
-              <h3 className="text-center font-extrabold text-green-700 text-lg tracking-wide mb-5 uppercase">Sans engagement</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                {/* 1 Bulletin */}
-                <div className="bg-white rounded-xl border border-green-200 p-5 flex flex-col">
-                  <div className="text-center font-bold text-gray-800 mb-3">1 Bulletin</div>
-                  <div className="text-center mb-4">
-                    <span className="text-5xl font-extrabold text-green-600">8</span>
-                    <span className="text-xl font-bold text-green-600 align-super">,90</span>
-                    <span className="text-sm text-gray-400 ml-1">€ HT</span>
+          <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 13, marginBottom: 52 }}>
+            Aperçu gratuit illimité · Paiement sécurisé · Satisfait ou remboursé 30 jours
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            {/* SANS ENGAGEMENT */}
+            <div style={{ background: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: 20, padding: 24 }}>
+              <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                <span style={{ background: '#dcfce7', color: '#15803d', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Sans engagement</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div style={{ background: 'white', borderRadius: 14, border: '1px solid #bbf7d0', padding: 18, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, textAlign: 'center', marginBottom: 14 }}>1 Bulletin</div>
+                  <div style={{ textAlign: 'center', marginBottom: 18 }}>
+                    <span style={{ fontSize: 42, fontWeight: 900, color: '#16a34a', letterSpacing: '-1px' }}>8</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: '#16a34a', verticalAlign: 'super' }}>,90</span>
+                    <span style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}>€ HT</span>
                   </div>
-                  <PayButton amount={8.90} description="Bulletin Facile — 1 bulletin de salaire" label="Acheter — 8,90 €" className="block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-lg transition-colors mb-4 text-sm w-full" />
-                  <ul className="space-y-1.5 mt-auto">
-                    {['Logo & couleur modifiables', 'Journal de paie inclus', 'DSN Phase 3 incluse', 'PDF immédiat', 'Calculs URSSAF 2026'].map(f => (
-                      <li key={f} className="flex items-start gap-2 text-xs text-gray-600"><CheckIcon />{f}</li>
+                  <PayButton amount={8.90} description="Bulletin Facile — 1 bulletin de salaire" label="Acheter"
+                    style={{ width: '100%', background: '#16a34a', color: 'white', fontWeight: 700, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 13, cursor: 'pointer', marginBottom: 14 }} />
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
+                    {['PDF immédiat', 'Calculs URSSAF 2026', 'Journal de paie', 'DSN incluse'].map(f => (
+                      <li key={f} style={{ display: 'flex', gap: 8, fontSize: 12, color: '#374151', alignItems: 'center' }}><IconCheck color="#16a34a" />{f}</li>
                     ))}
                   </ul>
                 </div>
-
-                {/* Pack */}
-                <div className="bg-white rounded-xl border-2 border-green-400 p-5 flex flex-col relative">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full whitespace-nowrap">
-                    Populaire
+                <div style={{ background: 'white', borderRadius: 14, border: '2px solid #16a34a', padding: 18, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: -11, left: '50%', transform: 'translateX(-50%)', background: '#16a34a', color: 'white', fontSize: 10, fontWeight: 700, padding: '2px 12px', borderRadius: 100, whiteSpace: 'nowrap' }}>Populaire</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, textAlign: 'center', marginBottom: 10 }}>Pack</div>
+                  <select value={packIdx} onChange={e => setPackIdx(Number(e.target.value))}
+                    style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '7px 10px', fontSize: 12, fontWeight: 600, marginBottom: 10, cursor: 'pointer', background: 'white' }}>
+                    {PACK_OPTIONS.map((o, i) => <option key={i} value={i}>{o.label}</option>)}
+                  </select>
+                  <div style={{ textAlign: 'center' }}>
+                    <span style={{ fontSize: 42, fontWeight: 900, color: '#16a34a', letterSpacing: '-1px' }}>{Math.floor(pack.total)}</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: '#16a34a', verticalAlign: 'super' }}>,{(pack.total % 1).toFixed(2).slice(2)}</span>
+                    <span style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}>€ HT</span>
                   </div>
-                  <div className="text-center font-bold text-gray-800 mb-2">Pack</div>
-                  <div className="relative mb-3">
-                    <select value={packIdx} onChange={e => setPackIdx(Number(e.target.value))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm font-semibold appearance-none pr-7 focus:outline-none focus:ring-2 focus:ring-green-400">
-                      {PACK_OPTIONS.map((o, i) => <option key={i} value={i}>{o.label}</option>)}
-                    </select>
-                    <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs">▾</div>
-                  </div>
-                  <div className="text-center mb-0.5">
-                    <span className="text-5xl font-extrabold text-green-600">{pack.total.toFixed(0)}</span>
-                    <span className="text-xl font-bold text-green-600 align-super">,{pack.total.toFixed(2).split('.')[1]}</span>
-                    <span className="text-sm text-gray-400 ml-1">€ HT</span>
-                  </div>
-                  <div className="text-center text-xs text-gray-400 mb-3">soit {pack.perFiche.toFixed(2).replace('.', ',')} € HT / fiche</div>
-                  <PayButton amount={pack.total} description={`Bulletin Facile — Pack ${pack.label}`} label={`Acheter — ${pack.total.toFixed(2).replace('.', ',')} €`} className="block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-lg transition-colors mb-4 text-sm w-full" />
-                  <ul className="space-y-1.5 mt-auto">
-                    {['Multi-salariés', 'Multi-entreprises', 'Logo & couleur modifiables', 'Journal de paie inclus', 'DSN Phase 3 incluse'].map(f => (
-                      <li key={f} className="flex items-start gap-2 text-xs text-gray-600"><CheckIcon />{f}</li>
+                  <div style={{ textAlign: 'center', fontSize: 11, color: '#94a3b8', marginBottom: 10 }}>{pack.perFiche.toFixed(2).replace('.', ',')} €/fiche</div>
+                  <PayButton amount={pack.total} description={`Bulletin Facile — Pack ${pack.label}`} label="Acheter ce pack"
+                    style={{ width: '100%', background: '#16a34a', color: 'white', fontWeight: 700, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 13, cursor: 'pointer', marginBottom: 14 }} />
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
+                    {['Multi-salariés', 'Multi-entreprises', 'PDF immédiat', 'DSN incluse'].map(f => (
+                      <li key={f} style={{ display: 'flex', gap: 8, fontSize: 12, color: '#374151', alignItems: 'center' }}><IconCheck color="#16a34a" />{f}</li>
                     ))}
                   </ul>
                 </div>
               </div>
             </div>
-
-            {/* ── ABONNEMENT ── */}
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
-              <h3 className="text-center font-extrabold text-blue-700 text-lg tracking-wide mb-5 uppercase">Abonnement</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                {/* Mensuel */}
-                <div className="bg-white rounded-xl border border-blue-200 p-5 flex flex-col">
-                  <div className="text-center font-bold text-gray-800 mb-2">Mensuel</div>
-                  <div className="relative mb-3">
-                    <select value={mensuelIdx} onChange={e => setMensuelIdx(Number(e.target.value))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm font-semibold appearance-none pr-7 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                      {MENSUEL_OPTIONS.map((o, i) => <option key={i} value={i}>{o.label}</option>)}
-                    </select>
-                    <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs">▾</div>
+            {/* ABONNEMENT */}
+            <div style={{ background: '#eff6ff', border: '1.5px solid #93c5fd', borderRadius: 20, padding: 24 }}>
+              <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                <span style={{ background: '#dbeafe', color: '#1d4ed8', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Abonnement</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div style={{ background: 'white', borderRadius: 14, border: '1px solid #bfdbfe', padding: 18, display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, textAlign: 'center', marginBottom: 10 }}>Mensuel</div>
+                  <select value={mensuelIdx} onChange={e => setMensuelIdx(Number(e.target.value))}
+                    style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '7px 10px', fontSize: 12, fontWeight: 600, marginBottom: 10, cursor: 'pointer', background: 'white' }}>
+                    {MENSUEL_OPTIONS.map((o, i) => <option key={i} value={i}>{o.label}</option>)}
+                  </select>
+                  <div style={{ textAlign: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 42, fontWeight: 900, color: '#2563eb', letterSpacing: '-1px' }}>{Math.floor(mensuel.prix)}</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: '#2563eb', verticalAlign: 'super' }}>,{(mensuel.prix % 1).toFixed(2).slice(2)}</span>
+                    <span style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}>€ HT</span>
                   </div>
-                  <div className="text-center mb-4">
-                    <span className="text-5xl font-extrabold text-blue-600">{mensuel.prix.toFixed(0)}</span>
-                    <span className="text-xl font-bold text-blue-600 align-super">,{mensuel.prix.toFixed(2).split('.')[1]}</span>
-                    <span className="text-sm text-gray-400 ml-1">€ HT</span>
-                    <div className="text-sm text-gray-500 font-semibold">/mois</div>
-                  </div>
-                  <a href="/tarifs"
-                    className="block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg transition-colors mb-4 text-sm">
-                    Choisir
-                  </a>
-                  <ul className="space-y-1.5 mt-auto">
-                    {['Fiches illimitées', 'Multi-entreprises', 'DSN illimitée', 'Mises à jour légales', 'Support prioritaire'].map(f => (
-                      <li key={f} className="flex items-start gap-2 text-xs text-gray-600"><CheckIcon />{f}</li>
+                  <div style={{ textAlign: 'center', fontSize: 12, color: '#64748b', fontWeight: 600, marginBottom: 14 }}>/mois</div>
+                  <PayButton amount={mensuel.prix} description={`Bulletin Facile — Abonnement mensuel ${mensuel.label}`} label="S'abonner"
+                    style={{ width: '100%', background: '#2563eb', color: 'white', fontWeight: 700, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 13, cursor: 'pointer', marginBottom: 14 }} />
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
+                    {['Bulletins illimités', 'Mises à jour légales', 'Support prioritaire'].map(f => (
+                      <li key={f} style={{ display: 'flex', gap: 8, fontSize: 12, color: '#374151', alignItems: 'center' }}><IconCheck color="#2563eb" />{f}</li>
                     ))}
                   </ul>
                 </div>
-
-                {/* Annuel */}
-                <div className="bg-white rounded-xl border-2 border-blue-400 p-5 flex flex-col relative">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full whitespace-nowrap">
-                    Économique
+                <div style={{ background: 'white', borderRadius: 14, border: '2px solid #2563eb', padding: 18, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: -11, left: '50%', transform: 'translateX(-50%)', background: '#2563eb', color: 'white', fontSize: 10, fontWeight: 700, padding: '2px 12px', borderRadius: 100, whiteSpace: 'nowrap' }}>Meilleur tarif</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, textAlign: 'center', marginBottom: 10 }}>Annuel</div>
+                  <select value={annuelIdx} onChange={e => setAnnuelIdx(Number(e.target.value))}
+                    style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '7px 10px', fontSize: 12, fontWeight: 600, marginBottom: 10, cursor: 'pointer', background: 'white' }}>
+                    {ANNUEL_OPTIONS.map((o, i) => <option key={i} value={i}>{o.label}</option>)}
+                  </select>
+                  <div style={{ textAlign: 'center' }}>
+                    <span style={{ fontSize: 42, fontWeight: 900, color: '#2563eb', letterSpacing: '-1px' }}>{Math.floor(annuel.prix)}</span>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: '#2563eb', verticalAlign: 'super' }}>,{(annuel.prix % 1).toFixed(2).slice(2)}</span>
+                    <span style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}>€ HT</span>
                   </div>
-                  <div className="text-center font-bold text-gray-800 mb-2">Annuel</div>
-                  <div className="relative mb-3">
-                    <select value={annuelIdx} onChange={e => setAnnuelIdx(Number(e.target.value))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm font-semibold appearance-none pr-7 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                      {ANNUEL_OPTIONS.map((o, i) => <option key={i} value={i}>{o.label}</option>)}
-                    </select>
-                    <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs">▾</div>
+                  <div style={{ textAlign: 'center', fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>/an</div>
+                  <div style={{ textAlign: 'center', fontSize: 12, color: '#16a34a', fontWeight: 700, marginBottom: 14 }}>
+                    soit {annuel.parMois.toFixed(2).replace('.', ',')} €/mois
                   </div>
-                  <div className="text-center mb-0.5">
-                    <span className="text-5xl font-extrabold text-blue-600">{annuel.prix.toFixed(0)}</span>
-                    <span className="text-xl font-bold text-blue-600 align-super">,{annuel.prix.toFixed(2).split('.')[1]}</span>
-                    <span className="text-sm text-gray-400 ml-1">€ HT</span>
-                    <div className="text-sm text-gray-500 font-semibold">/an</div>
-                  </div>
-                  <div className="text-center text-xs text-gray-400 mb-3">soit {annuel.parMois.toFixed(2).replace('.', ',')} € HT / mois</div>
-                  <a href="/tarifs"
-                    className="block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg transition-colors mb-4 text-sm">
-                    Choisir
-                  </a>
-                  <ul className="space-y-1.5 mt-auto">
-                    {['Fiches illimitées', 'Multi-entreprises', 'DSN illimitée', 'Mises à jour légales', 'Support prioritaire'].map(f => (
-                      <li key={f} className="flex items-start gap-2 text-xs text-gray-600"><CheckIcon />{f}</li>
+                  <PayButton amount={annuel.prix} description={`Bulletin Facile — Abonnement annuel ${annuel.label}`} label="S'abonner annuel"
+                    style={{ width: '100%', background: '#2563eb', color: 'white', fontWeight: 700, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 13, cursor: 'pointer', marginBottom: 14 }} />
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
+                    {['Bulletins illimités', 'Mises à jour légales', 'Support prioritaire'].map(f => (
+                      <li key={f} style={{ display: 'flex', gap: 8, fontSize: 12, color: '#374151', alignItems: 'center' }}><IconCheck color="#2563eb" />{f}</li>
                     ))}
                   </ul>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Garantie */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center text-sm text-gray-500">
-            <div className="flex items-center gap-2">🛡️ <span><strong>Satisfait ou remboursé</strong> 30 jours</span></div>
-            <div className="hidden sm:block">·</div>
-            <div className="flex items-center gap-2">👁️ <span><strong>Aperçu gratuit</strong> illimité avant achat</span></div>
-            <div className="hidden sm:block">·</div>
-            <div className="flex items-center gap-2">🔒 <span><strong>Paiement sécurisé</strong></span></div>
+          <div style={{ marginTop: 24, background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '18px 32px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 28 }}>
+            {[
+              { t: 'Satisfait ou remboursé', s: '30 jours sans conditions' },
+              { t: 'Aperçu gratuit', s: 'Avant tout paiement' },
+              { t: 'Paiement sécurisé', s: 'Via SumUp' },
+              { t: 'Taux légaux 2026', s: 'URSSAF officiels' },
+            ].map(g => (
+              <div key={g.t} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>{g.t}</div>
+                <div style={{ fontSize: 12, color: '#64748b' }}>{g.s}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── FAQ SEO ── */}
-      <section className="bg-gray-50 py-20 px-6" aria-labelledby="faq-heading">
-        <div className="max-w-2xl mx-auto">
-          <h2 id="faq-heading" className="text-3xl font-extrabold text-center text-gray-900 mb-4">
-            Questions fréquentes sur la génération de bulletins de salaire
-          </h2>
-          <p className="text-center text-gray-500 mb-10">Tout ce que vous devez savoir sur Bulletin Facile et le calcul des cotisations sociales.</p>
-          <div className="space-y-4">
+      {/* FAQ */}
+      <section style={{ padding: '80px 24px', background: '#f8fafc' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, textAlign: 'center', marginBottom: 48 }}>Questions fréquentes</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {[
-              {
-                q: 'Comment calculer le salaire net à partir du brut en 2026 ?',
-                a: 'Avec Bulletin Facile, saisissez simplement le salaire brut mensuel. Le net à payer est calculé automatiquement après déduction de toutes les cotisations salariales (vieillesse, AGIRC-ARRCO, CSG/CRDS…) et du prélèvement à la source (PAS). Pour 2026 : PMSS 4 005 €, SMIC 1 801,80 €.',
-              },
-              {
-                q: 'Les taux URSSAF et AGIRC-ARRCO 2026 sont-ils intégrés ?',
-                a: 'Oui. Tous les taux officiels 2025 et 2026 sont intégrés : vieillesse plafonnée (6,90% / 8,55%), AGIRC-ARRCO T1 (3,15% / 4,72%), T2 (8,64% / 12,95%), CEG, CET (0,14% / 0,21%), CSG déductible (6,80%), CSG/CRDS non déductible (2,90%), allocations familiales, AT/MP, chômage, AGS.',
-              },
-              {
-                q: 'Comment fonctionne la réduction Fillon dans Bulletin Facile ?',
-                a: 'La réduction Fillon (allègement général de cotisations patronales) est calculée automatiquement si le salaire brut est inférieur à 1,6 × SMIC annuel. Le coefficient et le montant apparaissent dans le tableau des cotisations patronales.',
-              },
-              {
-                q: 'Bulletin Facile gère-t-il les heures supplémentaires et les absences ?',
-                a: 'Oui. Les heures supplémentaires 25%/50% sont calculées avec exonération IR (Loi TEPA). Les absences (maladie, AT, CP, RTT, sans solde) sont déduites automatiquement avec calcul de l\'IJSS en cas de maintien de salaire.',
-              },
-              {
-                q: 'Quelle est la différence entre sans engagement et abonnement ?',
-                a: 'En sans engagement, vous achetez des bulletins à l\'unité ou en pack — idéal pour 1 à 20 bulletins/mois. L\'abonnement mensuel ou annuel offre des bulletins illimités — idéal pour les employeurs avec plusieurs salariés. Dans les deux cas, l\'aperçu est gratuit et illimité avant paiement.',
-              },
+              { q: 'Comment calculer le salaire net à partir du brut en 2026 ?', a: 'Saisissez le brut dans Bulletin Facile. Le net est calculé après déduction des cotisations salariales (vieillesse, AGIRC-ARRCO, CSG/CRDS…) et du prélèvement à la source. Pour 2026 : PMSS 4 005 €, SMIC 1 801,80 €.' },
+              { q: 'Les taux URSSAF et AGIRC-ARRCO 2026 sont-ils intégrés ?', a: 'Oui. Tous les taux officiels 2025 et 2026 sont intégrés : vieillesse plafonnée (6,90%), AGIRC-ARRCO T1 (3,15%), T2 (8,64%), CEG, CET (0,14%), CSG déductible (6,80%), CSG/CRDS non déductible (2,90%), allocations familiales, AT/MP, chômage, AGS.' },
+              { q: 'La réduction Fillon est-elle calculée automatiquement ?', a: 'Oui. Le coefficient et le montant apparaissent dans le tableau des cotisations patronales dès que le salaire est inférieur à 1,6 × SMIC annuel.' },
+              { q: 'Bulletin Facile gère-t-il les absences et heures supplémentaires ?', a: 'Oui. Les absences (maladie, AT, CP, RTT, sans solde) sont déduites avec calcul IJSS. Les heures supplémentaires 25%/50% sont calculées avec exonération IR (Loi TEPA).' },
+              { q: 'Quelle est la différence entre sans engagement et abonnement ?', a: 'Sans engagement : vous achetez à l\'unité ou en pack — idéal jusqu\'à 20 bulletins/mois. Abonnement mensuel ou annuel : bulletins illimités — idéal pour employeurs avec plusieurs salariés.' },
             ].map(({ q, a }) => (
-              <details key={q} className="bg-white rounded-xl border border-gray-200 p-5 group">
-                <summary className="font-semibold text-gray-900 cursor-pointer list-none flex justify-between items-center gap-4">
-                  <span>{q}</span>
-                  <span className="text-blue-600 text-xl shrink-0 group-open:rotate-45 transition-transform">+</span>
+              <details key={q} style={{ background: 'white', borderRadius: 10, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                <summary style={{ padding: '16px 20px', fontWeight: 600, fontSize: 14, cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {q}
+                  <span style={{ color: '#94a3b8', fontSize: 18, fontWeight: 300, flexShrink: 0, marginLeft: 16 }}>+</span>
                 </summary>
-                <p className="mt-3 text-gray-500 text-sm leading-relaxed">{a}</p>
+                <p style={{ padding: '0 20px 16px', margin: 0, color: '#64748b', fontSize: 14, lineHeight: 1.7 }}>{a}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA FINAL ── */}
-      <section className="bg-blue-800 py-20 px-6 text-center text-white">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-extrabold mb-4">
-            Prêt à générer votre premier bulletin de salaire ?
+      {/* CTA FINAL */}
+      <section style={{ background: 'linear-gradient(160deg, #0f172a, #1e3a8a)', padding: '80px 24px', textAlign: 'center', color: 'white' }}>
+        <div style={{ maxWidth: 580, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 34, fontWeight: 900, marginBottom: 16, letterSpacing: '-0.5px' }}>
+            Prêt à générer votre premier bulletin ?
           </h2>
-          <p className="text-blue-200 mb-8">
+          <p style={{ color: '#93c5fd', marginBottom: 40, fontSize: 17, lineHeight: 1.7 }}>
             Rejoignez les RH, gérants de TPE/PME et comptables qui gagnent du temps chaque mois.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/generateur"
-              className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold text-xl px-10 py-4 rounded-2xl shadow-xl transition-all hover:scale-105">
-              Essayer gratuitement →
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+            <a href="/generateur" style={{ background: '#fbbf24', color: '#0f172a', fontWeight: 800, fontSize: 17, padding: '15px 40px', borderRadius: 12, textDecoration: 'none' }}>
+              Essayer gratuitement
             </a>
-            <a href="/tarifs"
-              className="border-2 border-white/50 text-white hover:bg-white/10 font-bold text-xl px-10 py-4 rounded-2xl transition-colors">
-              Voir tous les tarifs
+            <a href="/tarifs" style={{ border: '1px solid rgba(255,255,255,0.25)', color: 'white', fontWeight: 600, fontSize: 17, padding: '15px 32px', borderRadius: 12, textDecoration: 'none' }}>
+              Voir les tarifs
             </a>
           </div>
-          <p className="text-blue-300 text-sm mt-4">Aperçu gratuit · Dès 8,90 € · Conforme droit social 2026</p>
+          <p style={{ color: '#475569', fontSize: 12, marginTop: 20 }}>Aperçu gratuit · Dès 8,90 € · Conforme droit social 2026</p>
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer className="bg-gray-900 text-gray-400 text-sm py-8 px-6">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div>
-            <span className="font-bold text-white">Bulletin Facile</span>
-            <span className="ml-2">· Générateur de bulletin de salaire français</span>
+      {/* FOOTER */}
+      <footer style={{ background: '#0f172a', color: '#64748b', padding: '56px 24px 32px', fontSize: 14 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 40, marginBottom: 48 }}>
+            <div>
+              <div style={{ color: 'white', fontWeight: 900, fontSize: 17, marginBottom: 12, letterSpacing: '-0.5px' }}>Bulletin Facile</div>
+              <p style={{ fontSize: 13, lineHeight: 1.7, maxWidth: 260, color: '#64748b' }}>
+                Générateur de bulletin de salaire français conforme au droit social 2025/2026.
+              </p>
+            </div>
+            <div>
+              <div style={{ color: 'white', fontWeight: 700, fontSize: 11, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '1px' }}>Outils</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[['Bulletin de paie', '/generateur'], ['Contrat de travail', '/contrat'], ['Tarifs', '/tarifs']].map(([l, h]) => (
+                  <a key={l} href={h} style={{ color: '#64748b', textDecoration: 'none', fontSize: 13 }}>{l}</a>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div style={{ color: 'white', fontWeight: 700, fontSize: 11, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '1px' }}>Guides</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[['SMIC 2026', '/smic-2026'], ['Salaire brut en net', '/salaire-brut-en-net'], ['Lire une fiche de paie', '/comment-lire-fiche-de-paie']].map(([l, h]) => (
+                  <a key={l} href={h} style={{ color: '#64748b', textDecoration: 'none', fontSize: 13 }}>{l}</a>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div style={{ color: 'white', fontWeight: 700, fontSize: 11, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '1px' }}>À propos</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[['Qui sommes-nous ?', '/qui-sommes-nous'], ['Contact', 'mailto:contact@bulletinfacile.fr']].map(([l, h]) => (
+                  <a key={l} href={h} style={{ color: '#64748b', textDecoration: 'none', fontSize: 13 }}>{l}</a>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="flex gap-6">
-            <a href="/generateur" className="hover:text-white transition-colors">Bulletin de paie</a>
-            <a href="/contrat" className="hover:text-white transition-colors">Contrat de travail</a>
-            <a href="/tarifs" className="hover:text-white transition-colors">Tarifs</a>
-            <a href="#faq-heading" className="hover:text-white transition-colors">FAQ</a>
+          <div style={{ borderTop: '1px solid #1e293b', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, fontSize: 12, color: '#475569' }}>
+            <span>© {new Date().getFullYear()} <span style={{ color: 'white', fontWeight: 700 }}>Bulletin Facile</span> · Conformité URSSAF 2025/2026</span>
+            <span>Paiement sécurisé · Satisfait ou remboursé 30 jours</span>
           </div>
-          <p>© {new Date().getFullYear()} Bulletin Facile · Conformité URSSAF 2025/2026</p>
         </div>
       </footer>
     </div>
