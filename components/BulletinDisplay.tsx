@@ -1,6 +1,75 @@
 'use client';
 import type { ResultBS, LigneBS } from '@/lib/cotisations';
 
+// ── Générateur DSN simplifié ──
+function generateDSN(data: ResultBS): string {
+  const { input, totaux, params } = data;
+  const pad2 = (n: number) => String(n).padStart(2, '0');
+  const now = new Date();
+  const moisRef = `${params.annee}${pad2(params.mois)}`;
+
+  const lines: string[] = [
+    '// DSN PHASE 3 - Généré par BS Facile',
+    `// Période : ${pad2(params.mois)}/${params.annee}`,
+    `// Généré le : ${now.toLocaleDateString('fr-FR')}`,
+    '',
+    'S10.G00.00.001,' + params.annee + pad2(params.mois) + '01',
+    'S10.G00.00.002,' + params.annee + pad2(params.mois) + String(new Date(params.annee, params.mois, 0).getDate()),
+    'S10.G00.00.003,01',
+    '',
+    '// --- ÉTABLISSEMENT ---',
+    `S21.G00.06.001,${input.entrepriseSiret?.replace(/\s/g, '') || ''}`,
+    `S21.G00.06.002,${input.entrepriseNom || ''}`,
+    `S21.G00.06.003,${input.entrepriseAdresse || ''}`,
+    `S21.G00.06.021,${input.entrepriseNaf?.replace('.', '') || ''}`,
+    '',
+    '// --- INDIVIDU ---',
+    `S21.G00.30.001,${input.salariéNss || ''}`,
+    `S21.G00.30.002,${input.salariéNom || ''}`,
+    `S21.G00.30.004,${input.salariéPrenom || ''}`,
+    `S21.G00.30.006,${input.salariéAdresse || ''}`,
+    '',
+    '// --- CONTRAT ---',
+    `S21.G00.40.001,${moisRef}01`,
+    `S21.G00.40.007,${input.statut === 'cadre' ? '12' : '11'}`,
+    `S21.G00.40.009,${input.salariéPoste || ''}`,
+    '',
+    '// --- RÉMUNÉRATION ---',
+    `S21.G00.51.001,${moisRef}01`,
+    `S21.G00.51.002,${moisRef}${String(new Date(params.annee, params.mois, 0).getDate())}`,
+    `S21.G00.51.010,${totaux.brutMensuel.toFixed(2)}`,
+    `S21.G00.51.011,${totaux.netAPayer.toFixed(2)}`,
+    `S21.G00.51.013,${totaux.netAvantPAS.toFixed(2)}`,
+    `S21.G00.51.020,${(input.heuresMensuelles || 151.67).toFixed(2)}`,
+    '',
+    '// --- VERSEMENT ---',
+    `S21.G00.60.001,${moisRef}${String(new Date(params.annee, params.mois, 0).getDate())}`,
+    `S21.G00.60.002,${totaux.netAPayer.toFixed(2)}`,
+    `S21.G00.60.003,01`,
+    '',
+    '// --- COTISATIONS ---',
+    `// Total salarial : ${totaux.totalCotisationsSalariales.toFixed(2)} EUR`,
+    `// Total patronal : ${totaux.totalCotisationsPatronales.toFixed(2)} EUR`,
+    `// Coût employeur : ${totaux.coutEmployeur.toFixed(2)} EUR`,
+    `// Réduction Fillon : ${totaux.reductionFillon.toFixed(2)} EUR`,
+    '',
+    'S90.G00.90.001,1',
+    'S90.G00.90.002,1',
+  ];
+  return lines.join('\n');
+}
+
+function downloadDSN(data: ResultBS) {
+  const content = generateDSN(data);
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `DSN_${data.params.annee}_${String(data.params.mois).padStart(2,'0')}_${(data.input.entrepriseSiret || 'entreprise').slice(0,9)}.dsn`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 const euro = (n: number) =>
   new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n) + '\u00a0€';
 
@@ -354,6 +423,27 @@ export default function BulletinDisplay({ data }: { data: ResultBS }) {
       <div style={{ borderTop: '1px solid #ddd', padding: '6px 12px', fontSize: '8px', color: '#888', textAlign: 'center' }}>
         Bulletin de paie simplifié — Normes en vigueur | Conservez cette fiche de paie pendant toute la durée légale.
         Il existe une rubrique dédiée au bulletin de paie sur le site service-public.fr
+      </div>
+
+      {/* ══ BOUTONS DSN / CONTRAT ══ */}
+      <div className="no-print" style={{ borderTop: '1px solid #eee', padding: '12px 16px', display: 'flex', gap: '10px', flexWrap: 'wrap', backgroundColor: '#f7f9fc' }}>
+        <button
+          onClick={() => downloadDSN(data)}
+          style={{ backgroundColor: '#1a3a5c', color: 'white', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/></svg>
+          Télécharger DSN
+        </button>
+        <a
+          href="/contrat"
+          style={{ backgroundColor: '#15803d', color: 'white', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/></svg>
+          Générer contrat de travail
+        </a>
+        <div style={{ fontSize: '10px', color: '#999', alignSelf: 'center', marginLeft: 'auto' }}>
+          DSN Phase 3 — Format URSSAF
+        </div>
       </div>
     </div>
   );

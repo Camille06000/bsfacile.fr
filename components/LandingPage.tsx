@@ -34,7 +34,8 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <span className="text-blue-800 font-extrabold text-xl tracking-tight">BS Facile</span>
           <div className="flex items-center gap-4">
-            <a href="/generateur" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Essai gratuit</a>
+            <a href="/contrat" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Contrat de travail</a>
+            <a href="/generateur" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Bulletin de paie</a>
             <button onClick={handleBuy} disabled={loading}
               className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors">
               Accès à vie — {PRICE} €
@@ -310,7 +311,8 @@ export default function LandingPage() {
             <span className="ml-2">· Générateur de bulletin de salaire français</span>
           </div>
           <div className="flex gap-6">
-            <a href="/generateur" className="hover:text-white transition-colors">Générateur</a>
+            <a href="/generateur" className="hover:text-white transition-colors">Bulletin de paie</a>
+            <a href="/contrat" className="hover:text-white transition-colors">Contrat de travail</a>
             <a href="#pricing" className="hover:text-white transition-colors">Tarifs</a>
             <a href="#faq-heading" className="hover:text-white transition-colors">FAQ</a>
           </div>
