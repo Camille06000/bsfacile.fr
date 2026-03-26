@@ -66,6 +66,13 @@ export interface ContratData {
   cfa: string;
   maitreApprentissage: string;
   diplome: string;
+  // Temps de travail avancé
+  forfaitJours: boolean;
+  forfaitJoursNb: string;
+  teletravail: boolean;
+  teletravailJours: string;
+  // Mutuelle
+  mutuelle: boolean;
   // Autres
   periodeEssaiApp: string;
   avantages: string;
@@ -106,6 +113,11 @@ const defaultData: ContratData = {
   clauseConfidentialite: true,
   clauseMobilite: false,
   mobiliteZone: '',
+  forfaitJours: false,
+  forfaitJoursNb: '218',
+  teletravail: false,
+  teletravailJours: '',
+  mutuelle: true,
   cfa: '',
   maitreApprentissage: '',
   diplome: '',
@@ -441,6 +453,26 @@ export default function ContratForm() {
                 <input value={form.repartitionHeures} onChange={set('repartitionHeures')} className={inp}
                   placeholder="ex : lundi au vendredi 9h–17h" />
               </Field>
+              <div className="md:col-span-2 space-y-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={form.forfaitJours} onChange={setBool('forfaitJours')} className="rounded" />
+                  <span className="text-sm font-medium">Forfait jours (cadres)</span>
+                </label>
+                {form.forfaitJours && (
+                  <Field label="Nombre de jours / an">
+                    <input type="number" value={form.forfaitJoursNb} onChange={set('forfaitJoursNb')} className={inp} placeholder="218" />
+                  </Field>
+                )}
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={form.teletravail} onChange={setBool('teletravail')} className="rounded" />
+                  <span className="text-sm font-medium">Télétravail</span>
+                </label>
+                {form.teletravail && (
+                  <Field label="Nombre de jours de télétravail / semaine">
+                    <input type="number" value={form.teletravailJours} onChange={set('teletravailJours')} className={inp} placeholder="ex : 2" />
+                  </Field>
+                )}
+              </div>
             </div>
           )}
 
@@ -487,6 +519,13 @@ export default function ContratForm() {
                   <div>
                     <div className="font-semibold text-sm">Clause de mobilité géographique</div>
                     <div className="text-xs text-gray-500">Possibilité de mutation dans une zone définie</div>
+                  </div>
+                </label>
+                <label className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
+                  <input type="checkbox" checked={form.mutuelle} onChange={setBool('mutuelle')} className="mt-0.5 rounded" />
+                  <div>
+                    <div className="font-semibold text-sm">Mutuelle d&apos;entreprise</div>
+                    <div className="text-xs text-gray-500">Adhésion obligatoire à la mutuelle collective de l&apos;entreprise</div>
                   </div>
                 </label>
               </div>
