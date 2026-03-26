@@ -54,3 +54,23 @@
   .cta-box { padding: 28px 16px !important; }
   .cta-box a { font-size: 15px !important; padding: 12px 24px !important; }
 }
+
+/* ── Landing page mobile ─────────────────────────────── */
+@media (max-width: 640px) {
+  .trust-bar { grid-template-columns: 1fr 1fr !important; gap: 16px !important; }
+  .two-col { grid-template-columns: 1fr !important; }
+  .three-col { grid-template-columns: 1fr !important; }
+  .steps-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
+  .testimonials-grid { grid-template-columns: 1fr !important; }
+  .section-mobile { padding: 48px 16px !important; }
+  .pricing-inner { grid-template-columns: 1fr !important; }
+  .pricing-outer { grid-template-columns: 1fr !important; }
+  .cta-buttons { flex-direction: column !important; align-items: stretch !important; }
+  .cta-buttons a { text-align: center !important; }
+  .compare-wrap { overflow-x: auto !important; }
+  .tarifs-grid { grid-template-columns: 1fr !important; }
+  .tarifs-inner { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 480px) {
+  .nav-logo { height: 32px !important; width: auto !important; }
+}

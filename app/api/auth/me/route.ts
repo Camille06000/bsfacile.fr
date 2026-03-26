@@ -8,7 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
-import { getUserById, getActiveSubscription } from '@/lib/db';
+import { getUserById, getActiveSubscription, getFreeBulletinsCount } from '@/lib/db';
 
 const COOKIE_NAME = 'session';
 
@@ -39,10 +39,12 @@ export async function GET(req: NextRequest) {
     }
 
     const subscription = getActiveSubscription(userId) ?? null;
+    const freeBulletinsUsed = subscription ? 0 : getFreeBulletinsCount(userId);
 
     return NextResponse.json({
       user: { id: user.id, email: user.email },
       subscription,
+      freeBulletinsUsed,
     });
   } catch {
     // JWT invalide ou expiré

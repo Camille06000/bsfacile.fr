@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { calculerBS } from '@/lib/cotisations';
-import { getUserById, getActiveSubscription, incrementBulletinUsed, saveBulletin } from '@/lib/db';
+import { getUserById, getActiveSubscription, incrementBulletinUsed, saveBulletin, getFreeBulletinsCount } from '@/lib/db';
 
 const COOKIE_NAME = 'session';
 
@@ -15,7 +15,10 @@ export async function POST(req: NextRequest) {
   // --- Auth check ---
   const sessionCookie = req.cookies.get(COOKIE_NAME);
   if (!sessionCookie?.value) {
-    return NextResponse.json({ error: 'Non authentifié. Connectez-vous pour générer un bulletin.' }, { status: 401 });
+    return NextResponse.json(
+      { error: 'Créez un compte gratuit pour générer vos 3 premiers bulletins.', redirect: '/dashboard' },
+      { status: 401 }
+    );
   }
 
   let userId: number;
@@ -24,7 +27,10 @@ export async function POST(req: NextRequest) {
     userId = Number(payload.sub);
     if (!userId) throw new Error('Invalid sub');
   } catch {
-    return NextResponse.json({ error: 'Session expirée. Reconnectez-vous.' }, { status: 401 });
+    return NextResponse.json(
+      { error: 'Créez un compte gratuit pour générer vos 3 premiers bulletins.', redirect: '/dashboard' },
+      { status: 401 }
+    );
   }
 
   const user = getUserById(userId);
@@ -33,8 +39,16 @@ export async function POST(req: NextRequest) {
   }
 
   const subscription = getActiveSubscription(userId);
-  if (!subscription) {
-    return NextResponse.json({ error: 'Aucun abonnement actif. Achetez un accès pour générer des bulletins.', redirect: '/tarifs' }, { status: 403 });
+  const isFreeUser = !subscription;
+
+  if (isFreeUser) {
+    const freeBulletins = getFreeBulletinsCount(userId);
+    if (freeBulletins >= 3) {
+      return NextResponse.json(
+        { error: 'Vous avez utilisé vos 3 bulletins gratuits. Choisissez une offre pour continuer.', redirect: '/tarifs' },
+        { status: 403 }
+      );
+    }
   }
   // ---
   const body = await req.json();
@@ -78,10 +92,15 @@ export async function POST(req: NextRequest) {
   });
 
   // Track usage
-  if (subscription.bulletins_total > 0) {
-    incrementBulletinUsed(subscription.id);
+  if (!isFreeUser && subscription) {
+    if (subscription.bulletins_total > 0) {
+      incrementBulletinUsed(subscription.id);
+    }
+    saveBulletin({ userId, subscriptionId: subscription.id, data: body });
+    return NextResponse.json({ ...result, isFree: false });
+  } else {
+    // Free bulletin (no subscription)
+    saveBulletin({ userId, subscriptionId: null, data: body });
+    return NextResponse.json({ ...result, isFree: true });
   }
-  saveBulletin({ userId, subscriptionId: subscription.id, data: body });
-
-  return NextResponse.json(result);
 }

@@ -72,14 +72,14 @@ export default function TarifsPage() {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 16px 80px' }}>
 
         {/* GRID 2 colonnes */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))', gap: 24 }}>
+        <div className="tarifs-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
 
           {/* ── SANS ENGAGEMENT ── */}
           <div style={{ background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: 20, padding: 24 }}>
             <h2 style={{ textAlign: 'center', fontWeight: 900, color: '#15803d', fontSize: 18, letterSpacing: 1, marginBottom: 20, textTransform: 'uppercase' }}>
               Sans engagement
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="tarifs-inner" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 
               {/* 1 Bulletin */}
               <div style={{ background: 'white', borderRadius: 14, border: '1px solid #d1fae5', padding: 20, display: 'flex', flexDirection: 'column' }}>
@@ -133,7 +133,7 @@ export default function TarifsPage() {
             <h2 style={{ textAlign: 'center', fontWeight: 900, color: '#1d4ed8', fontSize: 18, letterSpacing: 1, marginBottom: 20, textTransform: 'uppercase' }}>
               Abonnement
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="tarifs-inner" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 
               {/* Mensuel */}
               <div style={{ background: 'white', borderRadius: 14, border: '1px solid #bfdbfe', padding: 20, display: 'flex', flexDirection: 'column' }}>

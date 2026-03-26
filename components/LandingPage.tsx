@@ -141,7 +141,7 @@ export default function LandingPage() {
           <p style={{ fontSize: 14, color: '#64748b', marginBottom: 40 }}>
             Pour les RH, TPE/PME et cabinets comptables · <span style={{ color: '#93c5fd' }}>10× moins cher que Silae ou Sage Paie</span>
           </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginBottom: 16 }}>
+          <div className="cta-buttons" style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginBottom: 16 }}>
             <a href="/tarifs" style={{ background: '#fbbf24', color: '#0f172a', fontWeight: 800, fontSize: 16, padding: '16px 40px', borderRadius: 10, textDecoration: 'none', boxShadow: '0 4px 20px rgba(251,191,36,0.4)' }}>
               Créer mon bulletin — dès 8,90 €
             </a>
@@ -155,7 +155,7 @@ export default function LandingPage() {
 
       {/* TRUST BAR */}
       <section style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '18px 24px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, textAlign: 'center' }}>
+        <div className="trust-bar" style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, textAlign: 'center' }}>
           {[
             { val: '+500',        label: 'Bulletins générés' },
             { val: '8,90 €',     label: 'Tarif de départ' },
@@ -176,7 +176,7 @@ export default function LandingPage() {
           <h2 style={{ fontSize: 30, fontWeight: 800, textAlign: 'center', marginBottom: 48 }}>
             La paie manuelle, c'est terminé
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div className="two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
             <div style={{ background: '#fff5f5', border: '1px solid #fecaca', borderRadius: 16, padding: 28 }}>
               <div style={{ fontWeight: 700, color: '#dc2626', marginBottom: 16, fontSize: 13, borderBottom: '1px solid #fecaca', paddingBottom: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Sans Bulletin Facile
@@ -215,7 +215,7 @@ export default function LandingPage() {
           <p style={{ textAlign: 'center', color: '#64748b', marginBottom: 52, fontSize: 16, maxWidth: 540, margin: '0 auto 52px' }}>
             Toutes les cotisations du Code du travail, calculées selon les paramètres officiels URSSAF 2026.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+          <div className="three-col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             {FEATURES.map(f => (
               <article key={f.title} style={{ background: 'white', borderRadius: 16, padding: 28, border: '1px solid #e2e8f0' }}>
                 <div style={{ width: 48, height: 48, background: '#eff6ff', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
@@ -234,7 +234,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{ fontSize: 30, fontWeight: 800, marginBottom: 12 }}>3 étapes, 30 secondes</h2>
           <p style={{ color: '#64748b', marginBottom: 56, fontSize: 16 }}>Aucune formation. Aucun logiciel à installer.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
+          <div className="steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
             {[
               { n: '01', title: 'Saisissez le salaire brut', desc: 'Entrez le brut mensuel, le statut cadre/non-cadre, l\'effectif et le taux PAS.' },
               { n: '02', title: 'Calcul instantané', desc: 'Toutes les cotisations 2025/2026 apparaissent — salariales et patronales — en temps réel.' },
@@ -269,7 +269,7 @@ export default function LandingPage() {
             <h2 style={{ fontSize: 30, fontWeight: 800, marginBottom: 8 }}>4,9/5 · Ils gagnent du temps chaque mois</h2>
             <p style={{ color: '#64748b', fontSize: 15 }}>Rejoignez +500 RH, gérants et comptables qui ont simplifié leur paie</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginTop: 40 }}>
+          <div className="testimonials-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginTop: 40 }}>
             {[
               { name: 'Marie L.',     role: 'Responsable RH · PME 12 salariés', text: '2 heures économisées par mois dès le premier bulletin. Les taux sont toujours à jour — je ne vérifie plus rien manuellement.', badge: '2h/mois économisées', initial: 'M' },
               { name: 'Thomas R.',   role: 'Gérant SARL · Secteur BTP',        text: 'La réduction Fillon est calculée automatiquement. À 8,90 € le bulletin, c\'est 10× moins cher que ce que me proposait mon logiciel de paie.', badge: '10× moins cher', initial: 'T' },
@@ -306,8 +306,8 @@ export default function LandingPage() {
           <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, marginBottom: 40 }}>
             Les grands logiciels sont conçus pour les DRH de 50+ salariés. Pas pour vous.
           </p>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+          <div className="compare-wrap" style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, minWidth: 560 }}>
               <thead>
                 <tr style={{ background: '#f8fafc' }}>
                   <th style={{ padding: '14px 20px', textAlign: 'left', fontWeight: 700, color: '#374151', border: '1px solid #e2e8f0' }}>Logiciel</th>
@@ -508,7 +508,7 @@ export default function LandingPage() {
           <p style={{ color: '#93c5fd', marginBottom: 40, fontSize: 17, lineHeight: 1.7 }}>
             Rejoignez les RH, gérants de TPE/PME et comptables qui gagnent du temps chaque mois.
           </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+          <div className="cta-buttons" style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
             <a href="/tarifs" style={{ background: '#fbbf24', color: '#0f172a', fontWeight: 800, fontSize: 17, padding: '15px 40px', borderRadius: 12, textDecoration: 'none' }}>
               Créer mon premier bulletin →
             </a>

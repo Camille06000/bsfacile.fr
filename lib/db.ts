@@ -224,3 +224,10 @@ export function getBulletinsByUser(userId: number): DbSubscription[] {
     .prepare('SELECT * FROM bulletins WHERE user_id = ? ORDER BY created_at DESC')
     .all(userId) as DbSubscription[];
 }
+
+export function getFreeBulletinsCount(userId: number): number {
+  const row = getDb()
+    .prepare('SELECT COUNT(*) as cnt FROM bulletins WHERE user_id = ? AND subscription_id IS NULL')
+    .get(userId) as { cnt: number };
+  return row?.cnt ?? 0;
+}

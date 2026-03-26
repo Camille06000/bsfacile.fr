@@ -181,7 +181,7 @@ const pct = (n: number | null) =>
 const lastDay = (mois: number, annee: number) => new Date(annee, mois, 0).getDate();
 const fmt2 = (n: number) => String(n).padStart(2, '0');
 
-export default function BulletinDisplay({ data, logoDataUrl }: { data: ResultBS; logoDataUrl?: string }) {
+export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: ResultBS; logoDataUrl?: string; isFree?: boolean }) {
   const [showDSN, setShowDSN] = useState(false);
   const { lignes, elementsSalaire, lignesAbsences, totaux, params, input } = data;
   const { mois, annee, pmss } = params;
@@ -223,6 +223,40 @@ export default function BulletinDisplay({ data, logoDataUrl }: { data: ResultBS;
   };
 
   return (
+    <div style={{ position: 'relative' }}>
+      {isFree && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 10,
+            overflow: 'hidden',
+          }}
+        >
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                left: `${(i % 4) * 28 - 5}%`,
+                top: `${Math.floor(i / 4) * 32 + 8}%`,
+                transform: 'rotate(-30deg)',
+                fontSize: '32px',
+                fontWeight: 900,
+                color: 'rgba(100, 100, 100, 0.15)',
+                whiteSpace: 'nowrap',
+                userSelect: 'none',
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                letterSpacing: '0.05em',
+              }}
+            >
+              DÉMO – bulletinfacile.fr
+            </div>
+          ))}
+        </div>
+      )}
     <div
       id="bulletin-pdf"
       className="bulletin-print bg-white text-gray-900 font-sans max-w-4xl mx-auto shadow-lg"
@@ -596,6 +630,7 @@ export default function BulletinDisplay({ data, logoDataUrl }: { data: ResultBS;
 
       {/* Modal DSN */}
       {showDSN && <DSNModal data={data} onClose={() => setShowDSN(false)} />}
+    </div>
     </div>
   );
 }

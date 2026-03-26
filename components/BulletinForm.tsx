@@ -171,6 +171,7 @@ export default function BulletinForm() {
   const [absences, setAbsences] = useState<AbsenceForm[]>([]);
   const [logoDataUrl, setLogoDataUrl] = useState<string>('');
   const [result, setResult] = useState<ResultBS | null>(null);
+  const [isFree, setIsFree] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [tab, setTab] = useState<TabType>('principal');
@@ -306,6 +307,7 @@ export default function BulletinForm() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erreur serveur');
+      setIsFree(!!data.isFree);
       setResult(data);
       setTimeout(() => document.getElementById('bulletin-section')?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (err: unknown) {
@@ -805,7 +807,7 @@ export default function BulletinForm() {
 
       {result && (
         <section id="bulletin-section">
-          <BulletinDisplay data={result} logoDataUrl={logoDataUrl} />
+          <BulletinDisplay data={result} logoDataUrl={logoDataUrl} isFree={isFree} />
         </section>
       )}
     </div>
