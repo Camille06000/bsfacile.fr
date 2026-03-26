@@ -61,12 +61,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               applicationCategory: 'BusinessApplication',
               operatingSystem: 'Web',
               offers: {
-                '@type': 'Offer',
-                price: '49.00',
+                '@type': 'AggregateOffer',
+                lowPrice: '8.90',
+                highPrice: '998.00',
                 priceCurrency: 'EUR',
-                priceValidUntil: '2027-12-31',
                 availability: 'https://schema.org/InStock',
-                name: 'Accès à vie',
+                offerCount: '4',
               },
               aggregateRating: {
                 '@type': 'AggregateRating',
@@ -112,10 +112,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 },
                 {
                   '@type': 'Question',
-                  name: 'Comment fonctionne le paiement à vie ?',
+                  name: 'Quels sont les tarifs de Bulletin Facile ?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Vous payez 49€ une seule fois et accédez à Bulletin Facile sans limite de durée, y compris toutes les futures mises à jour légales.',
+                    text: 'Bulletin Facile propose plusieurs formules : à partir de 8,90€ HT pour 1 bulletin sans engagement, ou en abonnement mensuel dès 28,85€ HT/mois pour des bulletins illimités.',
                   },
                 },
               ],

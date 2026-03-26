@@ -43,7 +43,14 @@
       "WebFetch(domain:www.quickpaie.com)",
       "WebFetch(domain:who.is)",
       "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"feat: landing page refaite avec pricing 4 tiers + noms domaine recherchés\")",
-      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"rebrand: BS Facile → Bulletin Facile + domaine bulletinfacile.fr partout\")"
+      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"rebrand: BS Facile → Bulletin Facile + domaine bulletinfacile.fr partout\")",
+      "Bash(ssh -o StrictHostKeyChecking=no root@72.60.233.11 \"cat /etc/nginx/sites-enabled/* 2>/dev/null || cat /etc/nginx/conf.d/*.conf 2>/dev/null || echo ''no nginx config found''\")",
+      "Bash(ssh -o:*)",
+      "Bash(nslookup bulletinfacile.fr 8.8.8.8)",
+      "Bash(host bulletinfacile.fr 8.8.8.8)",
+      "Bash(curl -s https://bulletinfacile.fr)",
+      "Bash(curl -s https://bulletinfacile.fr/tarifs)",
+      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"fix: supprime toutes références 49€ à vie — Schema.org + FAQ mis à jour pricing 8,90€\")"
     ]
   }
 }
