@@ -36,7 +36,13 @@
       "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"feat: absences \\(maladie, AT, CP, RTT, sans solde, injustifiée\\) avec IJSS subrogation\")",
       "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" push)",
       "WebFetch(domain:www.fiche-paie.net)",
-      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"feat: page tarifs /tarifs avec prix 1€ moins que fiche-paie.net\")"
+      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"feat: page tarifs /tarifs avec prix 1€ moins que fiche-paie.net\")",
+      "WebSearch",
+      "WebFetch(domain:www.afnic.fr)",
+      "WebFetch(domain:openpaye.co)",
+      "WebFetch(domain:www.quickpaie.com)",
+      "WebFetch(domain:who.is)",
+      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"feat: landing page refaite avec pricing 4 tiers + noms domaine recherchés\")"
     ]
   }
 }
