@@ -50,7 +50,13 @@
       "Bash(host bulletinfacile.fr 8.8.8.8)",
       "Bash(curl -s https://bulletinfacile.fr)",
       "Bash(curl -s https://bulletinfacile.fr/tarifs)",
-      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"fix: supprime toutes références 49€ à vie — Schema.org + FAQ mis à jour pricing 8,90€\")"
+      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"fix: supprime toutes références 49€ à vie — Schema.org + FAQ mis à jour pricing 8,90€\")",
+      "Bash(ssh root@72.60.233.11 \"cd /var/www/bsfacile.fr && git pull && npm run build && pm2 restart bsfacile\")",
+      "Bash(ssh root@72.60.233.11 \"find / -name ''package.json'' -path ''*/bsfacile*'' 2>/dev/null | head -5\")",
+      "Bash(ssh root@72.60.233.11 \"pm2 list 2>/dev/null | head -20\")",
+      "Bash(ssh root@72.60.233.11 \"pm2 info bsfacile 2>/dev/null | grep ''root\\\\|exec\\\\|cwd\\\\|script'' | head -10\")",
+      "Bash(ssh root@72.60.233.11 \"cd /var/www/bsfacile && git pull && npm run build && pm2 restart bsfacile\")",
+      "Bash(ssh root@72.60.233.11 \"cat /var/www/bsfacile/.env.local 2>/dev/null || cat /var/www/bsfacile/.env 2>/dev/null\")"
     ]
   }
 }

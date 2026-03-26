@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Nav from '@/components/Nav';
+import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Qui sommes-nous ? — Bulletin Facile',
@@ -25,17 +27,7 @@ export default function QuiSommesNousPage() {
   return (
     <div style={{ fontFamily: 'Inter, Arial, sans-serif', color: '#1a1a2e' }}>
 
-      {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, background: 'rgba(255,255,255,0.97)', borderBottom: '1px solid #e5e7eb', zIndex: 50, backdropFilter: 'blur(8px)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontWeight: 900, fontSize: 20, color: '#1e40af', textDecoration: 'none' }}>Bulletin Facile</Link>
-          <div style={{ display: 'flex', gap: 24, fontSize: 14 }}>
-            <Link href="/generateur" style={{ color: '#6b7280', textDecoration: 'none' }}>Générateur</Link>
-            <Link href="/tarifs" style={{ color: '#6b7280', textDecoration: 'none' }}>Tarifs</Link>
-            <Link href="/blog" style={{ color: '#6b7280', textDecoration: 'none' }}>Guides</Link>
-          </div>
-        </div>
-      </nav>
+      <Nav />
 
       {/* HERO */}
       <section style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%)', color: 'white', padding: '80px 24px 100px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
@@ -153,20 +145,7 @@ export default function QuiSommesNousPage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer style={{ background: '#111827', color: '#9ca3af', padding: '40px 24px', textAlign: 'center', fontSize: 13 }}>
-        <div style={{ marginBottom: 16 }}>
-          <span style={{ color: 'white', fontWeight: 700 }}>Bulletin Facile</span> · Générateur de bulletin de salaire français
-        </div>
-        <div style={{ display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/" style={{ color: '#9ca3af', textDecoration: 'none' }}>Accueil</Link>
-          <Link href="/generateur" style={{ color: '#9ca3af', textDecoration: 'none' }}>Générateur</Link>
-          <Link href="/tarifs" style={{ color: '#9ca3af', textDecoration: 'none' }}>Tarifs</Link>
-          <Link href="/smic-2026" style={{ color: '#9ca3af', textDecoration: 'none' }}>SMIC 2026</Link>
-          <Link href="/comment-lire-fiche-de-paie" style={{ color: '#9ca3af', textDecoration: 'none' }}>Lire une fiche de paie</Link>
-        </div>
-        <p style={{ marginTop: 20 }}>© {new Date().getFullYear()} Bulletin Facile · Conformité URSSAF 2025/2026</p>
-      </footer>
+      <Footer />
     </div>
   );
 }

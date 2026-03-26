@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Nav from '@/components/Nav';
+import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Salaire Brut en Net 2026 : Convertisseur & Calcul — Bulletin Facile',
@@ -20,13 +22,7 @@ export default function SalaireBrutEnNetPage() {
   return (
     <div style={{ fontFamily: 'Inter, Arial, sans-serif', color: '#1a1a2e' }}>
 
-      {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, background: 'rgba(255,255,255,0.97)', borderBottom: '1px solid #e5e7eb', zIndex: 50, backdropFilter: 'blur(8px)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontWeight: 900, fontSize: 20, color: '#1e40af', textDecoration: 'none' }}>Bulletin Facile</Link>
-          <Link href="/generateur" style={{ background: '#1d4ed8', color: 'white', fontWeight: 700, fontSize: 13, padding: '8px 18px', borderRadius: 8, textDecoration: 'none' }}>Calculer mon net →</Link>
-        </div>
-      </nav>
+      <Nav />
 
       {/* HERO */}
       <section style={{ background: 'linear-gradient(135deg, #0c4a6e 0%, #0369a1 60%, #0284c7 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
@@ -131,9 +127,7 @@ export default function SalaireBrutEnNetPage() {
         </div>
       </div>
 
-      <footer style={{ background: '#111827', color: '#9ca3af', padding: '40px 24px', textAlign: 'center', fontSize: 13 }}>
-        <p>© {new Date().getFullYear()} <span style={{ color: 'white', fontWeight: 700 }}>Bulletin Facile</span> · Conformité URSSAF 2025/2026</p>
-      </footer>
+      <Footer />
     </div>
   );
 }

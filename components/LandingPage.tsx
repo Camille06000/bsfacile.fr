@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import PayButton from '@/components/PayButton';
 
 const PACK_OPTIONS = [
   { label: '3 Fiches', total: 22.70, perFiche: 7.57 },
@@ -245,10 +246,7 @@ export default function LandingPage() {
                     <span className="text-xl font-bold text-green-600 align-super">,90</span>
                     <span className="text-sm text-gray-400 ml-1">€ HT</span>
                   </div>
-                  <a href="/generateur"
-                    className="block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-lg transition-colors mb-4 text-sm">
-                    Créer un bulletin
-                  </a>
+                  <PayButton amount={8.90} description="Bulletin Facile — 1 bulletin de salaire" label="Acheter — 8,90 €" className="block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-lg transition-colors mb-4 text-sm w-full" />
                   <ul className="space-y-1.5 mt-auto">
                     {['Logo & couleur modifiables', 'Journal de paie inclus', 'DSN Phase 3 incluse', 'PDF immédiat', 'Calculs URSSAF 2026'].map(f => (
                       <li key={f} className="flex items-start gap-2 text-xs text-gray-600"><CheckIcon />{f}</li>
@@ -275,10 +273,7 @@ export default function LandingPage() {
                     <span className="text-sm text-gray-400 ml-1">€ HT</span>
                   </div>
                   <div className="text-center text-xs text-gray-400 mb-3">soit {pack.perFiche.toFixed(2).replace('.', ',')} € HT / fiche</div>
-                  <a href="/generateur"
-                    className="block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-lg transition-colors mb-4 text-sm">
-                    Choisir
-                  </a>
+                  <PayButton amount={pack.total} description={`Bulletin Facile — Pack ${pack.label}`} label={`Acheter — ${pack.total.toFixed(2).replace('.', ',')} €`} className="block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-lg transition-colors mb-4 text-sm w-full" />
                   <ul className="space-y-1.5 mt-auto">
                     {['Multi-salariés', 'Multi-entreprises', 'Logo & couleur modifiables', 'Journal de paie inclus', 'DSN Phase 3 incluse'].map(f => (
                       <li key={f} className="flex items-start gap-2 text-xs text-gray-600"><CheckIcon />{f}</li>
