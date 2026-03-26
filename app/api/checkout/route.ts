@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
       currency: 'EUR',
       merchant_code: merchantCode,
       description,
-      return_url: `${baseUrl}/success`,
+      // return_url inclut checkout_id pour vérification côté client (fallback webhook)
+      return_url: `${baseUrl}/success?checkout_id=CHECKOUT_ID_PLACEHOLDER`,
     };
 
     // Inclure l'email dans personal_details pour que le webhook le reçoive
@@ -48,6 +49,22 @@ export async function POST(req: NextRequest) {
     }
 
     const checkout = await checkoutRes.json();
+
+    // Mettre à jour return_url avec le vrai checkout_id
+    if (checkout.id) {
+      try {
+        await fetch(`https://api.sumup.com/v0.1/checkouts/${checkout.id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            return_url: `${baseUrl}/success?checkout_id=${checkout.id}`,
+          }),
+        });
+      } catch { /* non bloquant */ }
+    }
 
     // Stocker l'email en DB (table pending_checkouts) pour fiabiliser le webhook
     if (email && checkout.id) {

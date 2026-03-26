@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { findOrCreateUser, createSubscription, getDb } from '@/lib/db';
 
-// Webhook SumUp — reçoit les événements de paiement
-// Configurer dans SumUp Dashboard → Developers → Webhooks
-// URL : https://bulletinfacile.fr/api/webhook
-
 // ---------------------------------------------------------------------------
-// Détermine le type d'abonnement selon le montant payé (en euros)
+// SumUp webhook — CHECKOUT_STATUS_CHANGED
+//
+// ⚠️  Le payload SumUp est MINIMAL : { event_type, id }
+//     Il N'Y A PAS de payload.status ni payload.email dans le body.
+//     On doit appeler l'API SumUp pour vérifier le statut réel.
 // ---------------------------------------------------------------------------
 
 interface SubscriptionMeta {
@@ -15,49 +15,57 @@ interface SubscriptionMeta {
   expiresAt?: number;
 }
 
-function resolveSubscriptionMeta(amountEuros: number): SubscriptionMeta {
+function resolveSubscription(amountCents: number): SubscriptionMeta {
   const now = Math.floor(Date.now() / 1000);
-
-  if (amountEuros <= 9.0) {
-    // 8.90 € — bulletin unique
-    return { type: 'single', bulletinsTotal: 1 };
+  switch (amountCents) {
+    case 890:   return { type: 'single',  bulletinsTotal: 1 };
+    case 2900:  return { type: 'pack5',   bulletinsTotal: 5 };
+    case 2885:  return { type: 'monthly', bulletinsTotal: 0, expiresAt: now + 31 * 24 * 3600 };
+    case 28800: return { type: 'annual',  bulletinsTotal: 0, expiresAt: now + 366 * 24 * 3600 };
+    default: {
+      const euros = amountCents / 100;
+      if (euros <= 9)               return { type: 'single',  bulletinsTotal: 1 };
+      if (euros >= 28 && euros <= 30) return { type: 'monthly', bulletinsTotal: 0, expiresAt: now + 31 * 24 * 3600 };
+      if (euros > 9 && euros <= 35)  return { type: 'pack5',   bulletinsTotal: 5 };
+      return { type: 'annual', bulletinsTotal: 0, expiresAt: now + 366 * 24 * 3600 };
+    }
   }
-  if (amountEuros >= 28 && amountEuros <= 30) {
-    // 28.85 €/mois — abonnement mensuel (illimité, expire dans 31 jours)
-    return { type: 'monthly', bulletinsTotal: 0, expiresAt: now + 31 * 24 * 3600 };
-  }
-  if (amountEuros > 9 && amountEuros <= 35) {
-    // 29.00 € — pack 5 bulletins
-    return { type: 'pack5', bulletinsTotal: 5 };
-  }
-  if (amountEuros <= 290) {
-    // 288.00 €/an — abonnement annuel (illimité, expire dans 366 jours)
-    return { type: 'annual', bulletinsTotal: 0, expiresAt: now + 366 * 24 * 3600 };
-  }
-  // Fallback — traité comme mensuel si montant inconnu
-  return { type: 'monthly', bulletinsTotal: 0, expiresAt: now + 31 * 24 * 3600 };
 }
 
-// ---------------------------------------------------------------------------
-// Détermine précisément le type selon le montant en centimes
-// ---------------------------------------------------------------------------
+async function verifyCheckoutWithSumUp(checkoutId: string) {
+  const apiKey = process.env.SUMUP_API_KEY;
+  const res = await fetch(`https://api.sumup.com/v0.1/checkouts/${checkoutId}`, {
+    headers: { 'Authorization': `Bearer ${apiKey}` },
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
 
-function resolveSubscriptionMetaByCents(amountCents: number): SubscriptionMeta {
-  const now = Math.floor(Date.now() / 1000);
+async function activateSubscription(checkoutId: string, email: string, amountCents: number) {
+  const user = findOrCreateUser(email);
+  const meta = resolveSubscription(amountCents);
 
-  switch (amountCents) {
-    case 890:
-      return { type: 'single', bulletinsTotal: 1 };
-    case 2900:
-      return { type: 'pack5', bulletinsTotal: 5 };
-    case 2885:
-      return { type: 'monthly', bulletinsTotal: 0, expiresAt: now + 31 * 24 * 3600 };
-    case 28800:
-      return { type: 'annual', bulletinsTotal: 0, expiresAt: now + 366 * 24 * 3600 };
-    default:
-      // Fallback par tranche
-      return resolveSubscriptionMeta(amountCents / 100);
-  }
+  createSubscription({
+    userId: user.id,
+    type: meta.type,
+    checkoutId,
+    amountCents,
+    bulletinsTotal: meta.bulletinsTotal,
+    expiresAt: meta.expiresAt,
+  });
+
+  console.log(`[Webhook] Abonnement créé — userId: ${user.id}, type: ${meta.type}, email: ${email}`);
+
+  // Nettoie pending_checkouts
+  try { getDb().prepare('DELETE FROM pending_checkouts WHERE checkout_id = ?').run(checkoutId); } catch { /* ok */ }
+
+  // Envoie le magic link de connexion
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://bulletinfacile.fr';
+  await fetch(`${baseUrl}/api/auth/magic-link`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  }).catch(err => console.error('[Webhook] Magic link error:', err));
 }
 
 // ---------------------------------------------------------------------------
@@ -66,93 +74,58 @@ function resolveSubscriptionMetaByCents(amountCents: number): SubscriptionMeta {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
+  console.log('[SumUp Webhook]', JSON.stringify(body));
 
-  console.log('[SumUp Webhook]', JSON.stringify(body, null, 2));
+  // SumUp envoie : { event_type: "CHECKOUT_STATUS_CHANGED", id: "uuid" }
+  if (body.event_type === 'CHECKOUT_STATUS_CHANGED') {
+    const checkoutId: string = body.id ?? '';
 
-  // Événement de paiement réussi
-  if (
-    body.event_type === 'CHECKOUT_STATUS_CHANGED' &&
-    body.payload?.status === 'PAID'
-  ) {
-    const checkoutId: string = body.payload?.id ?? `unknown-${Date.now()}`;
+    if (!checkoutId) {
+      console.warn('[Webhook] Pas de checkout id dans le body');
+      return NextResponse.json({ received: true });
+    }
 
-    // Récupère l'email : d'abord dans le payload SumUp, sinon dans pending_checkouts
-    let email: string =
-      body.payload?.personal_details?.email ||
-      body.payload?.customer?.email ||
-      body.payload?.customer_id ||
-      body.payload?.email ||
-      '';
+    // 1. Vérifier le statut réel via l'API SumUp
+    const checkout = await verifyCheckoutWithSumUp(checkoutId);
+    if (!checkout) {
+      console.error('[Webhook] Impossible de vérifier le checkout:', checkoutId);
+      return NextResponse.json({ received: true });
+    }
 
-    // Récupère le montant en centimes
-    let amountCents: number = Math.round(
-      (body.payload?.amount ?? body.payload?.transaction_amount ?? 0) * 100,
-    );
+    console.log(`[Webhook] Statut checkout: ${checkout.status}, montant: ${checkout.amount}`);
 
-    // Fallback : chercher dans pending_checkouts si email absent du payload
-    if (!email && checkoutId) {
+    if (checkout.status !== 'PAID') {
+      return NextResponse.json({ received: true, status: checkout.status });
+    }
+
+    // 2. Récupérer l'email : depuis l'API ou depuis pending_checkouts
+    let email: string = checkout.personal_details?.email || '';
+    const amountCents = Math.round((checkout.amount ?? 0) * 100);
+
+    if (!email) {
       try {
-        const db = getDb();
-        const row = db.prepare('SELECT email, amount_cents FROM pending_checkouts WHERE checkout_id = ?').get(checkoutId) as { email: string; amount_cents: number } | undefined;
+        const row = getDb()
+          .prepare('SELECT email, amount_cents FROM pending_checkouts WHERE checkout_id = ?')
+          .get(checkoutId) as { email: string; amount_cents: number } | undefined;
         if (row) {
           email = row.email;
-          if (!amountCents) amountCents = row.amount_cents;
           console.log(`[Webhook] Email récupéré depuis pending_checkouts: ${email}`);
         }
       } catch (dbErr) {
-        console.error('[Webhook] Erreur pending_checkouts lookup:', dbErr);
+        console.error('[Webhook] pending_checkouts lookup error:', dbErr);
       }
     }
 
-    console.log(
-      `[Webhook] Paiement confirmé — checkout: ${checkoutId}, email: ${email}, montant: ${amountCents} cts`,
-    );
-
     if (!email) {
-      console.warn('[Webhook] Email absent du payload SumUp et de pending_checkouts — abonnement non créé.');
+      console.warn('[Webhook] Email introuvable pour checkout:', checkoutId);
       return NextResponse.json({ received: true, warning: 'email_absent' });
     }
 
+    // 3. Créer l'abonnement + envoyer le magic link
     try {
-      // 1. Crée ou retrouve l'utilisateur
-      const user = findOrCreateUser(email);
-
-      // 2. Détermine le type d'abonnement selon le montant
-      const meta = resolveSubscriptionMetaByCents(amountCents);
-
-      // 3. Crée l'abonnement
-      createSubscription({
-        userId: user.id,
-        type: meta.type,
-        checkoutId,
-        amountCents,
-        bulletinsTotal: meta.bulletinsTotal,
-        expiresAt: meta.expiresAt,
-      });
-
-      console.log(
-        `[Webhook] Abonnement créé — userId: ${user.id}, type: ${meta.type}`,
-      );
-
-      // 4. Nettoie pending_checkouts
-      try {
-        getDb().prepare('DELETE FROM pending_checkouts WHERE checkout_id = ?').run(checkoutId);
-      } catch { /* non bloquant */ }
-
-      // 5. Envoie le lien magique de connexion
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BASE_URL || 'https://bulletinfacile.fr';
-      await fetch(`${baseUrl}/api/auth/magic-link`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      }).catch((err) =>
-        console.error('[Webhook] Échec envoi magic link:', err),
-      );
-
+      await activateSubscription(checkoutId, email, amountCents);
     } catch (err) {
-      console.error('[Webhook] Erreur lors de la création du compte:', err);
-      // On retourne quand même 200 pour éviter que SumUp ne réessaie indéfiniment
+      console.error('[Webhook] Erreur activation abonnement:', err);
     }
   }
 
