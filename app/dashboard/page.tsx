@@ -72,9 +72,12 @@ const ERROR_MESSAGES: Record<string, string> = {
 // Main page
 // ---------------------------------------------------------------------------
 
+const FREE_LIMIT = 3;
+
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [freeBulletinsUsed, setFreeBulletinsUsed] = useState(0);
   const [loading, setLoading] = useState(true);
 
   // Magic link form state
@@ -98,7 +101,8 @@ export default function DashboardPage() {
       .then((data) => {
         if (data.user) {
           setUser(data.user);
-          setSubscription(data.subscription);
+          setSubscription(data.subscription ?? null);
+          setFreeBulletinsUsed(data.freeBulletinsUsed ?? 0);
         }
       })
       .catch(() => {/* non connecté */})
@@ -310,11 +314,37 @@ export default function DashboardPage() {
               ) : (
                 <div style={{
                   background: 'white', borderRadius: 24, padding: '28px 36px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.08)', textAlign: 'center',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
                 }}>
-                  <p style={{ color: '#6b7280', fontSize: 15, margin: '0 0 20px' }}>
-                    Vous n&apos;avez pas d&apos;abonnement actif.
-                  </p>
+                  {/* Free bulletins progress */}
+                  <div style={{ marginBottom: 20 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                      <span style={{ fontWeight: 700, color: '#92400e', fontSize: 14 }}>
+                        Bulletins gratuits
+                      </span>
+                      <span style={{ fontWeight: 700, color: '#92400e', fontSize: 14 }}>
+                        {freeBulletinsUsed}/{FREE_LIMIT} utilisés
+                      </span>
+                    </div>
+                    <div style={{ background: '#fef3c7', borderRadius: 999, height: 8, overflow: 'hidden' }}>
+                      <div style={{
+                        width: `${Math.min(100, Math.round((freeBulletinsUsed / FREE_LIMIT) * 100))}%`,
+                        height: '100%',
+                        background: freeBulletinsUsed >= FREE_LIMIT ? '#dc2626' : '#f59e0b',
+                        borderRadius: 999,
+                        transition: 'width 0.3s',
+                      }} />
+                    </div>
+                    {freeBulletinsUsed < FREE_LIMIT ? (
+                      <p style={{ color: '#6b7280', fontSize: 13, margin: '8px 0 0' }}>
+                        Il vous reste <strong>{FREE_LIMIT - freeBulletinsUsed} bulletin{FREE_LIMIT - freeBulletinsUsed > 1 ? 's' : ''} gratuit{FREE_LIMIT - freeBulletinsUsed > 1 ? 's' : ''}</strong> (avec filigrane DÉMO).
+                      </p>
+                    ) : (
+                      <p style={{ color: '#dc2626', fontSize: 13, margin: '8px 0 0', fontWeight: 600 }}>
+                        Bulletins gratuits épuisés. Choisissez une offre pour continuer.
+                      </p>
+                    )}
+                  </div>
                   <Link
                     href="/tarifs"
                     style={{
@@ -329,7 +359,7 @@ export default function DashboardPage() {
               )}
 
               {/* CTA */}
-              {subscription && (
+              {(subscription || freeBulletinsUsed < FREE_LIMIT) && (
                 <Link
                   href="/generateur"
                   style={{
@@ -338,7 +368,7 @@ export default function DashboardPage() {
                     textAlign: 'center', boxShadow: '0 4px 16px rgba(37,99,235,0.3)',
                   }}
                 >
-                  Créer un nouveau bulletin →
+                  {subscription ? 'Créer un nouveau bulletin →' : `Créer un bulletin gratuit (${FREE_LIMIT - freeBulletinsUsed} restant${FREE_LIMIT - freeBulletinsUsed > 1 ? 's' : ''}) →`}
                 </Link>
               )}
             </div>
