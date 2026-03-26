@@ -49,6 +49,8 @@ export interface InputBS {
   acompte?: number;
   // Absences
   absences?: Absence[];
+  // Logo
+  logoDataUrl?: string; // base64 data URL du logo entreprise
 }
 
 export interface Absence {

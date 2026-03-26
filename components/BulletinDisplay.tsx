@@ -181,7 +181,7 @@ const pct = (n: number | null) =>
 const lastDay = (mois: number, annee: number) => new Date(annee, mois, 0).getDate();
 const fmt2 = (n: number) => String(n).padStart(2, '0');
 
-export default function BulletinDisplay({ data }: { data: ResultBS }) {
+export default function BulletinDisplay({ data, logoDataUrl }: { data: ResultBS; logoDataUrl?: string }) {
   const [showDSN, setShowDSN] = useState(false);
   const { lignes, elementsSalaire, lignesAbsences, totaux, params, input } = data;
   const { mois, annee, pmss } = params;
@@ -232,6 +232,13 @@ export default function BulletinDisplay({ data }: { data: ResultBS }) {
       {/* ══ EN-TÊTE ══ */}
       <div style={{ display: 'flex', borderBottom: '1px solid #bbb' }}>
         <div style={{ width: '50%', padding: '12px', borderRight: '1px solid #bbb' }}>
+          {logoDataUrl && (
+            <img
+              src={logoDataUrl}
+              alt="Logo"
+              style={{ maxHeight: 40, maxWidth: 110, objectFit: 'contain', marginBottom: 6, display: 'block' }}
+            />
+          )}
           <div style={{ fontWeight: 'bold', fontSize: '11px', color: '#1a3a5c', marginBottom: '2px' }}>VOTRE ENTREPRISE</div>
           <div style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '4px' }}>{input.entrepriseNom || 'Nom de l\'entreprise'}</div>
           {input.entrepriseAdresse && <div style={{ fontSize: '10px', color: '#444' }}>{input.entrepriseAdresse}</div>}

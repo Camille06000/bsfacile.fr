@@ -59,6 +59,83 @@ const newAbsence = (motif = 'Maladie'): AbsenceForm => {
 
 type TabType = 'principal' | 'entreprise' | 'salarie' | 'elements' | 'absences';
 
+const EXEMPLES_BULLETINS = [
+  {
+    label: 'SMIC 2026',
+    icon: '👷',
+    data: {
+      brutMensuel: '1801.80',
+      statut: 'non-cadre',
+      effectif: '<50',
+      tauxPAS: '0',
+      heuresMensuelles: '151.67',
+      tauxHoraire: '11.88',
+      entrepriseNom: 'Example SAS',
+      entrepriseSiret: '123 456 789 00012',
+      entrepriseAdresse: '12 rue de la Paix, 75001 Paris',
+      salariéNom: 'DUPONT',
+      salariéPrenom: 'Jean',
+      salariéPoste: 'Employé polyvalent',
+    },
+  },
+  {
+    label: 'Technicien 2 500 €',
+    icon: '🔧',
+    data: {
+      brutMensuel: '2500',
+      statut: 'non-cadre',
+      effectif: '<50',
+      tauxPAS: '7.5',
+      heuresMensuelles: '151.67',
+      tauxHoraire: '16.48',
+      entrepriseNom: 'Tech Industries SARL',
+      entrepriseSiret: '987 654 321 00034',
+      entrepriseAdresse: '5 avenue des Technologies, 69001 Lyon',
+      salariéNom: 'MARTIN',
+      salariéPrenom: 'Sophie',
+      salariéPoste: 'Technicienne de maintenance',
+    },
+  },
+  {
+    label: 'Cadre 4 000 €',
+    icon: '💼',
+    data: {
+      brutMensuel: '4000',
+      statut: 'cadre',
+      effectif: '>=50',
+      tauxPAS: '11',
+      heuresMensuelles: '151.67',
+      tauxHoraire: '26.37',
+      entrepriseNom: 'Conseil & Stratégie SA',
+      entrepriseSiret: '456 789 123 00056',
+      entrepriseAdresse: '28 boulevard Haussmann, 75009 Paris',
+      salariéNom: 'BERNARD',
+      salariéPrenom: 'Céline',
+      salariéPoste: 'Responsable Marketing',
+    },
+  },
+  {
+    label: 'Avec heures supp.',
+    icon: '⏰',
+    data: {
+      brutMensuel: '2200',
+      statut: 'non-cadre',
+      effectif: '<50',
+      tauxPAS: '5',
+      heuresMensuelles: '151.67',
+      tauxHoraire: '14.50',
+      heuresSupp25: '4',
+      heuresSupp50: '2',
+      entrepriseNom: 'Boulangerie du Centre',
+      entrepriseSiret: '321 654 987 00078',
+      entrepriseAdresse: '3 place de la République, 31000 Toulouse',
+      salariéNom: 'LEROY',
+      salariéPrenom: 'Marc',
+      salariéPoste: 'Boulanger',
+    },
+  },
+];
+
 export default function BulletinForm() {
   const [form, setForm] = useState({
     brutMensuel: '',
@@ -92,6 +169,7 @@ export default function BulletinForm() {
 
   const [heureMajorees, setHeureMajorees] = useState<HeureMajoree[]>([]);
   const [absences, setAbsences] = useState<AbsenceForm[]>([]);
+  const [logoDataUrl, setLogoDataUrl] = useState<string>('');
   const [result, setResult] = useState<ResultBS | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -204,6 +282,7 @@ export default function BulletinForm() {
     try {
       const payload = {
         ...form,
+        logoDataUrl: logoDataUrl || undefined,
         heuresMajorees: heureMajorees
           .filter(hm => parseFloat(hm.heures) > 0)
           .map(hm => ({ intitule: hm.intitule, heures: parseFloat(hm.heures), majoration: parseFloat(hm.majoration) || 100 })),
@@ -263,6 +342,35 @@ export default function BulletinForm() {
       </div>
 
       <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 no-print">
+        {/* Exemples */}
+        <div style={{ marginBottom: 0, padding: '12px 16px 0' }}>
+          <div className="text-xs font-semibold text-gray-500 mb-2">Charger un exemple :</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {EXEMPLES_BULLETINS.map((ex) => (
+              <button
+                key={ex.label}
+                type="button"
+                onClick={() => {
+                  setForm(f => ({ ...f, ...ex.data }));
+                  setTab('principal');
+                }}
+                style={{
+                  background: '#f0f9ff',
+                  border: '1px solid #bae6fd',
+                  borderRadius: 8,
+                  padding: '6px 14px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: '#0369a1',
+                  cursor: 'pointer',
+                }}
+              >
+                {ex.icon} {ex.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="bg-gray-100 border-b flex px-4 pt-2 gap-1 flex-wrap">
           <TabBtn t="principal" label="Paramètres" />
           <TabBtn t="entreprise" label="Entreprise" />
@@ -367,6 +475,39 @@ export default function BulletinForm() {
                 <div className="flex-1 border-t border-gray-200" />
                 <span>ou remplissez manuellement</span>
                 <div className="flex-1 border-t border-gray-200" />
+              </div>
+
+              {/* Logo entreprise */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Logo de l&apos;entreprise (optionnel)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {logoDataUrl && (
+                    <img src={logoDataUrl} alt="Logo" style={{ height: 40, maxWidth: 120, objectFit: 'contain', border: '1px solid #e5e7eb', borderRadius: 6, padding: 4 }} />
+                  )}
+                  <label style={{ cursor: 'pointer', background: '#f3f4f6', border: '1px dashed #d1d5db', borderRadius: 8, padding: '8px 16px', fontSize: 13, color: '#374151', display: 'inline-block' }}>
+                    {logoDataUrl ? 'Changer le logo' : '+ Ajouter un logo'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          if (ev.target?.result) setLogoDataUrl(ev.target.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+                  </label>
+                  {logoDataUrl && (
+                    <button type="button" onClick={() => setLogoDataUrl('')} style={{ fontSize: 12, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer' }}>
+                      Supprimer
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">PNG, JPG, SVG — apparaîtra sur le bulletin PDF</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -664,7 +805,7 @@ export default function BulletinForm() {
 
       {result && (
         <section id="bulletin-section">
-          <BulletinDisplay data={result} />
+          <BulletinDisplay data={result} logoDataUrl={logoDataUrl} />
         </section>
       )}
     </div>
