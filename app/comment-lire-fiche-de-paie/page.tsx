@@ -94,6 +94,15 @@ export default function CommentLireFicheDePaiePage() {
         </div>
       </section>
 
+      {/* IMAGE HERO */}
+      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+        <img
+          src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=900&h=300&fit=crop&q=80"
+          alt="Lecture et compréhension d'une fiche de paie"
+          style={{ width: '100%', height: 260, objectFit: 'cover', borderRadius: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}
+        />
+      </div>
+
       {/* INTRO */}
       <section style={{ maxWidth: 800, margin: '0 auto', padding: '56px 24px 0' }}>
         <p style={{ fontSize: 17, lineHeight: 1.85, color: '#374151' }}>

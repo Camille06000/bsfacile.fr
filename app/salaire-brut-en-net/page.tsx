@@ -46,6 +46,15 @@ export default function SalaireBrutEnNetPage() {
         </div>
       </section>
 
+      {/* IMAGE HERO */}
+      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+        <img
+          src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=900&h=300&fit=crop&q=80"
+          alt="Calcul salaire brut en net cotisations"
+          style={{ width: '100%', height: 260, objectFit: 'cover', borderRadius: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}
+        />
+      </div>
+
       <div style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
 
         {/* FORMULE */}

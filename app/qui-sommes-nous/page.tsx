@@ -51,6 +51,15 @@ export default function QuiSommesNousPage() {
         </div>
       </section>
 
+      {/* IMAGE HERO */}
+      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+        <img
+          src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=300&fit=crop&q=80"
+          alt="Équipe Bulletin Facile"
+          style={{ width: '100%', height: 260, objectFit: 'cover', borderRadius: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}
+        />
+      </div>
+
       {/* CHIFFRES */}
       <section style={{ background: '#f0f7ff', padding: '48px 24px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 24, textAlign: 'center' }}>
