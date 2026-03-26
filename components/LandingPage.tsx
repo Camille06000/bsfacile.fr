@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import PayButton from '@/components/PayButton';
+import Nav from '@/components/Nav';
+import Footer from '@/components/Footer';
 
 const PACK_OPTIONS = [
   { label: '3 bulletins',  total: 22.70, perFiche: 7.57 },
@@ -113,25 +115,10 @@ export default function LandingPage() {
   return (
     <div style={{ fontFamily: '"Inter", system-ui, -apple-system, sans-serif', color: '#0f172a' }}>
 
-      {/* NAV */}
-      <nav style={{ position: 'fixed', top: 0, width: '100%', zIndex: 100, background: 'rgba(255,255,255,0.96)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e2e8f0' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <a href="/" style={{ fontWeight: 800, fontSize: 18, color: '#1e40af', textDecoration: 'none', letterSpacing: '-0.5px' }}>
-            Bulletin Facile
-          </a>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 28, fontSize: 14, fontWeight: 500 }}>
-            <a href="/generateur" style={{ color: '#475569', textDecoration: 'none' }}>Bulletin de paie</a>
-            <a href="/contrat" style={{ color: '#475569', textDecoration: 'none' }}>Contrat</a>
-            <a href="/tarifs" style={{ color: '#475569', textDecoration: 'none' }}>Tarifs</a>
-            <a href="/generateur" style={{ background: '#1e40af', color: 'white', fontWeight: 700, padding: '9px 20px', borderRadius: 8, textDecoration: 'none', fontSize: 14 }}>
-              Essai gratuit
-            </a>
-          </div>
-        </div>
-      </nav>
+      <Nav />
 
       {/* HERO */}
-      <section style={{ paddingTop: 120, paddingBottom: 96, paddingLeft: 24, paddingRight: 24, background: 'linear-gradient(160deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%)', color: 'white' }}>
+      <section style={{ paddingTop: 80, paddingBottom: 96, paddingLeft: 24, paddingRight: 24, background: 'linear-gradient(160deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%)', color: 'white' }}>
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 100, padding: '6px 16px', fontSize: 13, fontWeight: 600, marginBottom: 32, color: '#bfdbfe' }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
@@ -461,47 +448,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer style={{ background: '#0f172a', color: '#64748b', padding: '56px 24px 32px', fontSize: 14 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 40, marginBottom: 48 }}>
-            <div>
-              <div style={{ color: 'white', fontWeight: 900, fontSize: 17, marginBottom: 12, letterSpacing: '-0.5px' }}>Bulletin Facile</div>
-              <p style={{ fontSize: 13, lineHeight: 1.7, maxWidth: 260, color: '#64748b' }}>
-                Générateur de bulletin de salaire français conforme au droit social 2025/2026.
-              </p>
-            </div>
-            <div>
-              <div style={{ color: 'white', fontWeight: 700, fontSize: 11, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '1px' }}>Outils</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {[['Bulletin de paie', '/generateur'], ['Contrat de travail', '/contrat'], ['Tarifs', '/tarifs']].map(([l, h]) => (
-                  <a key={l} href={h} style={{ color: '#64748b', textDecoration: 'none', fontSize: 13 }}>{l}</a>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div style={{ color: 'white', fontWeight: 700, fontSize: 11, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '1px' }}>Guides</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {[['SMIC 2026', '/smic-2026'], ['Salaire brut en net', '/salaire-brut-en-net'], ['Lire une fiche de paie', '/comment-lire-fiche-de-paie']].map(([l, h]) => (
-                  <a key={l} href={h} style={{ color: '#64748b', textDecoration: 'none', fontSize: 13 }}>{l}</a>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div style={{ color: 'white', fontWeight: 700, fontSize: 11, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '1px' }}>À propos</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {[['Qui sommes-nous ?', '/qui-sommes-nous'], ['Contact', 'mailto:contact@bulletinfacile.fr']].map(([l, h]) => (
-                  <a key={l} href={h} style={{ color: '#64748b', textDecoration: 'none', fontSize: 13 }}>{l}</a>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div style={{ borderTop: '1px solid #1e293b', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, fontSize: 12, color: '#475569' }}>
-            <span>© {new Date().getFullYear()} <span style={{ color: 'white', fontWeight: 700 }}>Bulletin Facile</span> · Conformité URSSAF 2025/2026</span>
-            <span>Paiement sécurisé · Satisfait ou remboursé 30 jours</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
