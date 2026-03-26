@@ -36,6 +36,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <a href="/contrat" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Contrat de travail</a>
             <a href="/generateur" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Bulletin de paie</a>
+            <a href="/tarifs" className="text-sm text-gray-600 hover:text-blue-700 hidden sm:block">Tarifs</a>
             <button onClick={handleBuy} disabled={loading}
               className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors">
               Accès à vie — {PRICE} €

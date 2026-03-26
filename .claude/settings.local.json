@@ -33,7 +33,10 @@
       "Bash(ssh -o StrictHostKeyChecking=no root@72.60.233.11 \"cd /var/www/bsfacile && git pull origin main && npm run build 2>&1 | tail -10 && pm2 restart bsfacile\")",
       "Bash(ssh -o StrictHostKeyChecking=no root@72.60.233.11 \"cd /var/www/bsfacile && git pull origin main && npm run build 2>&1 | tail -8 && pm2 restart bsfacile\")",
       "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" add -A)",
-      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"feat: absences \\(maladie, AT, CP, RTT, sans solde, injustifiée\\) avec IJSS subrogation\")"
+      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"feat: absences \\(maladie, AT, CP, RTT, sans solde, injustifiée\\) avec IJSS subrogation\")",
+      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" push)",
+      "WebFetch(domain:www.fiche-paie.net)",
+      "Bash(git -C \"C:/Users/nilov/Desktop/bsfacile.fr\" commit -m \"feat: page tarifs /tarifs avec prix 1€ moins que fiche-paie.net\")"
     ]
   }
 }
