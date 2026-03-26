@@ -55,6 +55,15 @@ export function getDb(): Database.Database {
         used       INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL DEFAULT (unixepoch())
       );
+
+      CREATE TABLE IF NOT EXISTS newsletter (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        prenom     TEXT    NOT NULL,
+        email      TEXT    UNIQUE NOT NULL,
+        status     TEXT    NOT NULL DEFAULT 'active',
+        source     TEXT    DEFAULT 'footer',
+        created_at INTEGER NOT NULL DEFAULT (unixepoch())
+      );
     `);
 
     _db.pragma('journal_mode = WAL');
