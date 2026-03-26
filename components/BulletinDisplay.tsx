@@ -1,62 +1,77 @@
 'use client';
+import { useState } from 'react';
 import type { ResultBS, LigneBS } from '@/lib/cotisations';
 
-// ── Générateur DSN simplifié ──
+// ── Générateur DSN Phase 3 (format officiel Net-Entreprises) ──
 function generateDSN(data: ResultBS): string {
   const { input, totaux, params } = data;
-  const pad2 = (n: number) => String(n).padStart(2, '0');
+  const p2 = (n: number) => String(n).padStart(2, '0');
   const now = new Date();
-  const moisRef = `${params.annee}${pad2(params.mois)}`;
+  const lastD = new Date(params.annee, params.mois, 0).getDate();
+  const debut  = `01${p2(params.mois)}${params.annee}`;
+  const fin    = `${p2(lastD)}${p2(params.mois)}${params.annee}`;
+  const siret  = (input.entrepriseSiret || '').replace(/\s/g, '');
+  const siren  = siret.slice(0, 9);
+  const heures = (input.heuresMensuelles || 151.67).toFixed(2);
 
-  const lines: string[] = [
-    '// DSN PHASE 3 - Généré par BS Facile',
-    `// Période : ${pad2(params.mois)}/${params.annee}`,
-    `// Généré le : ${now.toLocaleDateString('fr-FR')}`,
-    '',
-    'S10.G00.00.001,' + params.annee + pad2(params.mois) + '01',
-    'S10.G00.00.002,' + params.annee + pad2(params.mois) + String(new Date(params.annee, params.mois, 0).getDate()),
-    'S10.G00.00.003,01',
-    '',
-    '// --- ÉTABLISSEMENT ---',
-    `S21.G00.06.001,${input.entrepriseSiret?.replace(/\s/g, '') || ''}`,
+  const rows: string[] = [
+    // ── Entête (S10) ──
+    `S10.G00.00.001,${debut}`,
+    `S10.G00.00.002,${fin}`,
+    `S10.G00.00.003,01`,                         // 01 = DSN mensuelle
+    `S10.G00.00.005,01`,                         // 01 = production
+    // ── Emetteur (S10.G00.01) ──
+    `S10.G00.01.001,${siren}`,
+    `S10.G00.01.002,${siret}`,
+    `S10.G00.01.003,${input.entrepriseNom || ''}`,
+    `S10.G00.01.004,${input.entrepriseAdresse || ''}`,
+    `S10.G00.01.007,${now.toISOString().slice(0,10).split('-').reverse().join('')}`,
+    // ── Établissement (S21.G00.06) ──
+    `S21.G00.06.001,${siret}`,
     `S21.G00.06.002,${input.entrepriseNom || ''}`,
     `S21.G00.06.003,${input.entrepriseAdresse || ''}`,
-    `S21.G00.06.021,${input.entrepriseNaf?.replace('.', '') || ''}`,
-    '',
-    '// --- INDIVIDU ---',
+    `S21.G00.06.018,${debut}`,
+    `S21.G00.06.019,${fin}`,
+    `S21.G00.06.021,${(input.entrepriseNaf || '').replace('.', '')}`,
+    // ── Individu (S21.G00.30) ──
     `S21.G00.30.001,${input.salariéNss || ''}`,
     `S21.G00.30.002,${input.salariéNom || ''}`,
     `S21.G00.30.004,${input.salariéPrenom || ''}`,
     `S21.G00.30.006,${input.salariéAdresse || ''}`,
-    '',
-    '// --- CONTRAT ---',
-    `S21.G00.40.001,${moisRef}01`,
-    `S21.G00.40.007,${input.statut === 'cadre' ? '12' : '11'}`,
+    // ── Contrat (S21.G00.40) ──
+    `S21.G00.40.001,${input.salariéEntreeDate ? input.salariéEntreeDate.split('-').reverse().join('') : debut}`,
+    `S21.G00.40.006,01`,                         // 01 = CDI
+    `S21.G00.40.007,${input.statut === 'cadre' ? '12' : '10'}`,  // 10=Employé 12=Cadre
     `S21.G00.40.009,${input.salariéPoste || ''}`,
-    '',
-    '// --- RÉMUNÉRATION ---',
-    `S21.G00.51.001,${moisRef}01`,
-    `S21.G00.51.002,${moisRef}${String(new Date(params.annee, params.mois, 0).getDate())}`,
+    `S21.G00.40.011,${input.effectif === '>=50' ? '10' : '10'}`,
+    `S21.G00.40.019,01`,                         // 01 = temps plein
+    // ── Activité (S21.G00.65) ──
+    `S21.G00.65.001,${debut}`,
+    `S21.G00.65.002,${fin}`,
+    `S21.G00.65.020,${heures}`,
+    `S21.G00.65.021,${heures}`,
+    // ── Rémunération (S21.G00.51) ──
+    `S21.G00.51.001,${debut}`,
+    `S21.G00.51.002,${fin}`,
     `S21.G00.51.010,${totaux.brutMensuel.toFixed(2)}`,
     `S21.G00.51.011,${totaux.netAPayer.toFixed(2)}`,
     `S21.G00.51.013,${totaux.netAvantPAS.toFixed(2)}`,
-    `S21.G00.51.020,${(input.heuresMensuelles || 151.67).toFixed(2)}`,
-    '',
-    '// --- VERSEMENT ---',
-    `S21.G00.60.001,${moisRef}${String(new Date(params.annee, params.mois, 0).getDate())}`,
+    `S21.G00.51.014,${totaux.montantPAS.toFixed(2)}`,
+    `S21.G00.51.015,${(totaux.tauxPAS).toFixed(2)}`,
+    `S21.G00.51.016,${totaux.netAvantPAS.toFixed(2)}`,
+    `S21.G00.51.018,${totaux.totalCotisationsSalariales.toFixed(2)}`,
+    `S21.G00.51.019,${totaux.totalCotisationsPatronales.toFixed(2)}`,
+    `S21.G00.51.020,${heures}`,
+    `S21.G00.51.022,${totaux.reductionFillon.toFixed(2)}`,
+    // ── Versement individu (S21.G00.60) ──
+    `S21.G00.60.001,${fin}`,
     `S21.G00.60.002,${totaux.netAPayer.toFixed(2)}`,
-    `S21.G00.60.003,01`,
-    '',
-    '// --- COTISATIONS ---',
-    `// Total salarial : ${totaux.totalCotisationsSalariales.toFixed(2)} EUR`,
-    `// Total patronal : ${totaux.totalCotisationsPatronales.toFixed(2)} EUR`,
-    `// Coût employeur : ${totaux.coutEmployeur.toFixed(2)} EUR`,
-    `// Réduction Fillon : ${totaux.reductionFillon.toFixed(2)} EUR`,
-    '',
-    'S90.G00.90.001,1',
-    'S90.G00.90.002,1',
+    `S21.G00.60.003,01`,                         // 01 = virement
+    // ── Fin (S90) ──
+    `S90.G00.90.001,1`,
+    `S90.G00.90.002,1`,
   ];
-  return lines.join('\n');
+  return rows.join('\r\n');
 }
 
 function downloadDSN(data: ResultBS) {
@@ -70,6 +85,93 @@ function downloadDSN(data: ResultBS) {
   URL.revokeObjectURL(url);
 }
 
+// ── Modal DSN ──
+function DSNModal({ data, onClose }: { data: ResultBS; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const content = generateDSN(data);
+  const p2 = (n: number) => String(n).padStart(2, '0');
+  const periode = `${p2(data.params.mois)}/${data.params.annee}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div>
+            <h2 className="font-bold text-lg text-gray-900">DSN Phase 3 — {periode}</h2>
+            <p className="text-xs text-gray-500 mt-0.5">Format officiel Net-Entreprises — prêt à déposer</p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none font-bold">×</button>
+        </div>
+
+        {/* Infos clés */}
+        <div className="px-6 py-3 bg-blue-50 border-b border-blue-100 grid grid-cols-3 gap-4 text-xs">
+          <div><span className="text-gray-500">Établissement</span><div className="font-semibold truncate">{data.input.entrepriseNom || '—'}</div></div>
+          <div><span className="text-gray-500">Salarié</span><div className="font-semibold">{data.input.salariéPrenom} {data.input.salariéNom || '—'}</div></div>
+          <div><span className="text-gray-500">Net à payer</span><div className="font-semibold text-blue-700">{data.totaux.netAPayer.toFixed(2)} €</div></div>
+        </div>
+
+        {/* Contenu DSN */}
+        <div className="flex-1 overflow-auto px-4 py-3">
+          <pre className="text-[10px] font-mono text-gray-700 bg-gray-50 rounded border p-3 whitespace-pre-wrap leading-relaxed">
+            {content}
+          </pre>
+        </div>
+
+        {/* Actions */}
+        <div className="px-6 py-4 border-t border-gray-200 space-y-3">
+          {/* Étapes */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">
+            <div className="font-bold mb-1">📋 Comment déposer votre DSN :</div>
+            <ol className="list-decimal list-inside space-y-0.5">
+              <li>Téléchargez le fichier .dsn ci-dessous</li>
+              <li>Connectez-vous sur <strong>net-entreprises.fr</strong> avec votre compte</li>
+              <li>Allez dans <strong>DSN &gt; Déposer une DSN</strong></li>
+              <li>Sélectionnez le fichier téléchargé et validez</li>
+            </ol>
+          </div>
+
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() => downloadDSN(data)}
+              className="flex-1 bg-blue-700 hover:bg-blue-800 text-white py-2.5 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
+            >
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/></svg>
+              Télécharger le fichier .dsn
+            </button>
+            <button
+              onClick={handleCopy}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 px-4 rounded-lg font-semibold text-sm transition-colors"
+            >
+              {copied ? '✓ Copié !' : 'Copier'}
+            </button>
+            <a
+              href="https://www.net-entreprises.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-600 hover:bg-green-700 text-white py-2.5 px-4 rounded-lg font-semibold text-sm flex items-center gap-1.5 transition-colors"
+            >
+              Ouvrir Net-Entreprises
+              <svg width="11" height="11" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const euro = (n: number) =>
   new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n) + '\u00a0€';
 
@@ -80,6 +182,7 @@ const lastDay = (mois: number, annee: number) => new Date(annee, mois, 0).getDat
 const fmt2 = (n: number) => String(n).padStart(2, '0');
 
 export default function BulletinDisplay({ data }: { data: ResultBS }) {
+  const [showDSN, setShowDSN] = useState(false);
   const { lignes, elementsSalaire, totaux, params, input } = data;
   const { mois, annee, pmss } = params;
   const last = lastDay(mois, annee);
@@ -426,13 +529,13 @@ export default function BulletinDisplay({ data }: { data: ResultBS }) {
       </div>
 
       {/* ══ BOUTONS DSN / CONTRAT ══ */}
-      <div className="no-print" style={{ borderTop: '1px solid #eee', padding: '12px 16px', display: 'flex', gap: '10px', flexWrap: 'wrap', backgroundColor: '#f7f9fc' }}>
+      <div className="no-print" style={{ borderTop: '1px solid #eee', padding: '12px 16px', display: 'flex', gap: '10px', flexWrap: 'wrap', backgroundColor: '#f7f9fc', alignItems: 'center' }}>
         <button
-          onClick={() => downloadDSN(data)}
+          onClick={() => setShowDSN(true)}
           style={{ backgroundColor: '#1a3a5c', color: 'white', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
         >
           <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/></svg>
-          Télécharger DSN
+          Transmettre la DSN
         </button>
         <a
           href="/contrat"
@@ -441,10 +544,13 @@ export default function BulletinDisplay({ data }: { data: ResultBS }) {
           <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/></svg>
           Générer contrat de travail
         </a>
-        <div style={{ fontSize: '10px', color: '#999', alignSelf: 'center', marginLeft: 'auto' }}>
-          DSN Phase 3 — Format URSSAF
+        <div style={{ fontSize: '10px', color: '#999', marginLeft: 'auto' }}>
+          DSN Phase 3 — Net-Entreprises
         </div>
       </div>
+
+      {/* Modal DSN */}
+      {showDSN && <DSNModal data={data} onClose={() => setShowDSN(false)} />}
     </div>
   );
 }
