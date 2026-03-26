@@ -34,20 +34,23 @@ export default function HeuresSupplementairesFichePayePage() {
       <Nav />
 
       {/* HERO */}
-      <section style={{ background: 'linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="hero-section" style={{ background: 'linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -60, right: -60, width: 250, height: 250, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
         <div style={{ position: 'absolute', bottom: -40, left: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
         <div style={{ maxWidth: 800, margin: '0 auto', position: 'relative' }}>
           <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 50, padding: '6px 18px', fontSize: 13, fontWeight: 600, marginBottom: 24 }}>
             Loi TEPA — Plafond 2026
           </div>
-          <h1 style={{ fontSize: 'clamp(28px, 4.5vw, 52px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 20 }}>
+          <h1 className="hero-title" style={{ fontSize: 'clamp(28px, 4.5vw, 52px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 8 }}>
             Heures supplémentaires : calcul et exonération sur la fiche de paie
           </h1>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 8, marginBottom: 16 }}>
+            Dernière mise à jour : mars 2026
+          </div>
           <p style={{ fontSize: 19, opacity: 0.9, marginBottom: 40, lineHeight: 1.6 }}>
             Majoration de 25 % et 50 %, déduction Loi TEPA, plafond de 7 500 € : tout ce qu'il faut savoir pour calculer et afficher les heures supplémentaires sur le bulletin 2026.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16, maxWidth: 620, margin: '0 auto' }}>
+          <div className="hero-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16, maxWidth: 620, margin: '0 auto' }}>
             {[
               { val: '+25 %', label: '36e → 43e heure', sub: 'Majoration légale' },
               { val: '+50 %', label: 'À partir 44e heure', sub: 'Majoration légale' },
@@ -65,7 +68,7 @@ export default function HeuresSupplementairesFichePayePage() {
       </section>
 
       {/* IMAGE HERO */}
-      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+      <div className="hero-img-wrap" style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
         <img
           src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&h=300&fit=crop&q=80"
           alt="Employé travaillant des heures supplémentaires"
@@ -74,11 +77,11 @@ export default function HeuresSupplementairesFichePayePage() {
       </div>
 
       {/* CONTENU PRINCIPAL */}
-      <div style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
+      <div className="content-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
 
         {/* Définition et décompte */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Définition et décompte des heures supplémentaires</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Définition et décompte des heures supplémentaires</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 16 }}>
             Constituent des <strong>heures supplémentaires</strong> toutes les heures de travail effectuées au-delà de la <strong>durée légale du travail</strong>, fixée à 35 heures par semaine, soit 151,67 heures par mois (art. L.3121-28 du Code du travail).
           </p>
@@ -103,7 +106,7 @@ export default function HeuresSupplementairesFichePayePage() {
 
         {/* Taux de majoration */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Taux de majoration légaux</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Taux de majoration légaux</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 24 }}>
             Les taux de majoration sont fixés par la loi à titre indicatif mais peuvent être modifiés par accord de branche ou d'entreprise, à condition de ne pas descendre en dessous du <strong>minimum légal de 10 %</strong>.
           </p>
@@ -142,7 +145,7 @@ export default function HeuresSupplementairesFichePayePage() {
 
         {/* Tableau exemple de calcul */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 8, color: '#111827' }}>Tableau de calcul — Exemple</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 8, color: '#111827' }}>Tableau de calcul — Exemple</h2>
           <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 24 }}>Pour un salarié avec un taux horaire brut de base de 15,00 €</p>
           <div style={{ overflowX: 'auto', borderRadius: 12, border: '1px solid #e5e7eb' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
@@ -174,7 +177,7 @@ export default function HeuresSupplementairesFichePayePage() {
 
         {/* Exonération TEPA */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Exonération d'impôt — Loi TEPA 2026</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Exonération d'impôt — Loi TEPA 2026</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 24 }}>
             Depuis la loi TEPA (Travail, Emploi et Pouvoir d'Achat), renforcée par la loi pouvoir d'achat de 2022, les heures supplémentaires bénéficient d'un régime fiscal et social avantageux.
           </p>
@@ -217,7 +220,7 @@ export default function HeuresSupplementairesFichePayePage() {
 
         {/* Comment les HS apparaissent sur le bulletin */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Comment les heures supp. apparaissent sur le bulletin</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Comment les heures supp. apparaissent sur le bulletin</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 20 }}>
             Les heures supplémentaires doivent figurer sur des <strong>lignes distinctes</strong> du bulletin de salaire, séparées du salaire de base. Voici la structure habituelle :
           </p>
@@ -243,7 +246,7 @@ export default function HeuresSupplementairesFichePayePage() {
 
         {/* FAQ */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 32, textAlign: 'center', color: '#111827' }}>Questions fréquentes</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 32, textAlign: 'center', color: '#111827' }}>Questions fréquentes</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {FAQ.map(({ q, a }, i) => (
               <details key={i} style={{ border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
@@ -258,8 +261,41 @@ export default function HeuresSupplementairesFichePayePage() {
 
       </div>
 
+      {/* ARTICLES CONNEXES */}
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 24px' }}>
+        <section style={{ marginBottom: 64 }}>
+          <h2 className="section-title" style={{ fontSize: 22, fontWeight: 800, marginBottom: 20, color: '#0f172a' }}>Articles connexes</h2>
+          <div className="articles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {[
+              { title: 'Salaire brut en net', href: '/salaire-brut-en-net', desc: 'Formule et taux de charges' },
+              { title: 'Combien coûte un salarié', href: '/combien-coute-un-salarie', desc: 'Charges patronales 2026' },
+              { title: 'Prélèvement à la source', href: '/prelevement-a-la-source', desc: 'Taux et calcul sur le bulletin' },
+              { title: 'Créer une fiche de paie', href: '/creer-une-fiche-de-paie', desc: 'Mentions obligatoires et étapes' },
+            ].map(a => (
+              <a key={a.href} href={a.href} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '16px 18px', textDecoration: 'none', transition: 'box-shadow 0.2s' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 14, marginBottom: 4 }}>{a.title}</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>{a.desc}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": FAQ.map(f => ({
+            "@type": "Question",
+            "name": f.q,
+            "acceptedAnswer": { "@type": "Answer", "text": f.a }
+          }))
+        })}}
+      />
+
       {/* CTA */}
-      <section style={{ background: 'linear-gradient(135deg, #78350f, #92400e)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
+      <section className="cta-box" style={{ background: 'linear-gradient(135deg, #78350f, #92400e)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
         <h2 style={{ fontSize: 34, fontWeight: 900, marginBottom: 16 }}>Générez un bulletin avec heures supplémentaires</h2>
         <p style={{ opacity: 0.85, fontSize: 17, marginBottom: 32 }}>Notre générateur calcule automatiquement les majorations 25 %/50 % et applique la déduction TEPA selon la réglementation 2026.</p>
         <Link href="/generateur" style={{ display: 'inline-block', background: '#facc15', color: '#0f172a', fontWeight: 800, fontSize: 17, padding: '14px 36px', borderRadius: 12, textDecoration: 'none' }}>

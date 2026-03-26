@@ -59,7 +59,10 @@
       "Bash(ssh root@72.60.233.11 \"cat /var/www/bsfacile/.env.local 2>/dev/null || cat /var/www/bsfacile/.env 2>/dev/null\")",
       "Bash(ssh root@72.60.233.11 \"sed -i ''s|NEXT_PUBLIC_BASE_URL=.*|NEXT_PUBLIC_BASE_URL=https://bulletinfacile.fr|'' /var/www/bsfacile/.env.local && cat /var/www/bsfacile/.env.local\")",
       "Bash(node -e \":*)",
-      "Bash(ssh root@72.60.233.11 \"grep -r ''pruna\\\\|PRUNA\\\\|prunai'' /var/www/ /root/ /etc/ /home/ 2>/dev/null | grep -v Binary | grep -v ''.git'' | head -20\")"
+      "Bash(ssh root@72.60.233.11 \"grep -r ''pruna\\\\|PRUNA\\\\|prunai'' /var/www/ /root/ /etc/ /home/ 2>/dev/null | grep -v Binary | grep -v ''.git'' | head -20\")",
+      "Bash(ssh root@72.60.233.11 \"grep -q PRUNA_KEY /var/www/bsfacile/.env.local && echo ''already set'' || echo ''PRUNA_KEY=pru_YdwyangHCUMp6rN8efbG9cicDD_8vU-I'' >> /var/www/bsfacile/.env.local && echo ''added''\")",
+      "Bash(ssh root@72.60.233.11 \"openssl rand -base64 32\")",
+      "Bash(ssh root@72.60.233.11:*)"
     ]
   }
 }

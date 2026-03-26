@@ -50,20 +50,23 @@ export default function CombienCouteUnSalariePage() {
       <Nav />
 
       {/* HERO */}
-      <section style={{ background: 'linear-gradient(135deg, #064e3b 0%, #065f46 55%, #047857 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="hero-section" style={{ background: 'linear-gradient(135deg, #064e3b 0%, #065f46 55%, #047857 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -60, right: -60, width: 250, height: 250, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
         <div style={{ position: 'absolute', bottom: -40, left: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
         <div style={{ maxWidth: 800, margin: '0 auto', position: 'relative' }}>
           <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 50, padding: '6px 18px', fontSize: 13, fontWeight: 600, marginBottom: 24 }}>
             Charges patronales — 2026
           </div>
-          <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 20 }}>
+          <h1 className="hero-title" style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 8 }}>
             Combien coûte réellement un salarié ?
           </h1>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 8, marginBottom: 16 }}>
+            Dernière mise à jour : mars 2026
+          </div>
           <p style={{ fontSize: 20, opacity: 0.9, marginBottom: 40, lineHeight: 1.6 }}>
             Charges patronales, réduction Fillon, exemple chiffré : calculez le coût employeur réel d'un recrutement en 2026.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, maxWidth: 600, margin: '0 auto' }}>
+          <div className="hero-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, maxWidth: 600, margin: '0 auto' }}>
             {[
               { val: '× 1,4 à 1,6', label: 'Rapport coût / brut', sub: 'Selon le niveau de salaire' },
               { val: '~270 €', label: 'Réduction Fillon', sub: 'Pour 2 000 € brut au SMIC' },
@@ -80,7 +83,7 @@ export default function CombienCouteUnSalariePage() {
       </section>
 
       {/* IMAGE HERO */}
-      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+      <div className="hero-img-wrap" style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
         <img
           src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=900&h=300&fit=crop&q=80"
           alt="Analyse du coût employeur et charges patronales"
@@ -89,11 +92,11 @@ export default function CombienCouteUnSalariePage() {
       </div>
 
       {/* CONTENU PRINCIPAL */}
-      <div style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
+      <div className="content-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
 
         {/* La règle des 1,5 */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>La règle du "fois 1,5"</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>La règle du "fois 1,5"</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 16 }}>
             En pratique, le <strong>coût employeur d'un salarié est environ 1,4 à 1,6 fois son salaire brut</strong>. Pour un salarié payé 2 000 € brut mensuel, l'entreprise débourse entre 2 500 € et 3 000 € selon le secteur, la taille de l'entreprise et l'application des exonérations.
           </p>
@@ -118,7 +121,7 @@ export default function CombienCouteUnSalariePage() {
 
         {/* Tableau cotisations patronales */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 8, color: '#111827' }}>Cotisations patronales 2026</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 8, color: '#111827' }}>Cotisations patronales 2026</h2>
           <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 24 }}>Taux applicables pour les salariés du secteur privé non agricole</p>
           <div style={{ overflowX: 'auto', borderRadius: 12, border: '1px solid #e5e7eb' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
@@ -145,7 +148,7 @@ export default function CombienCouteUnSalariePage() {
 
         {/* Réduction Fillon */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>La réduction générale Fillon</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>La réduction générale Fillon</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 16 }}>
             La <strong>réduction générale de cotisations patronales</strong> (dite réduction Fillon) permet aux employeurs de réduire leurs charges pour les salaires jusqu'à 1,6 fois le SMIC. C'est le principal dispositif d'allègement du coût du travail en France.
           </p>
@@ -165,7 +168,7 @@ export default function CombienCouteUnSalariePage() {
 
         {/* Exemple chiffré */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Exemple chiffré : 2 000 € brut</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Exemple chiffré : 2 000 € brut</h2>
           <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 20 }}>Salarié non-cadre, entreprise de moins de 50 salariés, secteur privé</p>
           <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, overflow: 'hidden' }}>
             {[
@@ -186,7 +189,7 @@ export default function CombienCouteUnSalariePage() {
 
         {/* FAQ */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 32, textAlign: 'center', color: '#111827' }}>Questions fréquentes</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 32, textAlign: 'center', color: '#111827' }}>Questions fréquentes</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {FAQ.map(({ q, a }, i) => (
               <details key={i} style={{ border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
@@ -201,8 +204,41 @@ export default function CombienCouteUnSalariePage() {
 
       </div>
 
+      {/* ARTICLES CONNEXES */}
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 24px' }}>
+        <section style={{ marginBottom: 64 }}>
+          <h2 className="section-title" style={{ fontSize: 22, fontWeight: 800, marginBottom: 20, color: '#0f172a' }}>Articles connexes</h2>
+          <div className="articles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {[
+              { title: 'Réduction Fillon', href: '/reduction-fillon', desc: 'Calcul et coefficient 2026' },
+              { title: 'SMIC 2026', href: '/smic-2026', desc: 'Montant brut, net et horaire' },
+              { title: 'Heures supplémentaires', href: '/heures-supplementaires-fiche-de-paie', desc: 'Déductions patronales TEPA' },
+              { title: 'Salaire brut en net', href: '/salaire-brut-en-net', desc: 'Formule et taux de charges' },
+            ].map(a => (
+              <a key={a.href} href={a.href} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '16px 18px', textDecoration: 'none', transition: 'box-shadow 0.2s' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 14, marginBottom: 4 }}>{a.title}</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>{a.desc}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": FAQ.map(f => ({
+            "@type": "Question",
+            "name": f.q,
+            "acceptedAnswer": { "@type": "Answer", "text": f.a }
+          }))
+        })}}
+      />
+
       {/* CTA */}
-      <section style={{ background: 'linear-gradient(135deg, #064e3b, #065f46)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
+      <section className="cta-box" style={{ background: 'linear-gradient(135deg, #064e3b, #065f46)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
         <h2 style={{ fontSize: 34, fontWeight: 900, marginBottom: 16 }}>Calculez le coût exact de votre recrutement</h2>
         <p style={{ opacity: 0.85, fontSize: 17, marginBottom: 32 }}>Notre générateur calcule automatiquement les cotisations patronales et la réduction Fillon selon le profil exact de votre salarié.</p>
         <Link href="/generateur" style={{ display: 'inline-block', background: '#facc15', color: '#0f172a', fontWeight: 800, fontSize: 17, padding: '14px 36px', borderRadius: 12, textDecoration: 'none' }}>

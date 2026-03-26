@@ -75,15 +75,18 @@ export default function CommentLireFicheDePaiePage() {
       <Nav />
 
       {/* HERO */}
-      <section style={{ background: 'linear-gradient(135deg, #312e81 0%, #4338ca 60%, #6366f1 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="hero-section" style={{ background: 'linear-gradient(135deg, #312e81 0%, #4338ca 60%, #6366f1 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -80, left: '50%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', transform: 'translateX(-50%)' }} />
         <div style={{ maxWidth: 800, margin: '0 auto', position: 'relative' }}>
           <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 50, padding: '6px 18px', fontSize: 13, fontWeight: 600, marginBottom: 24 }}>
             📋 Guide complet · Mise à jour 2026
           </div>
-          <h1 style={{ fontSize: 'clamp(32px, 5vw, 58px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 20 }}>
+          <h1 className="hero-title" style={{ fontSize: 'clamp(32px, 5vw, 58px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 8 }}>
             Comment lire<br />une fiche de paie ?
           </h1>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 8, marginBottom: 16 }}>
+            Dernière mise à jour : mars 2026
+          </div>
           <p style={{ fontSize: 19, opacity: 0.88, lineHeight: 1.7, maxWidth: 600, margin: '0 auto 36px' }}>
             Salaire brut, cotisations, CSG, CRDS, prélèvement à la source... Comprendre chaque ligne de votre bulletin en 5 minutes.
           </p>
@@ -95,7 +98,7 @@ export default function CommentLireFicheDePaiePage() {
       </section>
 
       {/* IMAGE HERO */}
-      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+      <div className="hero-img-wrap" style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
         <img
           src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=900&h=300&fit=crop&q=80"
           alt="Lecture et compréhension d'une fiche de paie"
@@ -111,14 +114,14 @@ export default function CommentLireFicheDePaiePage() {
       </section>
 
       {/* GUIDE EN 5 SECTIONS */}
-      <div id="guide" style={{ maxWidth: 860, margin: '0 auto', padding: '48px 24px 72px' }}>
+      <div id="guide" className="content-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '48px 24px 72px' }}>
         {SECTIONS.map((section, idx) => (
           <section key={idx} style={{ marginBottom: 56 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
               <div style={{ width: 52, height: 52, borderRadius: '50%', background: section.color, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 18, flexShrink: 0 }}>
                 {section.num}
               </div>
-              <h2 style={{ fontSize: 24, fontWeight: 900, color: '#111827', margin: 0 }}>{section.titre}</h2>
+              <h2 className="section-title" style={{ fontSize: 24, fontWeight: 900, color: '#111827', margin: 0 }}>{section.titre}</h2>
             </div>
             <div style={{ background: section.bg, borderRadius: 14, border: `1px solid ${section.color}30`, overflow: 'hidden' }}>
               {section.items.map((item, i) => (
@@ -138,7 +141,7 @@ export default function CommentLireFicheDePaiePage() {
 
         {/* ENCADRÉ : Brut ≠ Net ≠ Coût employeur */}
         <section style={{ marginBottom: 56 }}>
-          <h2 style={{ fontSize: 28, fontWeight: 900, marginBottom: 24 }}>Brut ≠ Net ≠ Coût employeur : les 3 salaires à connaître</h2>
+          <h2 className="section-title" style={{ fontSize: 28, fontWeight: 900, marginBottom: 24 }}>Brut ≠ Net ≠ Coût employeur : les 3 salaires à connaître</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
             {[
               { titre: 'Salaire BRUT', emoji: '📊', color: '#1d4ed8', desc: 'La base contractuelle. C\'est le montant inscrit dans votre contrat de travail. Il inclut les cotisations sociales salariales et patronales.', ex: 'Ex : 2 500 €' },
@@ -157,7 +160,7 @@ export default function CommentLireFicheDePaiePage() {
 
         {/* Mentions obligatoires */}
         <section>
-          <h2 style={{ fontSize: 28, fontWeight: 900, marginBottom: 20 }}>Les mentions obligatoires sur une fiche de paie</h2>
+          <h2 className="section-title" style={{ fontSize: 28, fontWeight: 900, marginBottom: 20 }}>Les mentions obligatoires sur une fiche de paie</h2>
           <p style={{ fontSize: 15, color: '#6b7280', lineHeight: 1.75, marginBottom: 20 }}>Depuis la loi Rebsamen de 2015 et ses décrets d'application, le bulletin de paie dit « simplifié » doit comporter :</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
             {[
@@ -183,8 +186,39 @@ export default function CommentLireFicheDePaiePage() {
         </section>
       </div>
 
+      {/* ARTICLES CONNEXES */}
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 24px 64px' }}>
+        <section>
+          <h2 className="section-title" style={{ fontSize: 22, fontWeight: 800, marginBottom: 20, color: '#0f172a' }}>Articles connexes</h2>
+          <div className="articles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {[
+              { title: 'Salaire brut en net', href: '/salaire-brut-en-net', desc: 'Formule et taux de charges' },
+              { title: 'Créer une fiche de paie', href: '/creer-une-fiche-de-paie', desc: 'Mentions obligatoires et étapes' },
+              { title: 'Prélèvement à la source', href: '/prelevement-a-la-source', desc: 'Taux et calcul sur le bulletin' },
+              { title: 'Net social', href: '/net-social', desc: 'Mention obligatoire depuis 2024' },
+            ].map(a => (
+              <a key={a.href} href={a.href} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '16px 18px', textDecoration: 'none', transition: 'box-shadow 0.2s' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 14, marginBottom: 4 }}>{a.title}</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>{a.desc}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": "Comment lire une fiche de paie ? Guide complet 2026",
+          "description": "Comprendre sa fiche de paie en 2026 : salaire brut, cotisations salariales et patronales, CSG, CRDS, prélèvement à la source, net à payer.",
+          "publisher": { "@type": "Organization", "name": "Bulletin Facile", "url": "https://bulletinfacile.fr" }
+        })}}
+      />
+
       {/* CTA */}
-      <section style={{ background: 'linear-gradient(135deg, #312e81, #4338ca)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
+      <section className="cta-box" style={{ background: 'linear-gradient(135deg, #312e81, #4338ca)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
         <h2 style={{ fontSize: 34, fontWeight: 900, marginBottom: 16 }}>Générez maintenant un bulletin conforme et lisible</h2>
         <p style={{ opacity: 0.85, fontSize: 17, marginBottom: 32 }}>Toutes les mentions obligatoires, tous les calculs vérifiés — en 30 secondes.</p>
         <Link href="/generateur" style={{ display: 'inline-block', background: '#facc15', color: '#1a1a2e', fontWeight: 800, fontSize: 17, padding: '14px 36px', borderRadius: 12, textDecoration: 'none' }}>

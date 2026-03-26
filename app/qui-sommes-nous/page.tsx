@@ -30,7 +30,7 @@ export default function QuiSommesNousPage() {
       <Nav />
 
       {/* HERO */}
-      <section style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%)', color: 'white', padding: '80px 24px 100px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="hero-section" style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%)', color: 'white', padding: '80px 24px 100px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         {/* Cercles décoratifs */}
         <div style={{ position: 'absolute', top: -80, right: -80, width: 300, height: 300, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
         <div style={{ position: 'absolute', bottom: -60, left: -60, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
@@ -39,7 +39,7 @@ export default function QuiSommesNousPage() {
           <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 50, padding: '6px 18px', fontSize: 13, fontWeight: 600, marginBottom: 24 }}>
             🇫🇷 Générateur de bulletin de salaire 100% français
           </div>
-          <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 20 }}>
+          <h1 className="hero-title" style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 20 }}>
             Qui sommes-nous ?
           </h1>
           <p style={{ fontSize: 20, opacity: 0.88, lineHeight: 1.7, marginBottom: 32 }}>
@@ -52,7 +52,7 @@ export default function QuiSommesNousPage() {
       </section>
 
       {/* IMAGE HERO */}
-      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+      <div className="hero-img-wrap" style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
         <img
           src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=300&fit=crop&q=80"
           alt="Équipe Bulletin Facile"
@@ -75,7 +75,7 @@ export default function QuiSommesNousPage() {
       {/* NOTRE HISTOIRE */}
       <section style={{ maxWidth: 800, margin: '0 auto', padding: '72px 24px' }}>
         <div style={{ display: 'inline-block', background: '#dbeafe', color: '#1d4ed8', borderRadius: 50, padding: '4px 16px', fontSize: 13, fontWeight: 700, marginBottom: 16 }}>Notre histoire</div>
-        <h2 style={{ fontSize: 36, fontWeight: 900, marginBottom: 24, lineHeight: 1.2 }}>
+        <h2 className="section-title" style={{ fontSize: 36, fontWeight: 900, marginBottom: 24, lineHeight: 1.2 }}>
           Une mission claire : rendre la paie accessible à tous
         </h2>
         <div style={{ fontSize: 16, lineHeight: 1.9, color: '#374151' }}>
@@ -96,7 +96,7 @@ export default function QuiSommesNousPage() {
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <div style={{ display: 'inline-block', background: '#dcfce7', color: '#15803d', borderRadius: 50, padding: '4px 16px', fontSize: 13, fontWeight: 700, marginBottom: 16 }}>Ce qui nous guide</div>
-            <h2 style={{ fontSize: 36, fontWeight: 900 }}>Nos 4 valeurs fondamentales</h2>
+            <h2 className="section-title" style={{ fontSize: 36, fontWeight: 900 }}>Nos 4 valeurs fondamentales</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 28 }}>
             {VALEURS.map((v, i) => (
@@ -112,7 +112,7 @@ export default function QuiSommesNousPage() {
 
       {/* CE QU'ON CALCULE */}
       <section style={{ maxWidth: 800, margin: '0 auto', padding: '72px 24px' }}>
-        <h2 style={{ fontSize: 32, fontWeight: 900, marginBottom: 32, textAlign: 'center' }}>Ce que Bulletin Facile calcule automatiquement</h2>
+        <h2 className="section-title" style={{ fontSize: 32, fontWeight: 900, marginBottom: 32, textAlign: 'center' }}>Ce que Bulletin Facile calcule automatiquement</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           {[
             'Cotisations vieillesse plafonnée et déplafonnée',
@@ -139,7 +139,7 @@ export default function QuiSommesNousPage() {
       </section>
 
       {/* CTA */}
-      <section style={{ background: 'linear-gradient(135deg, #1e3a8a, #2563eb)', color: 'white', padding: '72px 24px', textAlign: 'center' }}>
+      <section className="cta-box" style={{ background: 'linear-gradient(135deg, #1e3a8a, #2563eb)', color: 'white', padding: '72px 24px', textAlign: 'center' }}>
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
           <h2 style={{ fontSize: 36, fontWeight: 900, marginBottom: 16 }}>Prêt à simplifier votre paie ?</h2>
           <p style={{ opacity: 0.85, fontSize: 18, marginBottom: 36 }}>Générez votre premier bulletin en 30 secondes. Aperçu gratuit, sans inscription.</p>

@@ -35,20 +35,23 @@ export default function ArretMaladieFicheDePayePage() {
       <Nav />
 
       {/* HERO */}
-      <section style={{ background: 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="hero-section" style={{ background: 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -60, right: -60, width: 250, height: 250, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
         <div style={{ position: 'absolute', bottom: -40, left: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
         <div style={{ maxWidth: 820, margin: '0 auto', position: 'relative' }}>
           <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 50, padding: '6px 18px', fontSize: 13, fontWeight: 600, marginBottom: 24 }}>
             Droit social 2026 — Sécurité Sociale
           </div>
-          <h1 style={{ fontSize: 'clamp(32px, 5vw, 58px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 16 }}>
+          <h1 className="hero-title" style={{ fontSize: 'clamp(32px, 5vw, 58px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 8 }}>
             Arrêt maladie sur la fiche de paie
           </h1>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 8, marginBottom: 16 }}>
+            Dernière mise à jour : mars 2026
+          </div>
           <p style={{ fontSize: 20, opacity: 0.9, marginBottom: 40 }}>
             IJSS, subrogation, maintien de salaire : tout comprendre en 2026
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: 16, maxWidth: 720, margin: '0 auto' }}>
+          <div className="hero-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: 16, maxWidth: 720, margin: '0 auto' }}>
             {[
               { val: '3 jours', label: 'Délai de carence', sub: 'Secteur privé' },
               { val: '50 %', label: 'Taux IJSS', sub: 'Du salaire journalier de base' },
@@ -66,7 +69,7 @@ export default function ArretMaladieFicheDePayePage() {
       </section>
 
       {/* IMAGE HERO */}
-      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+      <div className="hero-img-wrap" style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
         <img
           src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=900&h=300&fit=crop&q=80"
           alt="Arrêt maladie et fiche de paie"
@@ -75,11 +78,11 @@ export default function ArretMaladieFicheDePayePage() {
       </div>
 
       {/* CONTENU PRINCIPAL */}
-      <div style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
+      <div className="content-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
 
         {/* Délai de carence */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Le délai de carence</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Le délai de carence</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 16 }}>
             Dans le secteur privé, un <strong>délai de carence de 3 jours</strong> s'applique à tout arrêt maladie ordinaire. Pendant ces 3 premiers jours, le salarié ne perçoit ni IJSS de la CPAM, ni maintien de salaire de l'employeur (sauf dispositions conventionnelles plus favorables).
           </p>
@@ -101,7 +104,7 @@ export default function ArretMaladieFicheDePayePage() {
 
         {/* IJSS */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Les Indemnités Journalières de Sécurité Sociale (IJSS)</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Les Indemnités Journalières de Sécurité Sociale (IJSS)</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 20 }}>
             À partir du 4e jour d'arrêt, la <strong>Caisse Primaire d'Assurance Maladie (CPAM)</strong> verse des indemnités journalières au salarié (ou à l'employeur en cas de subrogation).
           </p>
@@ -128,7 +131,7 @@ export default function ArretMaladieFicheDePayePage() {
 
         {/* Maintien de salaire */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Maintien de salaire par l'employeur</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Maintien de salaire par l'employeur</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 20 }}>
             En complément des IJSS, l'employeur est tenu de maintenir une partie du salaire selon l'ancienneté du salarié, conformément à la <strong>loi de mensualisation du 19 janvier 1978</strong> et à l'Accord National Interprofessionnel (ANI).
           </p>
@@ -163,7 +166,7 @@ export default function ArretMaladieFicheDePayePage() {
 
         {/* Subrogation */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>La subrogation</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>La subrogation</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 16 }}>
             La <strong>subrogation</strong> est le mécanisme par lequel l'employeur maintient le salaire pendant l'arrêt et perçoit directement les IJSS de la CPAM à la place du salarié. Elle permet au salarié de continuer à recevoir son salaire sans interruption.
           </p>
@@ -177,7 +180,7 @@ export default function ArretMaladieFicheDePayePage() {
 
         {/* Exemple chiffré */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Exemple chiffré sur bulletin (2 500 € brut, 10 jours d'absence)</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Exemple chiffré sur bulletin (2 500 € brut, 10 jours d'absence)</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 24 }}>
             Salarié avec 6 ans d'ancienneté, rémunéré 2 500 € brut/mois, absent 10 jours ouvrés (dont 3 jours de carence) :
           </p>
@@ -202,7 +205,7 @@ export default function ArretMaladieFicheDePayePage() {
 
         {/* FAQ */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 32, textAlign: 'center', color: '#111827' }}>Questions fréquentes sur l'arrêt maladie</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 32, textAlign: 'center', color: '#111827' }}>Questions fréquentes sur l'arrêt maladie</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {FAQ.map(({ q, a }, i) => (
               <details key={i} style={{ border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
@@ -217,8 +220,41 @@ export default function ArretMaladieFicheDePayePage() {
 
       </div>
 
+      {/* ARTICLES CONNEXES */}
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 24px' }}>
+        <section style={{ marginBottom: 64 }}>
+          <h2 className="section-title" style={{ fontSize: 22, fontWeight: 800, marginBottom: 20, color: '#0f172a' }}>Articles connexes</h2>
+          <div className="articles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {[
+              { title: 'Heures supplémentaires', href: '/heures-supplementaires-fiche-de-paie', desc: 'Calcul et exonération TEPA' },
+              { title: 'Solde de tout compte', href: '/solde-de-tout-compte', desc: 'Documents et indemnités de départ' },
+              { title: 'Créer une fiche de paie', href: '/creer-une-fiche-de-paie', desc: 'Mentions obligatoires et étapes' },
+              { title: 'Net social', href: '/net-social', desc: 'Définition et calcul 2026' },
+            ].map(a => (
+              <a key={a.href} href={a.href} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '16px 18px', textDecoration: 'none', transition: 'box-shadow 0.2s' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 14, marginBottom: 4 }}>{a.title}</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>{a.desc}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": FAQ.map(f => ({
+            "@type": "Question",
+            "name": f.q,
+            "acceptedAnswer": { "@type": "Answer", "text": f.a }
+          }))
+        })}}
+      />
+
       {/* CTA */}
-      <section style={{ background: 'linear-gradient(135deg, #450a0a, #991b1b)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
+      <section className="cta-box" style={{ background: 'linear-gradient(135deg, #450a0a, #991b1b)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
         <h2 style={{ fontSize: 34, fontWeight: 900, marginBottom: 16 }}>Générez un bulletin avec absence maladie</h2>
         <p style={{ opacity: 0.85, fontSize: 17, marginBottom: 32 }}>Bulletin Facile prend en charge la subrogation, les IJSS et le maintien de salaire directement sur le bulletin.</p>
         <Link href="/generateur" style={{ display: 'inline-block', background: '#facc15', color: '#0f172a', fontWeight: 800, fontSize: 17, padding: '14px 36px', borderRadius: 12, textDecoration: 'none' }}>

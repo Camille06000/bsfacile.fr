@@ -2,8 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Print ──────────────────────────────────────────── */
 @media print {
   .no-print { display: none !important; }
   body { background: white; }
   .bulletin-print { box-shadow: none !important; }
+}
+
+/* ── Mobile-first Nav ───────────────────────────────── */
+@media (max-width: 640px) {
+  .nav-desktop { display: none !important; }
+  .nav-hamburger { display: flex !important; }
+}
+
+/* ── Responsive helpers for article pages ───────────── */
+
+/* Tables scroll on mobile */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Hero section padding */
+@media (max-width: 640px) {
+  .hero-section { padding: 48px 16px 56px !important; }
+  .hero-title { font-size: clamp(26px, 7vw, 42px) !important; }
+  .hero-stats { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+}
+
+/* Content sections */
+@media (max-width: 640px) {
+  .content-wrap { padding: 40px 16px !important; }
+  .section-title { font-size: 22px !important; }
+}
+
+/* Footer columns stack on mobile */
+@media (max-width: 640px) {
+  .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
+}
+
+/* Related articles grid */
+@media (max-width: 480px) {
+  .articles-grid { grid-template-columns: 1fr !important; }
+}
+
+/* Image hero overlap — reduce on mobile */
+@media (max-width: 640px) {
+  .hero-img-wrap { margin-top: -16px !important; padding: 0 12px !important; }
+  .hero-img-wrap img { height: 180px !important; border-radius: 10px !important; }
+}
+
+/* CTA section */
+@media (max-width: 640px) {
+  .cta-box { padding: 28px 16px !important; }
+  .cta-box a { font-size: 15px !important; padding: 12px 24px !important; }
 }

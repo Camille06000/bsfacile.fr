@@ -35,20 +35,23 @@ export default function NetSocialPage() {
       <Nav />
 
       {/* HERO */}
-      <section style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="hero-section" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -60, right: -60, width: 250, height: 250, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
         <div style={{ position: 'absolute', bottom: -40, left: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
         <div style={{ maxWidth: 820, margin: '0 auto', position: 'relative' }}>
           <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 50, padding: '6px 18px', fontSize: 13, fontWeight: 600, marginBottom: 24 }}>
             Obligatoire depuis janvier 2024 — Arrêté du 31 janvier 2023
           </div>
-          <h1 style={{ fontSize: 'clamp(32px, 5vw, 58px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 16 }}>
+          <h1 className="hero-title" style={{ fontSize: 'clamp(32px, 5vw, 58px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 8 }}>
             Le montant net social
           </h1>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 8, marginBottom: 16 }}>
+            Dernière mise à jour : mars 2026
+          </div>
           <p style={{ fontSize: 20, opacity: 0.9, marginBottom: 40 }}>
             Définition, calcul et différence avec le net à payer en 2026
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, maxWidth: 720, margin: '0 auto' }}>
+          <div className="hero-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, maxWidth: 720, margin: '0 auto' }}>
             {[
               { val: 'Jan. 2024', label: 'Obligation légale', sub: 'Sur tous les bulletins' },
               { val: 'RSA / APL', label: 'Sert à calculer', sub: 'Les aides CAF' },
@@ -66,7 +69,7 @@ export default function NetSocialPage() {
       </section>
 
       {/* IMAGE HERO */}
-      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+      <div className="hero-img-wrap" style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
         <img
           src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=900&h=300&fit=crop&q=80"
           alt="Net social sur bulletin de salaire, calcul droits sociaux"
@@ -75,11 +78,11 @@ export default function NetSocialPage() {
       </div>
 
       {/* CONTENU PRINCIPAL */}
-      <div style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
+      <div className="content-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
 
         {/* Définition */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Qu'est-ce que le montant net social ?</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Qu'est-ce que le montant net social ?</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 16 }}>
             Le <strong>montant net social</strong> est une nouvelle mention obligatoire introduite sur les bulletins de paie depuis le <strong>1er janvier 2024</strong> (arrêté du 31 janvier 2023). Il représente le revenu net du salarié après déduction de l'ensemble des cotisations salariales obligatoires, à l'exception de la CSG non déductible et de la CRDS.
           </p>
@@ -103,7 +106,7 @@ export default function NetSocialPage() {
 
         {/* Tableau comparatif Net à payer / Net social / Net fiscal */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Net à payer, net social, net fiscal : quelles différences ?</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Net à payer, net social, net fiscal : quelles différences ?</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 20 }}>
             Ces trois notions figurent sur le bulletin de paie mais ne correspondent pas aux mêmes réalités. Il est important de ne pas les confondre.
           </p>
@@ -154,7 +157,7 @@ export default function NetSocialPage() {
 
         {/* Formule de calcul */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Formule de calcul du net social</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Formule de calcul du net social</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 20 }}>
             La formule officielle du montant net social est la suivante :
           </p>
@@ -173,7 +176,7 @@ export default function NetSocialPage() {
 
         {/* Exemple chiffré */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Exemple chiffré pour 2 000 € brut</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Exemple chiffré pour 2 000 € brut</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 24 }}>
             Voici comment se décompose le passage du brut au net social, puis au net à payer, pour un salarié non-cadre au secteur privé :
           </p>
@@ -199,7 +202,7 @@ export default function NetSocialPage() {
 
         {/* Où trouver */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Où trouver le net social sur le bulletin ?</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Où trouver le net social sur le bulletin ?</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 16 }}>
             Depuis le 1er janvier 2024, le montant net social doit figurer obligatoirement sur le bulletin de paie, dans une zone clairement identifiée. Il apparaît généralement <strong>en bas du bulletin, avant le montant net à payer</strong>.
           </p>
@@ -246,7 +249,7 @@ export default function NetSocialPage() {
 
         {/* FAQ */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 32, textAlign: 'center', color: '#111827' }}>Questions fréquentes sur le net social</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 32, textAlign: 'center', color: '#111827' }}>Questions fréquentes sur le net social</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {FAQ.map(({ q, a }, i) => (
               <details key={i} style={{ border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
@@ -261,8 +264,41 @@ export default function NetSocialPage() {
 
       </div>
 
+      {/* ARTICLES CONNEXES */}
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 24px' }}>
+        <section style={{ marginBottom: 64 }}>
+          <h2 className="section-title" style={{ fontSize: 22, fontWeight: 800, marginBottom: 20, color: '#0f172a' }}>Articles connexes</h2>
+          <div className="articles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {[
+              { title: 'Salaire brut en net', href: '/salaire-brut-en-net', desc: 'Formule et taux de charges' },
+              { title: 'Prélèvement à la source', href: '/prelevement-a-la-source', desc: 'Taux et calcul sur le bulletin' },
+              { title: 'Comment lire une fiche de paie', href: '/comment-lire-fiche-de-paie', desc: 'Décryptez chaque ligne du bulletin' },
+              { title: 'Créer une fiche de paie', href: '/creer-une-fiche-de-paie', desc: 'Mentions obligatoires et étapes' },
+            ].map(a => (
+              <a key={a.href} href={a.href} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '16px 18px', textDecoration: 'none', transition: 'box-shadow 0.2s' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 14, marginBottom: 4 }}>{a.title}</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>{a.desc}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": FAQ.map(f => ({
+            "@type": "Question",
+            "name": f.q,
+            "acceptedAnswer": { "@type": "Answer", "text": f.a }
+          }))
+        })}}
+      />
+
       {/* CTA */}
-      <section style={{ background: 'linear-gradient(135deg, #1e1b4b, #3730a3)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
+      <section className="cta-box" style={{ background: 'linear-gradient(135deg, #1e1b4b, #3730a3)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
         <h2 style={{ fontSize: 34, fontWeight: 900, marginBottom: 16 }}>Générez un bulletin avec net social conforme</h2>
         <p style={{ opacity: 0.85, fontSize: 17, marginBottom: 32 }}>Bulletin Facile affiche le montant net social obligatoire sur chaque bulletin généré, conforme à la réglementation 2026.</p>
         <Link href="/generateur" style={{ display: 'inline-block', background: '#facc15', color: '#0f172a', fontWeight: 800, fontSize: 17, padding: '14px 36px', borderRadius: 12, textDecoration: 'none' }}>

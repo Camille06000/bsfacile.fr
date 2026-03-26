@@ -34,3 +34,8 @@ yarn-error.log*
 
 # PDFs personnels — DONNÉES SENSIBLES — ne pas commiter
 *.pdf
+
+# Base de données SQLite — données utilisateurs
+data/*.db
+data/*.db-shm
+data/*.db-wal

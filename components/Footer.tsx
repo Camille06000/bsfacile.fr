@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer style={{ background: '#111827', color: '#9ca3af', padding: '48px 24px 32px', fontSize: 13 }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 32, marginBottom: 40 }}>
+        <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 32, marginBottom: 40 }}>
           <div>
             <div style={{ color: 'white', fontWeight: 900, fontSize: 16, marginBottom: 12 }}>Bulletin Facile</div>
             <p style={{ lineHeight: 1.7, fontSize: 13 }}>Générateur de bulletin de salaire français conforme au droit social 2025/2026.</p>
@@ -18,11 +18,24 @@ export default function Footer() {
             </div>
           </div>
           <div>
-            <div style={{ color: 'white', fontWeight: 700, marginBottom: 12 }}>Guides</div>
+            <div style={{ color: 'white', fontWeight: 700, marginBottom: 12 }}>Guides salaire</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <Link href="/smic-2026" style={{ color: '#9ca3af', textDecoration: 'none' }}>SMIC 2026</Link>
               <Link href="/salaire-brut-en-net" style={{ color: '#9ca3af', textDecoration: 'none' }}>Brut en Net</Link>
               <Link href="/comment-lire-fiche-de-paie" style={{ color: '#9ca3af', textDecoration: 'none' }}>Lire une fiche de paie</Link>
+              <Link href="/creer-une-fiche-de-paie" style={{ color: '#9ca3af', textDecoration: 'none' }}>Créer une fiche de paie</Link>
+              <Link href="/prelevement-a-la-source" style={{ color: '#9ca3af', textDecoration: 'none' }}>Prélèvement à la source</Link>
+            </div>
+          </div>
+          <div>
+            <div style={{ color: 'white', fontWeight: 700, marginBottom: 12 }}>Guides droit social</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <Link href="/reduction-fillon" style={{ color: '#9ca3af', textDecoration: 'none' }}>Réduction Fillon</Link>
+              <Link href="/arret-maladie-fiche-de-paie" style={{ color: '#9ca3af', textDecoration: 'none' }}>Arrêt maladie</Link>
+              <Link href="/heures-supplementaires-fiche-de-paie" style={{ color: '#9ca3af', textDecoration: 'none' }}>Heures supplémentaires</Link>
+              <Link href="/combien-coute-un-salarie" style={{ color: '#9ca3af', textDecoration: 'none' }}>Coût d'un salarié</Link>
+              <Link href="/net-social" style={{ color: '#9ca3af', textDecoration: 'none' }}>Net social</Link>
+              <Link href="/solde-de-tout-compte" style={{ color: '#9ca3af', textDecoration: 'none' }}>Solde de tout compte</Link>
             </div>
           </div>
           <div>

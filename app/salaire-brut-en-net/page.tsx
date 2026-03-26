@@ -25,15 +25,18 @@ export default function SalaireBrutEnNetPage() {
       <Nav />
 
       {/* HERO */}
-      <section style={{ background: 'linear-gradient(135deg, #0c4a6e 0%, #0369a1 60%, #0284c7 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="hero-section" style={{ background: 'linear-gradient(135deg, #0c4a6e 0%, #0369a1 60%, #0284c7 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', bottom: -80, right: -80, width: 320, height: 320, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
         <div style={{ maxWidth: 800, margin: '0 auto', position: 'relative' }}>
           <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 50, padding: '6px 18px', fontSize: 13, fontWeight: 600, marginBottom: 24 }}>
             🧮 Calcul instantané · Taux 2026 officiel
           </div>
-          <h1 style={{ fontSize: 'clamp(32px, 5vw, 60px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 20 }}>
+          <h1 className="hero-title" style={{ fontSize: 'clamp(32px, 5vw, 60px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 8 }}>
             Salaire Brut en Net 2026
           </h1>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 8, marginBottom: 16 }}>
+            Dernière mise à jour : mars 2026
+          </div>
           <p style={{ fontSize: 19, opacity: 0.88, lineHeight: 1.7, marginBottom: 8, maxWidth: 600, margin: '0 auto 12px' }}>
             Formule, taux de charges salariales et exemples pour tous les niveaux de salaire.
           </p>
@@ -47,7 +50,7 @@ export default function SalaireBrutEnNetPage() {
       </section>
 
       {/* IMAGE HERO */}
-      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+      <div className="hero-img-wrap" style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
         <img
           src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=900&h=300&fit=crop&q=80"
           alt="Calcul salaire brut en net cotisations"
@@ -55,11 +58,11 @@ export default function SalaireBrutEnNetPage() {
         />
       </div>
 
-      <div style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
+      <div className="content-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
 
         {/* FORMULE */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20 }}>La formule brut → net</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20 }}>La formule brut → net</h2>
           <div style={{ background: '#eff6ff', border: '2px solid #bfdbfe', borderRadius: 14, padding: '28px 32px', textAlign: 'center', marginBottom: 24 }}>
             <div style={{ fontSize: 28, fontWeight: 900, color: '#1d4ed8', fontFamily: 'monospace' }}>
               Net = Brut × (1 − taux de charges salariales)
@@ -75,7 +78,7 @@ export default function SalaireBrutEnNetPage() {
 
         {/* TABLEAU D'EXEMPLES */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 24 }}>Exemples de conversion brut → net en 2026</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 24 }}>Exemples de conversion brut → net en 2026</h2>
           <div style={{ overflowX: 'auto', borderRadius: 12, border: '1px solid #e5e7eb' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
               <thead>
@@ -102,7 +105,7 @@ export default function SalaireBrutEnNetPage() {
 
         {/* TAUX DE CHARGES */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 24 }}>Détail des cotisations salariales 2026</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 24 }}>Détail des cotisations salariales 2026</h2>
           <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #e5e7eb' }}>
             {[
               { rubrique: 'Vieillesse plafonnée', taux: '6,90 %', base: 'Jusqu\'au PMSS (4 005 €)' },
@@ -126,8 +129,37 @@ export default function SalaireBrutEnNetPage() {
           </div>
         </section>
 
+        {/* ARTICLES CONNEXES */}
+        <section style={{ marginBottom: 64 }}>
+          <h2 className="section-title" style={{ fontSize: 22, fontWeight: 800, marginBottom: 20, color: '#0f172a' }}>Articles connexes</h2>
+          <div className="articles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {[
+              { title: 'SMIC 2026', href: '/smic-2026', desc: 'Montant brut, net et horaire' },
+              { title: 'Prélèvement à la source', href: '/prelevement-a-la-source', desc: 'Taux et calcul sur le bulletin' },
+              { title: 'Comment lire une fiche de paie', href: '/comment-lire-fiche-de-paie', desc: 'Décryptez chaque ligne du bulletin' },
+              { title: 'Combien coûte un salarié', href: '/combien-coute-un-salarie', desc: 'Charges patronales 2026' },
+            ].map(a => (
+              <a key={a.href} href={a.href} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '16px 18px', textDecoration: 'none', transition: 'box-shadow 0.2s' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 14, marginBottom: 4 }}>{a.title}</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>{a.desc}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": "Salaire Brut en Net 2026 : Convertisseur & Calcul",
+            "description": "Convertissez votre salaire brut en net en 2026.",
+            "publisher": { "@type": "Organization", "name": "Bulletin Facile", "url": "https://bulletinfacile.fr" }
+          })}}
+        />
+
         {/* CTA ENCADRÉ */}
-        <div style={{ background: 'linear-gradient(135deg, #0c4a6e, #0369a1)', borderRadius: 16, padding: '40px 32px', color: 'white', textAlign: 'center' }}>
+        <div className="cta-box" style={{ background: 'linear-gradient(135deg, #0c4a6e, #0369a1)', borderRadius: 16, padding: '40px 32px', color: 'white', textAlign: 'center' }}>
           <h3 style={{ fontSize: 26, fontWeight: 900, marginBottom: 12 }}>Calculez votre net exact, pas une estimation</h3>
           <p style={{ opacity: 0.85, marginBottom: 28, fontSize: 16 }}>Notre générateur applique tous les taux URSSAF 2026 à votre situation précise : statut, effectif, convention, PAS.</p>
           <Link href="/generateur" style={{ display: 'inline-block', background: '#facc15', color: '#1a1a2e', fontWeight: 800, fontSize: 16, padding: '13px 32px', borderRadius: 10, textDecoration: 'none' }}>

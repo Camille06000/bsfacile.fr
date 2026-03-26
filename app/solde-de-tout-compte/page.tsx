@@ -35,20 +35,23 @@ export default function SoldeDeToutComptePage() {
       <Nav />
 
       {/* HERO */}
-      <section style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="hero-section" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)', color: 'white', padding: '72px 24px 90px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -60, right: -60, width: 250, height: 250, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
         <div style={{ position: 'absolute', bottom: -40, left: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
         <div style={{ maxWidth: 820, margin: '0 auto', position: 'relative' }}>
           <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 50, padding: '6px 18px', fontSize: 13, fontWeight: 600, marginBottom: 24 }}>
             Droit du travail 2026 — Rupture du contrat
           </div>
-          <h1 style={{ fontSize: 'clamp(32px, 5vw, 58px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 16 }}>
+          <h1 className="hero-title" style={{ fontSize: 'clamp(32px, 5vw, 58px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 8 }}>
             Solde de tout compte
           </h1>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 8, marginBottom: 16 }}>
+            Dernière mise à jour : mars 2026
+          </div>
           <p style={{ fontSize: 20, opacity: 0.9, marginBottom: 40 }}>
             Calcul, documents obligatoires et indemnités de départ en 2026
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: 16, maxWidth: 720, margin: '0 auto' }}>
+          <div className="hero-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: 16, maxWidth: 720, margin: '0 auto' }}>
             {[
               { val: '6 mois', label: 'Délai de contestation', sub: 'Après signature du reçu' },
               { val: '4 documents', label: 'Obligatoires', sub: 'Remis au salarié' },
@@ -66,7 +69,7 @@ export default function SoldeDeToutComptePage() {
       </section>
 
       {/* IMAGE HERO */}
-      <div style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
+      <div className="hero-img-wrap" style={{ maxWidth: 900, margin: '-32px auto 0', padding: '0 24px', position: 'relative', zIndex: 10 }}>
         <img
           src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&h=300&fit=crop&q=80"
           alt="Document contrat signature solde de tout compte"
@@ -75,11 +78,11 @@ export default function SoldeDeToutComptePage() {
       </div>
 
       {/* CONTENU PRINCIPAL */}
-      <div style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
+      <div className="content-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '64px 24px' }}>
 
         {/* Définition */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Qu'est-ce que le solde de tout compte ?</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Qu'est-ce que le solde de tout compte ?</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 16 }}>
             Le <strong>solde de tout compte</strong> est l'ensemble des sommes dues au salarié lors de la rupture de son contrat de travail. Il est établi par l'employeur et remis au salarié à la fin du contrat, <strong>quelle qu'en soit la cause</strong> : licenciement, démission, rupture conventionnelle, fin de CDD, départ à la retraite.
           </p>
@@ -104,7 +107,7 @@ export default function SoldeDeToutComptePage() {
 
         {/* Documents à remettre */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Documents obligatoires à remettre au salarié</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Documents obligatoires à remettre au salarié</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 24 }}>
             La loi impose à l'employeur de remettre au salarié, au moment de la rupture du contrat, les documents suivants :
           </p>
@@ -128,7 +131,7 @@ export default function SoldeDeToutComptePage() {
 
         {/* Tableau des éléments du dernier bulletin */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Ce que contient le dernier bulletin de salaire</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Ce que contient le dernier bulletin de salaire</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 20 }}>
             Le dernier bulletin regroupe plusieurs éléments de rémunération dont certains sont propres au départ du salarié :
           </p>
@@ -163,7 +166,7 @@ export default function SoldeDeToutComptePage() {
 
         {/* Calcul indemnité congés payés */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Calcul de l'indemnité de congés payés restants</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Calcul de l'indemnité de congés payés restants</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 20 }}>
             L'indemnité compensatrice de congés payés est due pour tout congé acquis et non pris au moment du départ. L'employeur doit appliquer la méthode la <strong>plus favorable au salarié</strong> entre :
           </p>
@@ -196,7 +199,7 @@ export default function SoldeDeToutComptePage() {
 
         {/* Calcul indemnité légale de licenciement */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Calcul de l'indemnité légale de licenciement</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 20, color: '#111827' }}>Calcul de l'indemnité légale de licenciement</h2>
           <p style={{ fontSize: 16, lineHeight: 1.85, color: '#374151', marginBottom: 20 }}>
             L'indemnité légale de licenciement est due à tout salarié licencié (hors faute grave ou lourde) ayant au moins <strong>8 mois d'ancienneté</strong> dans l'entreprise. Son montant minimal est fixé par décret :
           </p>
@@ -226,7 +229,7 @@ export default function SoldeDeToutComptePage() {
 
         {/* FAQ */}
         <section style={{ marginBottom: 64 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 900, marginBottom: 32, textAlign: 'center', color: '#111827' }}>Questions fréquentes sur le solde de tout compte</h2>
+          <h2 className="section-title" style={{ fontSize: 30, fontWeight: 900, marginBottom: 32, textAlign: 'center', color: '#111827' }}>Questions fréquentes sur le solde de tout compte</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {FAQ.map(({ q, a }, i) => (
               <details key={i} style={{ border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
@@ -241,8 +244,41 @@ export default function SoldeDeToutComptePage() {
 
       </div>
 
+      {/* ARTICLES CONNEXES */}
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 24px' }}>
+        <section style={{ marginBottom: 64 }}>
+          <h2 className="section-title" style={{ fontSize: 22, fontWeight: 800, marginBottom: 20, color: '#0f172a' }}>Articles connexes</h2>
+          <div className="articles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {[
+              { title: 'Arrêt maladie', href: '/arret-maladie-fiche-de-paie', desc: 'IJSS et maintien de salaire' },
+              { title: 'Créer une fiche de paie', href: '/creer-une-fiche-de-paie', desc: 'Mentions obligatoires et étapes' },
+              { title: 'Heures supplémentaires', href: '/heures-supplementaires-fiche-de-paie', desc: 'Calcul et exonération TEPA' },
+              { title: 'Net social', href: '/net-social', desc: 'Mention obligatoire depuis 2024' },
+            ].map(a => (
+              <a key={a.href} href={a.href} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '16px 18px', textDecoration: 'none', transition: 'box-shadow 0.2s' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 14, marginBottom: 4 }}>{a.title}</div>
+                <div style={{ fontSize: 12, color: '#6b7280' }}>{a.desc}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": FAQ.map(f => ({
+            "@type": "Question",
+            "name": f.q,
+            "acceptedAnswer": { "@type": "Answer", "text": f.a }
+          }))
+        })}}
+      />
+
       {/* CTA */}
-      <section style={{ background: 'linear-gradient(135deg, #0f172a, #334155)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
+      <section className="cta-box" style={{ background: 'linear-gradient(135deg, #0f172a, #334155)', color: 'white', padding: '64px 24px', textAlign: 'center' }}>
         <h2 style={{ fontSize: 34, fontWeight: 900, marginBottom: 16 }}>Générez le dernier bulletin de paie de votre salarié</h2>
         <p style={{ opacity: 0.85, fontSize: 17, marginBottom: 32 }}>Bulletin Facile vous aide à établir le dernier bulletin avec tous les éléments du solde de tout compte : CP, préavis, indemnités.</p>
         <Link href="/generateur" style={{ display: 'inline-block', background: '#facc15', color: '#0f172a', fontWeight: 800, fontSize: 17, padding: '14px 36px', borderRadius: 12, textDecoration: 'none' }}>
