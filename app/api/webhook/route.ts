@@ -131,3 +131,19 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
+
+// GET — quand SumUp redirige le navigateur vers return_url après paiement
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const checkoutId = searchParams.get('checkout_id') || searchParams.get('id') || '';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://bulletinfacile.fr';
+
+  // Déclenche la vérification en arrière-plan et redirige vers /success
+  if (checkoutId) {
+    // Fire-and-forget la vérification (le webhook POST aura déjà traité, ou /success/verify le fera)
+    fetch(`${baseUrl}/api/checkout/verify?id=${checkoutId}`).catch(() => {});
+    return NextResponse.redirect(`${baseUrl}/success?checkout_id=${checkoutId}`);
+  }
+
+  return NextResponse.redirect(`${baseUrl}/success`);
+}
