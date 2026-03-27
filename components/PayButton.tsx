@@ -62,12 +62,6 @@ export default function PayButton({ amount, description, label, style, className
         amount,
         currency: 'EUR',
         locale: 'fr-FR',
-        // Google Pay
-        googlePay: {
-          merchantId: process.env.NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID || 'BCR2DN4TXLQJJ44A',
-          merchantName: 'Bulletin Facile',
-        },
-        // Apple Pay — activé automatiquement sur Safari/iOS
         onResponse: async (type, body) => {
           console.log('[SumUp]', type, body);
           if (type === 'success') {
@@ -157,7 +151,7 @@ export default function PayButton({ amount, description, label, style, className
         </p>
         <div id="sumup-card-widget" />
         <p style={{ margin: '12px 0 0', fontSize: 11, color: '#6b7280', textAlign: 'center' }}>
-          🔒 Carte · Apple Pay · Google Pay · Conforme PCI DSS
+          🔒 Paiement chiffré · Conforme PCI DSS
         </p>
       </div>
     );
