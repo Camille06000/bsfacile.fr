@@ -62,7 +62,6 @@ export default function PayButton({ amount, description, label, style, className
         amount,
         currency: 'EUR',
         locale: 'fr-FR',
-        country: 'FR',
         // Google Pay
         googlePay: {
           merchantId: process.env.NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID || 'BCR2DN4TXLQJJ44A',
