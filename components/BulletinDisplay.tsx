@@ -188,6 +188,16 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
   const [emailSending, setEmailSending] = useState(false);
   const [emailStatus, setEmailStatus] = useState<'idle'|'ok'|'err'>('idle');
 
+  // ── Thèmes visuels ──────────────────────────────────────────────────────────
+  const THEMES = {
+    bleu: { label: 'Bleu Classique',       primary: '#1a3a5c', sectionBg: '#d6ecf8', infoBg: '#eef3f8', rowOdd: '#f5fafd', brutBg: '#d8ecf9', cumulsBg: '#dde8f0', irBg: '#e8f0f8', border: '#bbd4e8' },
+    gris: { label: 'Gris Professionnel',   primary: '#1f2937', sectionBg: '#e5e7eb', infoBg: '#f3f4f6', rowOdd: '#f9fafb', brutBg: '#e5e7eb', cumulsBg: '#e5e7eb', irBg: '#f3f4f6', border: '#d1d5db' },
+    vert: { label: 'Vert Émeraude',        primary: '#14532d', sectionBg: '#dcfce7', infoBg: '#f0fdf4', rowOdd: '#f7fef9', brutBg: '#d1fae5', cumulsBg: '#d1fae5', irBg: '#e0fce7', border: '#86efac' },
+  } as const;
+  type ThemeId = keyof typeof THEMES;
+  const [themeId, setThemeId] = useState<ThemeId>('bleu');
+  const t = THEMES[themeId];
+
   const handleSendEmail = async () => {
     if (!emailTo) return;
     setEmailSending(true);
@@ -245,13 +255,13 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
   const netAvantImpot = totaux.netAvantPAS;
   const hasElementsVariables = elementsSalaire && elementsSalaire.length > 1;
 
-  // Styles inline (compatibles PDF/impression)
+  // Styles inline (compatibles PDF/impression) — dynamiques selon thème
   const s = {
-    headerBlue: { backgroundColor: '#1a3a5c' } as React.CSSProperties,
-    sectionBg: { backgroundColor: '#d6ecf8' } as React.CSSProperties,
-    rowEven: { backgroundColor: '#ffffff' } as React.CSSProperties,
-    rowOdd: { backgroundColor: '#f5fafd' } as React.CSSProperties,
-    hsBg: { backgroundColor: '#fff8ed' } as React.CSSProperties,
+    headerBlue: { backgroundColor: t.primary } as React.CSSProperties,
+    sectionBg:  { backgroundColor: t.sectionBg } as React.CSSProperties,
+    rowEven:    { backgroundColor: '#ffffff' } as React.CSSProperties,
+    rowOdd:     { backgroundColor: t.rowOdd } as React.CSSProperties,
+    hsBg:       { backgroundColor: '#fff8ed' } as React.CSSProperties,
   };
 
   return (
@@ -296,12 +306,12 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
     >
 
       {/* ══ EN-TÊTE ══ */}
-      <div style={{ display: 'flex', borderBottom: '2px solid #1a3a5c' }}>
+      <div style={{ display: 'flex', borderBottom: '2px solid ' + t.primary }}>
         <div style={{ width: '55%', padding: '8px 10px', borderRight: '1px solid #bbb' }}>
           {logoDataUrl && (
             <img src={logoDataUrl} alt="Logo" style={{ maxHeight: 36, maxWidth: 100, objectFit: 'contain', marginBottom: 4, display: 'block' }} />
           )}
-          <div style={{ fontWeight: 'bold', fontSize: '12px', marginBottom: '2px', color: '#1a3a5c' }}>{input.entrepriseNom || 'Nom de l\'entreprise'}</div>
+          <div style={{ fontWeight: 'bold', fontSize: '12px', marginBottom: '2px', color: t.primary }}>{input.entrepriseNom || 'Nom de l\'entreprise'}</div>
           {input.entrepriseAdresse && <div style={{ fontSize: '9px', color: '#444' }}>{input.entrepriseAdresse}</div>}
           <div style={{ fontSize: '9px', display: 'flex', gap: '12px', marginTop: '2px', flexWrap: 'wrap' }}>
             {input.entrepriseSiret && <span>Siret : {input.entrepriseSiret}</span>}
@@ -310,13 +320,13 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
           {input.entrepriseConvention && <div style={{ fontSize: '8px', color: '#666', marginTop: '2px' }}>CCN : {input.entrepriseConvention}</div>}
         </div>
         <div style={{ width: '45%', padding: '8px 10px', backgroundColor: '#f7f9fc' }}>
-          <div style={{ fontWeight: 'bold', fontSize: '16px', color: '#1a3a5c', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bulletin de paie</div>
+          <div style={{ fontWeight: 'bold', fontSize: '16px', color: t.primary, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bulletin de paie</div>
           <div style={{ fontSize: '9px', marginBottom: '1px' }}>
             <span style={{ fontWeight: 'bold' }}>Période :</span> {periodeDebut} au {periodeFin}
           </div>
           <div style={{ fontSize: '9px', marginBottom: '8px' }}><span style={{ fontWeight: 'bold' }}>Paiement le</span> {periodeFin}</div>
           {/* Nom + Prénom sur une ligne */}
-          <div style={{ fontWeight: 'bold', fontSize: '11px', color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+          <div style={{ fontWeight: 'bold', fontSize: '11px', color: t.primary, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
             {input.salariéNom} {input.salariéPrenom}
           </div>
           {/* Adresse sur la ligne suivante */}
@@ -329,7 +339,7 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
       </div>
 
       {/* ══ INFOS SALARIÉ — 2 lignes grille ══ */}
-      <div style={{ padding: '4px 10px', borderBottom: '1px solid #bbb', backgroundColor: '#eef3f8', fontSize: '9px' }}>
+      <div style={{ padding: '4px 10px', borderBottom: '1px solid #bbb', backgroundColor: t.infoBg, fontSize: '9px' }}>
         {/* Ligne 1 : Matricule | Emploi | Statut | Contrat */}
         <div style={{ display: 'flex', gap: '0', flexWrap: 'nowrap', marginBottom: '3px' }}>
           {input.salariéMatricule  && <span style={{ marginRight: '14px' }}><b>Matricule :</b> {input.salariéMatricule}</span>}
@@ -382,14 +392,14 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
                 </tr>
               ))}
               {/* SALAIRE BRUT */}
-              <tr style={{ backgroundColor: '#d8ecf9', fontWeight: 'bold', borderBottom: '1px solid #bbd4e8' }}>
+              <tr style={{ backgroundColor: t.brutBg, fontWeight: 'bold', borderBottom: '1px solid ' + t.border }}>
                 <td style={{ padding: '3px 6px' }}>SALAIRE BRUT</td>
                 <td style={{ padding: '3px 6px', textAlign: 'right' }}>{euro(totaux.brutMensuel)}</td>
                 <td></td><td></td><td></td><td></td>
               </tr>
             </>
           ) : (
-            <tr style={{ backgroundColor: '#d8ecf9', fontWeight: 'bold', borderBottom: '1px solid #bbd4e8' }}>
+            <tr style={{ backgroundColor: t.brutBg, fontWeight: 'bold', borderBottom: '1px solid ' + t.border }}>
               <td style={{ padding: '3px 6px' }}>SALAIRE DE BASE — {heures.toFixed(2)} h</td>
               <td style={{ padding: '3px 6px', textAlign: 'right' }}>{euro(salBase)}</td>
               <td></td><td></td><td></td><td></td>
@@ -439,8 +449,8 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
             if (!rows || rows.length === 0) return null;
             return (
               <>
-                <tr key={key + '_head'} style={{ ...s.sectionBg, borderTop: '1px solid #b5d4e8' }}>
-                  <td colSpan={6} style={{ padding: '2px 6px', fontWeight: 'bold', fontSize: '10px', color: '#1a3a5c' }}>
+                <tr key={key + '_head'} style={{ ...s.sectionBg, borderTop: '1px solid ' + t.border }}>
+                  <td colSpan={6} style={{ padding: '2px 6px', fontWeight: 'bold', fontSize: '10px', color: t.primary }}>
                     {label}
                   </td>
                 </tr>
@@ -472,7 +482,7 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
           )}
 
           {/* TOTAL DES RETENUES */}
-          <tr style={{ backgroundColor: '#f0f0f0', fontWeight: 'bold', borderTop: '2px solid #1a3a5c', borderBottom: '1px solid #bbb' }}>
+          <tr style={{ backgroundColor: '#f0f0f0', fontWeight: 'bold', borderTop: '2px solid ' + t.primary, borderBottom: '1px solid #bbb' }}>
             <td style={{ padding: '3px 6px' }}>TOTAL DES RETENUES</td>
             <td></td><td></td>
             <td style={{ padding: '3px 6px', textAlign: 'right' }}>{euro(totaux.totalCotisationsSalariales)}</td>
@@ -504,7 +514,7 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
           )}
 
           {/* MONTANT NET SOCIAL */}
-          <tr style={{ backgroundColor: '#f7f9fc', fontWeight: 'bold' }}>
+          <tr style={{ backgroundColor: t.infoBg, fontWeight: 'bold' }}>
             <td style={{ padding: '3px 6px' }}>MONTANT NET SOCIAL</td>
             <td></td><td></td><td></td><td></td>
             <td style={{ padding: '3px 6px', textAlign: 'right' }}>{euro(netAvantImpot)}</td>
@@ -514,7 +524,7 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
       </table>
 
       {/* ══ NET À PAYER AVANT IMPÔT ══ */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1a3a5c', color: 'white', padding: '8px 12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: t.primary, color: 'white', padding: '8px 12px' }}>
         <div style={{ fontWeight: 'bold', fontSize: '12px', textTransform: 'uppercase' }}>Net à payer avant impôt sur le revenu</div>
         <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{euro(netAvantImpot)}</div>
       </div>
@@ -542,15 +552,15 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
           <div style={{ borderBottom: '1px solid #ddd', backgroundColor: '#f7f9fc' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px' }}>
               <thead>
-                <tr style={{ backgroundColor: '#dde8f0' }}>
-                  <th style={{ textAlign: 'left', padding: '2px 6px', fontWeight: 'bold', color: '#1a3a5c' }}>
+                <tr style={{ backgroundColor: t.cumulsBg }}>
+                  <th style={{ textAlign: 'left', padding: '2px 6px', fontWeight: 'bold', color: t.primary }}>
                     Cumuls depuis le 01/{dateLabel}
                   </th>
-                  <th style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 'bold', color: '#1a3a5c' }}>Salaire brut</th>
-                  <th style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 'bold', color: '#1a3a5c' }}>Net imposable</th>
-                  <th style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 'bold', color: '#1a3a5c' }}>Cotis. salariales</th>
-                  <th style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 'bold', color: '#1a3a5c' }}>Impôt (PAS)</th>
-                  <th style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 'bold', color: '#1a3a5c' }}>Net à payer</th>
+                  <th style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 'bold', color: t.primary }}>Salaire brut</th>
+                  <th style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 'bold', color: t.primary }}>Net imposable</th>
+                  <th style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 'bold', color: t.primary }}>Cotis. salariales</th>
+                  <th style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 'bold', color: t.primary }}>Impôt (PAS)</th>
+                  <th style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 'bold', color: t.primary }}>Net à payer</th>
                 </tr>
               </thead>
               <tbody>
@@ -562,13 +572,13 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
                   <td style={{ padding: '2px 6px', textAlign: 'right' }}>{euro(totaux.montantPAS)}</td>
                   <td style={{ padding: '2px 6px', textAlign: 'right' }}>{euro(totaux.netAPayer)}</td>
                 </tr>
-                <tr style={{ fontWeight: 'bold', borderTop: '1px solid #c5d8e8' }}>
-                  <td style={{ padding: '2px 6px', color: '#1a3a5c' }}>Cumul ({nbMois} mois)</td>
-                  <td style={{ padding: '2px 6px', textAlign: 'right', color: '#1a3a5c' }}>{euro(cumBrut)}</td>
-                  <td style={{ padding: '2px 6px', textAlign: 'right', color: '#1a3a5c' }}>{euro(cumNetImp)}</td>
-                  <td style={{ padding: '2px 6px', textAlign: 'right', color: '#1a3a5c' }}>{euro(cumCotSal)}</td>
-                  <td style={{ padding: '2px 6px', textAlign: 'right', color: '#1a3a5c' }}>{euro(cumPAS)}</td>
-                  <td style={{ padding: '2px 6px', textAlign: 'right', color: '#1a3a5c' }}>{euro(cumNet)}</td>
+                <tr style={{ fontWeight: 'bold', borderTop: '1px solid ' + t.border }}>
+                  <td style={{ padding: '2px 6px', color: t.primary }}>Cumul ({nbMois} mois)</td>
+                  <td style={{ padding: '2px 6px', textAlign: 'right', color: t.primary }}>{euro(cumBrut)}</td>
+                  <td style={{ padding: '2px 6px', textAlign: 'right', color: t.primary }}>{euro(cumNetImp)}</td>
+                  <td style={{ padding: '2px 6px', textAlign: 'right', color: t.primary }}>{euro(cumCotSal)}</td>
+                  <td style={{ padding: '2px 6px', textAlign: 'right', color: t.primary }}>{euro(cumPAS)}</td>
+                  <td style={{ padding: '2px 6px', textAlign: 'right', color: t.primary }}>{euro(cumNet)}</td>
                 </tr>
               </tbody>
             </table>
@@ -580,7 +590,7 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
       <div style={{ padding: '0 12px 8px', borderBottom: '1px solid #ddd' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', marginTop: '6px' }}>
           <thead>
-            <tr style={{ backgroundColor: '#e8f0f8' }}>
+            <tr style={{ backgroundColor: t.irBg }}>
               <th style={{ textAlign: 'left', padding: '3px 6px', fontWeight: 'bold' }} colSpan={2}>Impôt sur le revenu</th>
               <th style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 'bold' }}>Base</th>
               <th style={{ padding: '3px 6px', textAlign: 'center', fontWeight: 'bold' }}>Taux</th>
@@ -682,11 +692,11 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
         <div style={{ flex: 1 }} />
 
         {/* NET À PAYER AU SALARIÉ */}
-        <div style={{ border: '2px solid #1a3a5c', padding: '10px 16px', textAlign: 'right', minWidth: '220px' }}>
+        <div style={{ border: '2px solid ' + t.primary, padding: '10px 16px', textAlign: 'right', minWidth: '220px' }}>
           <div style={{ fontSize: '10px', color: '#555', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
             Net à payer au salarié
           </div>
-          <div style={{ fontWeight: 'bold', fontSize: '24px', color: '#1a3a5c' }}>
+          <div style={{ fontWeight: 'bold', fontSize: '24px', color: t.primary }}>
             {euro(totaux.acompte > 0 ? totaux.netAPayerApresAcompte : totaux.netAPayer)}
           </div>
           {totaux.tauxPAS > 0 && (
@@ -709,7 +719,35 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
       </div>
 
       {/* ══ BOUTONS DSN / CONTRAT ══ */}
-      <div className="no-print" style={{ borderTop: '1px solid #eee', padding: '12px 16px', display: 'flex', gap: '10px', flexWrap: 'wrap', backgroundColor: '#f7f9fc', alignItems: 'center' }}>
+      <div className="no-print" style={{ borderTop: '1px solid #eee', padding: '12px 16px', backgroundColor: '#f7f9fc' }}>
+
+        {/* Sélecteur de thème */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #e5e7eb' }}>
+          <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: '700', letterSpacing: '0.05em' }}>THÈME :</span>
+          {(Object.keys(THEMES) as ThemeId[]).map(id => (
+            <button
+              key={id}
+              onClick={() => setThemeId(id)}
+              title={THEMES[id].label}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '5px 12px',
+                borderRadius: '20px',
+                border: themeId === id ? '2px solid ' + THEMES[id].primary : '2px solid #e5e7eb',
+                backgroundColor: themeId === id ? THEMES[id].primary : 'white',
+                color: themeId === id ? 'white' : '#374151',
+                fontSize: '11px', fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: themeId === id ? 'rgba(255,255,255,0.5)' : THEMES[id].primary, display: 'inline-block', flexShrink: 0 }} />
+              {THEMES[id].label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
         <button
           onClick={() => setShowDSN(true)}
           style={{ backgroundColor: '#1a3a5c', color: 'white', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
@@ -736,6 +774,7 @@ export default function BulletinDisplay({ data, logoDataUrl, isFree }: { data: R
         <div style={{ fontSize: '10px', color: '#999', marginLeft: 'auto' }}>
           DSN Phase 3 — Net-Entreprises
         </div>
+        </div>{/* fin flex boutons */}
       </div>
 
       {/* Modal Email */}
