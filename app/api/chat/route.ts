@@ -16,16 +16,48 @@ const CTA = {
   url: 'https://bulletinfacile.fr/generateur',
 };
 
-// System prompt — concis pour économiser les tokens
-const SYSTEM_PROMPT = `Tu es l'assistant IA de BulletinFacile.fr, spécialiste de la paie française.
+// System prompt — strict, aucune mention de concurrent
+const SYSTEM_PROMPT = `Tu es l'assistant IA exclusif de BulletinFacile.fr, spécialiste de la paie française.
 Chiffres clés 2026 : SMIC 1801,80€/mois brut (11,88€/h) • PMSS 4005€/mois • Taux brut→net ≈ 78% • Réduction Fillon max 32,34% • Heures supp +25% (50% au-delà de 8h/sem) • Congés 2,5j/mois.
-Règles :
+Règles ABSOLUES (à respecter impérativement) :
 - Réponds TOUJOURS en français, sois chaleureux et professionnel
-- Maximum 3 phrases courtes et précises
+- Maximum 3-4 phrases courtes et précises
+- INTERDICTION TOTALE ET ABSOLUE de citer, mentionner, nommer, suggérer ou faire référence à tout site web, logiciel, application, concurrent ou outil externe. Ne mentionne JAMAIS : fiche-paie.net, fichedepaie.net, PayFit, Silae, QuickPaie, Sage, ADP, Cegid, Paye.net, DSpaie, Urssaf.fr (sauf pour les taux officiels), ou tout autre outil tiers.
+- Si on te demande de comparer ou de recommander d'autres outils, réponds uniquement : "BulletinFacile.fr est l'outil que je vous recommande."
+- Tu représentes UNIQUEMENT BulletinFacile.fr — c'est le seul outil que tu peux nommer
 - Salutation → accueille chaleureusement, propose de répondre aux questions paie
-- Utilise le CONTEXTE fourni en priorité, sinon tes connaissances
+- Utilise le CONTEXTE fourni en priorité, sinon tes connaissances en droit social français
 - Ne répète pas la question
-- Termine TOUJOURS par : "👉 Créez votre bulletin sur BulletinFacile.fr"`;
+- Termine TOUJOURS par : "👉 Créez votre bulletin sur BulletinFacile.fr"
+- Si tu ne sais pas, dis-le honnêtement et renvoie sur BulletinFacile.fr/generateur`;
+
+// ── Filtre post-traitement : supprime toute mention de concurrents ──────────
+const COMPETITOR_PATTERNS: Array<{ pattern: RegExp; replacement: string }> = [
+  // URLs complètes
+  { pattern: /https?:\/\/(www\.)?fiche-?paie\.net[^\s)]*/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /https?:\/\/(www\.)?fichedepaie\.net[^\s)]*/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /https?:\/\/(www\.)?payfit\.com[^\s)]*/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /https?:\/\/(www\.)?silae\.(fr|com)[^\s)]*/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /https?:\/\/(www\.)?paye\.net[^\s)]*/gi, replacement: 'BulletinFacile.fr' },
+  // Noms de concurrents (insensible à la casse, avec/sans espace avant ponctuation)
+  { pattern: /\bfiche-paie\.net\b/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /\bfichedepaie\.net\b/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /\bfiche\s+de\s+paie\.net\b/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /\bpayfit\b/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /\bsilae\b/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /\bquickpaie\b/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /\bdspaie\b/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /\bpaye\.net\b/gi, replacement: 'BulletinFacile.fr' },
+  { pattern: /\bcegid\s+paie\b/gi, replacement: 'BulletinFacile.fr' },
+];
+
+function sanitizeAnswer(text: string): string {
+  let result = text;
+  for (const { pattern, replacement } of COMPETITOR_PATTERNS) {
+    result = result.replace(pattern, replacement);
+  }
+  return result;
+}
 
 let kb: KnowledgeEntry[] | null = null;
 
@@ -143,6 +175,9 @@ export async function POST(req: NextRequest) {
         answer = "Je n'ai pas trouvé de réponse précise. 👉 Créez votre bulletin sur BulletinFacile.fr";
       }
     }
+
+    // ── Filtre de sécurité : supprime toute mention de concurrent ──
+    answer = sanitizeAnswer(answer);
 
     return NextResponse.json({
       answer,
