@@ -25,7 +25,7 @@ const sel = inp;
 interface EntrepriseResult {
   nom_complet: string;
   siren: string;
-  siege?: { siret?: string; adresse?: string; activite_principale?: string; code_postal?: string; commune?: string };
+  siege?: { siret?: string; adresse?: string; activite_principale?: string; libelle_commune?: string; code_postal?: string };
   activite_principale?: string;
 }
 
@@ -193,7 +193,8 @@ export default function BulletinForm() {
     const brut = e.target.value;
     setForm(f => {
       const h = parseFloat(f.heuresMensuelles), b = parseFloat(brut);
-      if (b > 0 && h > 0) return { ...f, brutMensuel: brut, tauxHoraire: String(r2(b / h)) };
+      // 4 décimales pour éviter l'erreur d'arrondi au recalcul (ex: 7940 → 7939)
+      if (b > 0 && h > 0) return { ...f, brutMensuel: brut, tauxHoraire: String(Math.round(b / h * 10000) / 10000) };
       return { ...f, brutMensuel: brut };
     });
   };
@@ -217,12 +218,12 @@ export default function BulletinForm() {
     });
   };
 
-  // Recherche entreprise
+  // Recherche entreprise — via proxy API (évite les blocages CORS)
   const searchEntreprise = useCallback(async (q: string) => {
     if (q.length < 2) { setSuggestions([]); return; }
     setSearching(true);
     try {
-      const res = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(q)}&page=1&per_page=8`);
+      const res = await fetch(`/api/search-entreprise?q=${encodeURIComponent(q)}`);
       const data = await res.json();
       setSuggestions(data.results || []);
       setShowSuggestions(true);
@@ -238,7 +239,8 @@ export default function BulletinForm() {
   };
 
   const selectEntreprise = (e: EntrepriseResult) => {
-    const adresse = [e.siege?.adresse, e.siege?.code_postal, e.siege?.commune].filter(Boolean).join(', ') || '';
+    // siege.adresse contient déjà l'adresse complète (numéro, rue, CP, ville)
+    const adresse = e.siege?.adresse || '';
     setForm(f => ({
       ...f,
       entrepriseNom: e.nom_complet || '',
@@ -283,7 +285,6 @@ export default function BulletinForm() {
     try {
       const payload = {
         ...form,
-        logoDataUrl: logoDataUrl || undefined,
         heuresMajorees: heureMajorees
           .filter(hm => parseFloat(hm.heures) > 0)
           .map(hm => ({ intitule: hm.intitule, heures: parseFloat(hm.heures), majoration: parseFloat(hm.majoration) || 100 })),
@@ -315,7 +316,15 @@ export default function BulletinForm() {
     } finally { setLoading(false); }
   };
 
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    const prev = document.title;
+    const company = result?.input?.entrepriseNom?.trim() || '';
+    const mois = result ? `${String(result.params.mois).padStart(2,'0')}/${result.params.annee}` : '';
+    document.title = company ? `Bulletin de salaire — ${company}${mois ? ` — ${mois}` : ''}` : 'Bulletin de salaire';
+    const restore = () => { document.title = prev; window.removeEventListener('afterprint', restore); };
+    window.addEventListener('afterprint', restore);
+    window.print();
+  };
 
   const TabBtn = ({ t, label, badge }: { t: TabType; label: string; badge?: string }) => (
     <button type="button" onClick={() => setTab(t)}
@@ -334,7 +343,7 @@ export default function BulletinForm() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 no-print">
         <div className="flex items-center justify-center gap-4 mb-3">
           <span className="font-bold text-blue-800 text-sm px-3 py-1 bg-blue-50 rounded-full border border-blue-200">Bulletin de paie</span>
           <a href="/contrat" className="text-sm text-gray-500 hover:text-blue-700 px-3 py-1 rounded-full hover:bg-gray-50 transition-colors">Contrat de travail →</a>
@@ -387,7 +396,7 @@ export default function BulletinForm() {
           {tab === 'principal' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Field label="Salaire brut mensuel (€)" hint="Calculé auto si heures + taux remplis">
-                <input type="number" min="1000" max="200000" step="0.01"
+                <input type="number" min="0" max="200000" step="0.01"
                   value={form.brutMensuel} onChange={handleBrut}
                   className={inp} placeholder="ex : 3 500,00" required />
               </Field>
