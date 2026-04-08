@@ -1,14 +1,16 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import PayButton from '@/components/PayButton';
 
+// ── Données pricing ──────────────────────────────────────────────────────────
 const PACK_OPTIONS = [
-  { label: '3 Fiches',  total: 22.70, perFiche: 7.57 },
-  { label: '5 Fiches',  total: 36.95, perFiche: 7.39 },
-  { label: '10 Fiches', total: 68.90, perFiche: 6.89 },
-  { label: '20 Fiches', total: 127.80, perFiche: 6.39 },
+  { label: '3 bulletins',  total: 22.70,  perU: 7.57 },
+  { label: '5 bulletins',  total: 36.95,  perU: 7.39 },
+  { label: '10 bulletins', total: 68.90,  perU: 6.89 },
+  { label: '20 bulletins', total: 127.80, perU: 6.39 },
 ];
 
 const MENSUEL_OPTIONS = [
@@ -25,197 +27,301 @@ const ANNUEL_OPTIONS = [
   { label: '25 à 49 salariés', prix: 998.00, parMois: 83.17 },
 ];
 
-const FEATURES_FICHE = ['Logo & couleur modifiables', 'Journal de paie inclus', 'DSN en 3 clics', 'Téléchargement PDF', 'Calculs URSSAF 2025/2026'];
-const FEATURES_PACK  = ['Multi-salariés', 'Multi-entreprises', 'Logo & couleur modifiables', 'Journal de paie inclus', 'DSN en 3 clics', 'Téléchargement PDF'];
-const FEATURES_SUB   = ['Bulletins illimités', 'Multi-entreprises', 'Logo & couleur modifiables', 'Journal de paie inclus', 'DSN en 3 clics', 'Mises à jour légales incluses', 'Support prioritaire'];
-
-const CheckIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 20 20" fill="#22c55e" style={{ flexShrink: 0, marginTop: 2 }}>
+// ── Icône check ──────────────────────────────────────────────────────────────
+const Check = ({ color = '#16a34a' }: { color?: string }) => (
+  <svg width="15" height="15" viewBox="0 0 20 20" fill={color} style={{ flexShrink: 0, marginTop: 1 }}>
     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
   </svg>
 );
 
-const btnGreen = { display: 'block', width: '100%', background: '#16a34a', color: 'white', fontWeight: 700, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 14, cursor: 'pointer' } as React.CSSProperties;
-const btnBlue  = { display: 'block', width: '100%', background: '#2563eb', color: 'white', fontWeight: 700, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 14, cursor: 'pointer' } as React.CSSProperties;
+// ── Styles boutons ───────────────────────────────────────────────────────────
+const btnGreen: React.CSSProperties = { display: 'block', width: '100%', background: '#16a34a', color: 'white', fontWeight: 700, padding: '12px 0', borderRadius: 10, border: 'none', fontSize: 14, cursor: 'pointer' };
+const btnBlue: React.CSSProperties  = { display: 'block', width: '100%', background: '#2563eb', color: 'white', fontWeight: 700, padding: '12px 0', borderRadius: 10, border: 'none', fontSize: 14, cursor: 'pointer' };
+const btnDark: React.CSSProperties  = { display: 'block', width: '100%', background: '#1a3a5c', color: 'white', fontWeight: 700, padding: '12px 0', borderRadius: 10, border: 'none', fontSize: 14, cursor: 'pointer' };
 
+// ── Prix affiché ─────────────────────────────────────────────────────────────
+function Prix({ amount, color }: { amount: number; color: string }) {
+  const [entier, dec] = amount.toFixed(2).split('.');
+  return (
+    <div style={{ textAlign: 'center', lineHeight: 1 }}>
+      <span style={{ fontSize: 52, fontWeight: 900, color }}>{entier}</span>
+      <span style={{ fontSize: 24, fontWeight: 800, color, verticalAlign: 'super', lineHeight: 1 }}>,{dec}</span>
+      <span style={{ fontSize: 13, color: '#9ca3af', marginLeft: 4 }}>€ HT</span>
+    </div>
+  );
+}
+
+// ── Badge ────────────────────────────────────────────────────────────────────
+function Badge({ label, bg, color }: { label: string; bg: string; color: string }) {
+  return (
+    <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: bg, color, fontSize: 11, fontWeight: 700, padding: '3px 14px', borderRadius: 50, whiteSpace: 'nowrap', border: `2px solid ${color === 'white' ? bg : 'transparent'}`, boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+      {label}
+    </div>
+  );
+}
+
+// ── Sélecteur dropdown ───────────────────────────────────────────────────────
+function Select({ value, onChange, options }: { value: number; onChange: (n: number) => void; options: { label: string }[] }) {
+  return (
+    <div style={{ position: 'relative', marginBottom: 12 }}>
+      <select value={value} onChange={e => onChange(Number(e.target.value))}
+        style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '9px 32px 9px 12px', fontSize: 13, fontWeight: 600, appearance: 'none', cursor: 'pointer', background: 'white' }}>
+        {options.map((o, i) => <option key={i} value={i}>{o.label}</option>)}
+      </select>
+      <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#6b7280', fontSize: 12 }}>▾</span>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 export default function TarifsPage() {
-  const [packIdx, setPackIdx]     = useState(0);
+  const [packIdx,    setPackIdx]    = useState(1); // Pack 5 par défaut
   const [mensuelIdx, setMensuelIdx] = useState(0);
-  const [annuelIdx, setAnnuelIdx]   = useState(0);
+  const [annuelIdx,  setAnnuelIdx]  = useState(0);
 
   const pack    = PACK_OPTIONS[packIdx];
   const mensuel = MENSUEL_OPTIONS[mensuelIdx];
   const annuel  = ANNUEL_OPTIONS[annuelIdx];
 
   return (
-    <div style={{ fontFamily: 'Inter, Arial, sans-serif', color: '#111827', minHeight: '100vh', background: 'linear-gradient(to bottom, #eff6ff, #fff)' }}>
+    <div style={{ fontFamily: 'Inter, Arial, sans-serif', color: '#111827', minHeight: '100vh', background: '#f8fafc' }}>
       <Nav />
 
-      {/* HEADER */}
-      <div style={{ textAlign: 'center', padding: '56px 24px 40px' }}>
-        <div style={{ display: 'inline-block', background: '#dbeafe', color: '#1d4ed8', borderRadius: 50, padding: '4px 16px', fontSize: 13, fontWeight: 700, marginBottom: 16 }}>
-          ⭐ 4,9/5 · +500 bulletins générés · Toujours 1 € moins cher que la concurrence
+      {/* ══ HERO ══ */}
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: '60px 24px 48px', textAlign: 'center' }}>
+        <div style={{ display: 'inline-flex', gap: 8, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 50, padding: '5px 18px', fontSize: 13, fontWeight: 600, marginBottom: 20 }}>
+          <span>⭐ 4,9/5</span><span style={{ opacity: 0.4 }}>·</span>
+          <span>+500 bulletins générés</span><span style={{ opacity: 0.4 }}>·</span>
+          <span>Accès immédiat</span>
         </div>
-        <h1 style={{ fontSize: 'clamp(28px, 5vw, 44px)', fontWeight: 900, marginBottom: 12 }}>
-          Choisissez votre offre
+        <h1 style={{ fontSize: 'clamp(28px,5vw,46px)', fontWeight: 900, margin: '0 0 16px', lineHeight: 1.15 }}>
+          Des tarifs simples,<br />sans surprise
         </h1>
-        <p style={{ color: '#6b7280', fontSize: 17, maxWidth: 520, margin: '0 auto 16px' }}>
-          Accès immédiat après paiement. Sans abonnement forcé.
+        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 17, maxWidth: 480, margin: '0 auto 28px' }}>
+          Bulletin de salaire ou contrat de travail — payez uniquement ce dont vous avez besoin.
         </p>
-        <div style={{ display: 'inline-flex', gap: 24, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '10px 24px', fontSize: 13, color: '#15803d', fontWeight: 600 }}>
-          <span>✅ Calculs URSSAF 2026 officiels</span>
-          <span>✅ PDF immédiat</span>
-          <span>✅ Remboursé si insatisfait</span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'center' }}>
+          {[
+            { icon: '✅', txt: 'Calculs URSSAF 2026 officiels' },
+            { icon: '⚡', txt: 'PDF immédiat' },
+            { icon: '🛡️', txt: 'Remboursé 30 jours' },
+            { icon: '🔒', txt: 'Paiement sécurisé SumUp' },
+          ].map(({ icon, txt }) => (
+            <span key={txt} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, padding: '7px 16px', fontSize: 13, color: 'rgba(255,255,255,0.9)' }}>
+              {icon} {txt}
+            </span>
+          ))}
         </div>
       </div>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 16px 80px' }}>
+      <div style={{ maxWidth: 1180, margin: '0 auto', padding: '48px 16px 80px' }}>
 
-        {/* GRID 2 colonnes */}
-        <div className="tarifs-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
-
-          {/* ── SANS ENGAGEMENT ── */}
-          <div style={{ background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: 20, padding: 24 }}>
-            <h2 style={{ textAlign: 'center', fontWeight: 900, color: '#15803d', fontSize: 18, letterSpacing: 1, marginBottom: 20, textTransform: 'uppercase' }}>
-              Sans engagement
-            </h2>
-            <div className="tarifs-inner" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-
-              {/* 1 Bulletin */}
-              <div style={{ background: 'white', borderRadius: 14, border: '1px solid #d1fae5', padding: 20, display: 'flex', flexDirection: 'column' }}>
-                <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 16, marginBottom: 16 }}>1 Bulletin</div>
-                <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                  <span style={{ fontSize: 48, fontWeight: 900, color: '#16a34a' }}>8</span>
-                  <span style={{ fontSize: 22, fontWeight: 800, color: '#16a34a', verticalAlign: 'super' }}>,90</span>
-                  <span style={{ fontSize: 13, color: '#9ca3af', marginLeft: 4 }}>€ HT</span>
-                </div>
-                <PayButton amount={8.90} description="Bulletin Facile — 1 bulletin de salaire" label="Acheter maintenant" style={btnGreen} />
-                <ul style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8, listStyle: 'none', padding: 0 }}>
-                  {FEATURES_FICHE.map(f => (
-                    <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4b5563' }}><CheckIcon />{f}</li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Pack */}
-              <div style={{ background: 'white', borderRadius: 14, border: '2px solid #16a34a', padding: 20, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#16a34a', color: 'white', fontSize: 11, fontWeight: 700, padding: '2px 12px', borderRadius: 50 }}>
-                  Populaire
-                </div>
-                <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Pack</div>
-                <div style={{ position: 'relative', marginBottom: 12 }}>
-                  <select value={packIdx} onChange={e => setPackIdx(Number(e.target.value))}
-                    style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 28px 8px 10px', fontSize: 13, fontWeight: 600, appearance: 'none', cursor: 'pointer' }}>
-                    {PACK_OPTIONS.map((o, i) => <option key={i} value={i}>{o.label}</option>)}
-                  </select>
-                  <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#6b7280' }}>▾</span>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <span style={{ fontSize: 48, fontWeight: 900, color: '#16a34a' }}>{Math.floor(pack.total)}</span>
-                  <span style={{ fontSize: 22, fontWeight: 800, color: '#16a34a', verticalAlign: 'super' }}>,{(pack.total % 1).toFixed(2).slice(2)}</span>
-                  <span style={{ fontSize: 13, color: '#9ca3af', marginLeft: 4 }}>€ HT</span>
-                </div>
-                <div style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginBottom: 12 }}>
-                  soit {pack.perFiche.toFixed(2).replace('.', ',')} € HT / fiche
-                </div>
-                <PayButton amount={pack.total} description={`Bulletin Facile — Pack ${pack.label}`} label="Acheter ce pack" style={btnGreen} />
-                <ul style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8, listStyle: 'none', padding: 0 }}>
-                  {FEATURES_PACK.map(f => (
-                    <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4b5563' }}><CheckIcon />{f}</li>
-                  ))}
-                </ul>
-              </div>
+        {/* ══ SECTION 1 — BULLETINS SANS ENGAGEMENT ══ */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <div style={{ display: 'inline-block', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 50, padding: '4px 16px', fontSize: 12, fontWeight: 700, color: '#15803d', marginBottom: 10 }}>
+              📄 BULLETINS DE SALAIRE
             </div>
+            <h2 style={{ fontSize: 26, fontWeight: 800, margin: '0 0 8px' }}>Sans engagement</h2>
+            <p style={{ color: '#6b7280', fontSize: 15, margin: 0 }}>Achetez uniquement ce dont vous avez besoin, quand vous en avez besoin</p>
           </div>
 
-          {/* ── ABONNEMENT ── */}
-          <div style={{ background: '#eff6ff', border: '2px solid #bfdbfe', borderRadius: 20, padding: 24 }}>
-            <h2 style={{ textAlign: 'center', fontWeight: 900, color: '#1d4ed8', fontSize: 18, letterSpacing: 1, marginBottom: 20, textTransform: 'uppercase' }}>
-              Abonnement
-            </h2>
-            <div className="tarifs-inner" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
 
-              {/* Mensuel */}
-              <div style={{ background: 'white', borderRadius: 14, border: '1px solid #bfdbfe', padding: 20, display: 'flex', flexDirection: 'column' }}>
-                <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Mensuel</div>
-                <div style={{ position: 'relative', marginBottom: 12 }}>
-                  <select value={mensuelIdx} onChange={e => setMensuelIdx(Number(e.target.value))}
-                    style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 28px 8px 10px', fontSize: 13, fontWeight: 600, appearance: 'none', cursor: 'pointer' }}>
-                    {MENSUEL_OPTIONS.map((o, i) => <option key={i} value={i}>{o.label}</option>)}
-                  </select>
-                  <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#6b7280' }}>▾</span>
-                </div>
-                <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                  <span style={{ fontSize: 48, fontWeight: 900, color: '#2563eb' }}>{Math.floor(mensuel.prix)}</span>
-                  <span style={{ fontSize: 22, fontWeight: 800, color: '#2563eb', verticalAlign: 'super' }}>,{(mensuel.prix % 1).toFixed(2).slice(2)}</span>
-                  <span style={{ fontSize: 13, color: '#9ca3af', marginLeft: 4 }}>€ HT</span>
-                  <div style={{ fontSize: 13, color: '#6b7280', fontWeight: 600 }}>/mois</div>
-                </div>
-                <PayButton amount={mensuel.prix} description={`Bulletin Facile — Abonnement mensuel ${mensuel.label}`} label="S'abonner" style={btnBlue} />
-                <ul style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8, listStyle: 'none', padding: 0 }}>
-                  {FEATURES_SUB.map(f => (
-                    <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4b5563' }}><CheckIcon />{f}</li>
-                  ))}
-                </ul>
-              </div>
+            {/* 1 bulletin */}
+            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', padding: 24, display: 'flex', flexDirection: 'column', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 4 }}>1 Bulletin</div>
+              <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 20 }}>Pour un besoin ponctuel</div>
+              <Prix amount={8.90} color="#16a34a" />
+              <div style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', marginBottom: 20, marginTop: 4 }}>par bulletin</div>
+              <PayButton amount={8.90} description="Bulletin Facile — 1 bulletin de salaire" label="Acheter maintenant" style={btnGreen} />
+              <ul style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 9, listStyle: 'none', padding: 0, margin: '20px 0 0' }}>
+                {['Calculs URSSAF 2026', 'Réduction Fillon auto', 'Téléchargement PDF', '3 thèmes visuels', 'Logo entreprise inclus'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4b5563' }}><Check />{f}</li>
+                ))}
+              </ul>
+            </div>
 
-              {/* Annuel */}
-              <div style={{ background: 'white', borderRadius: 14, border: '2px solid #2563eb', padding: 20, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#2563eb', color: 'white', fontSize: 11, fontWeight: 700, padding: '2px 12px', borderRadius: 50 }}>
-                  Économique
-                </div>
-                <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Annuel</div>
-                <div style={{ position: 'relative', marginBottom: 12 }}>
-                  <select value={annuelIdx} onChange={e => setAnnuelIdx(Number(e.target.value))}
-                    style={{ width: '100%', border: '1px solid #d1d5db', borderRadius: 8, padding: '8px 28px 8px 10px', fontSize: 13, fontWeight: 600, appearance: 'none', cursor: 'pointer' }}>
-                    {ANNUEL_OPTIONS.map((o, i) => <option key={i} value={i}>{o.label}</option>)}
-                  </select>
-                  <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#6b7280' }}>▾</span>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <span style={{ fontSize: 48, fontWeight: 900, color: '#2563eb' }}>{Math.floor(annuel.prix)}</span>
-                  <span style={{ fontSize: 22, fontWeight: 800, color: '#2563eb', verticalAlign: 'super' }}>,{(annuel.prix % 1).toFixed(2).slice(2)}</span>
-                  <span style={{ fontSize: 13, color: '#9ca3af', marginLeft: 4 }}>€ HT</span>
-                  <div style={{ fontSize: 13, color: '#6b7280', fontWeight: 600 }}>/an</div>
-                </div>
-                <div style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginBottom: 12 }}>
-                  soit {annuel.parMois.toFixed(2).replace('.', ',')} € HT / mois
-                </div>
-                <PayButton amount={annuel.prix} description={`Bulletin Facile — Abonnement annuel ${annuel.label}`} label="S'abonner annuel" style={btnBlue} />
-                <ul style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8, listStyle: 'none', padding: 0 }}>
-                  {FEATURES_SUB.map(f => (
-                    <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4b5563' }}><CheckIcon />{f}</li>
-                  ))}
-                </ul>
+            {/* Pack */}
+            <div style={{ background: 'white', borderRadius: 16, border: '2px solid #16a34a', padding: 24, display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 4px 16px rgba(22,163,74,0.12)' }}>
+              <Badge label="⭐ Populaire" bg="#16a34a" color="white" />
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 4 }}>Pack bulletins</div>
+              <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 16 }}>Économisez jusqu'à 28%</div>
+              <Select value={packIdx} onChange={setPackIdx} options={PACK_OPTIONS} />
+              <Prix amount={pack.total} color="#16a34a" />
+              <div style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginBottom: 20, marginTop: 4 }}>
+                soit <strong style={{ color: '#16a34a' }}>{pack.perU.toFixed(2).replace('.', ',')} €</strong> HT / bulletin
               </div>
+              <PayButton amount={pack.total} description={`Bulletin Facile — Pack ${pack.label}`} label={`Acheter le pack ${pack.label}`} style={btnGreen} />
+              <ul style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 9, listStyle: 'none', padding: 0, margin: '20px 0 0' }}>
+                {['Multi-salariés', 'Multi-entreprises', 'Calculs URSSAF 2026', 'Réduction Fillon auto', 'Téléchargement PDF', '3 thèmes visuels'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4b5563' }}><Check />{f}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contrat de travail — ici dans la grille bulletins */}
+            <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #1e40af 100%)', borderRadius: 16, border: '2px solid #1a3a5c', padding: 24, display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 4px 20px rgba(26,58,92,0.25)', color: 'white' }}>
+              <Badge label="📋 DOCUMENT LÉGAL" bg="rgba(255,255,255,0.15)" color="white" />
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4, marginTop: 8 }}>Contrat de travail</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>CDI · CDD · Apprentissage · Stage</div>
+              <Prix amount={10.00} color="white" />
+              <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 20, marginTop: 4 }}>par contrat généré</div>
+              <Link href="/contrat"
+                style={{ display: 'block', width: '100%', background: 'white', color: '#1a3a5c', fontWeight: 700, padding: '12px 0', borderRadius: 10, border: 'none', fontSize: 14, cursor: 'pointer', textAlign: 'center', textDecoration: 'none' }}>
+                Créer mon contrat →
+              </Link>
+              <ul style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 9, listStyle: 'none', padding: 0, margin: '20px 0 0' }}>
+                {['Conforme Code du travail 2026', 'CDI, CDD, Apprentissage, Stage', 'Clauses personnalisables', 'Recherche SIRET intégrée', 'Document PDF neutre et pro'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
+                    <Check color="rgba(255,255,255,0.9)" />{f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ══ SECTION 2 — ABONNEMENTS ══ */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <div style={{ display: 'inline-block', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 50, padding: '4px 16px', fontSize: 12, fontWeight: 700, color: '#1d4ed8', marginBottom: 10 }}>
+              ♾️ BULLETINS ILLIMITÉS
+            </div>
+            <h2 style={{ fontSize: 26, fontWeight: 800, margin: '0 0 8px' }}>Abonnements</h2>
+            <p style={{ color: '#6b7280', fontSize: 15, margin: 0 }}>Bulletins illimités · Taux mis à jour automatiquement · Annulation à tout moment</p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, maxWidth: 800, margin: '0 auto' }}>
+
+            {/* Mensuel */}
+            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', padding: 28, display: 'flex', flexDirection: 'column', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#374151', marginBottom: 4 }}>Mensuel</div>
+              <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 16 }}>Résiliable à tout moment</div>
+              <Select value={mensuelIdx} onChange={setMensuelIdx} options={MENSUEL_OPTIONS} />
+              <Prix amount={mensuel.prix} color="#2563eb" />
+              <div style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginBottom: 24, marginTop: 4 }}>/mois · sans engagement</div>
+              <PayButton amount={mensuel.prix} description={`Bulletin Facile — Abonnement mensuel ${mensuel.label}`} label="S'abonner au mois" style={btnBlue} />
+              <ul style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 9, listStyle: 'none', padding: 0, margin: '20px 0 0' }}>
+                {['Bulletins illimités', 'Multi-salariés & multi-entreprises', 'Taux URSSAF mis à jour auto', 'Réduction Fillon calculée', 'PDF immédiat · 3 thèmes', 'Support par email'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4b5563' }}><Check color="#2563eb" />{f}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Annuel */}
+            <div style={{ background: 'white', borderRadius: 16, border: '2px solid #2563eb', padding: 28, display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 4px 20px rgba(37,99,235,0.15)' }}>
+              <Badge label="🏆 Recommandé · 2 mois offerts" bg="#2563eb" color="white" />
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#374151', marginBottom: 4, marginTop: 8 }}>Annuel</div>
+              <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 16 }}>La meilleure valeur</div>
+              <Select value={annuelIdx} onChange={setAnnuelIdx} options={ANNUEL_OPTIONS} />
+              <Prix amount={annuel.prix} color="#2563eb" />
+              <div style={{ textAlign: 'center', fontSize: 12, marginBottom: 4, marginTop: 4 }}>
+                <span style={{ color: '#9ca3af' }}>/an · soit </span>
+                <strong style={{ color: '#2563eb' }}>{annuel.parMois.toFixed(2).replace('.', ',')} €</strong>
+                <span style={{ color: '#9ca3af' }}> HT/mois</span>
+              </div>
+              <div style={{ textAlign: 'center', background: '#dbeafe', borderRadius: 8, padding: '6px 12px', fontSize: 12, color: '#1d4ed8', fontWeight: 600, marginBottom: 20 }}>
+                Économie de {(mensuel.prix * 12 - annuel.prix).toFixed(0)} € vs mensuel
+              </div>
+              <PayButton amount={annuel.prix} description={`Bulletin Facile — Abonnement annuel ${annuel.label}`} label="S'abonner à l'année" style={btnBlue} />
+              <ul style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 9, listStyle: 'none', padding: 0, margin: '20px 0 0' }}>
+                {['Bulletins illimités', 'Multi-salariés & multi-entreprises', 'Taux URSSAF mis à jour auto', 'Réduction Fillon calculée', 'PDF immédiat · 3 thèmes', 'Support prioritaire', 'Mises à jour légales incluses'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4b5563' }}><Check color="#2563eb" />{f}</li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
 
-        {/* GARANTIE */}
-        <div style={{ marginTop: 32, background: 'white', border: '1px solid #e5e7eb', borderRadius: 16, padding: '24px 32px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 32, fontSize: 14, color: '#374151' }}>
-            <span>🛡️ <strong>Satisfait ou remboursé</strong> 30 jours</span>
-            <span>⚡ <strong>Accès immédiat</strong> après paiement</span>
-            <span>🔒 <strong>Paiement sécurisé</strong> SumUp</span>
-            <span>✓ <strong>Taux légaux</strong> URSSAF 2025/2026</span>
+        {/* ══ TABLEAU COMPARATIF ══ */}
+        <div style={{ marginBottom: 56, background: 'white', borderRadius: 20, border: '1px solid #e5e7eb', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          <div style={{ background: '#f8fafc', borderBottom: '1px solid #e5e7eb', padding: '20px 32px' }}>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>Comparatif des offres</h3>
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: '#f1f5f9' }}>
+                  <th style={{ padding: '12px 20px', textAlign: 'left', fontWeight: 700, color: '#374151' }}>Fonctionnalité</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center', fontWeight: 700, color: '#16a34a' }}>Unitaire</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center', fontWeight: 700, color: '#16a34a' }}>Pack</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center', fontWeight: 700, color: '#2563eb', background: '#eff6ff' }}>Abonnement</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center', fontWeight: 700, color: '#1a3a5c' }}>Contrat</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['Bulletins de salaire', '1', 'Selon pack', '∞ illimités', '—'],
+                  ['Calculs URSSAF 2026', '✅', '✅', '✅', '—'],
+                  ['Réduction Fillon auto', '✅', '✅', '✅', '—'],
+                  ['Téléchargement PDF', '✅', '✅', '✅', '✅'],
+                  ['Multi-salariés', '—', '✅', '✅', '—'],
+                  ['Multi-entreprises', '—', '✅', '✅', '—'],
+                  ['Logo & thèmes visuels', '✅', '✅', '✅', '—'],
+                  ['Taux mis à jour auto', '—', '—', '✅', '—'],
+                  ['Support prioritaire', '—', '—', '✅', '—'],
+                  ['Contrat CDI/CDD/App.', '—', '—', '—', '✅'],
+                  ['Conforme Code travail', '—', '—', '—', '✅'],
+                  ['Clauses personnalisées', '—', '—', '—', '✅'],
+                ].map(([feat, ...vals], i) => (
+                  <tr key={feat} style={{ background: i % 2 === 0 ? 'white' : '#fafafa', borderBottom: '1px solid #f3f4f6' }}>
+                    <td style={{ padding: '11px 20px', color: '#374151', fontWeight: 500 }}>{feat}</td>
+                    {vals.map((v, j) => (
+                      <td key={j} style={{ padding: '11px 16px', textAlign: 'center', color: v === '—' ? '#d1d5db' : v === '✅' ? '#16a34a' : '#374151', fontWeight: v === '✅' ? 700 : 400, background: j === 2 ? '#f8faff' : undefined }}>
+                        {v}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+                <tr style={{ background: '#f8fafc', borderTop: '2px solid #e5e7eb' }}>
+                  <td style={{ padding: '14px 20px', fontWeight: 700 }}>Prix HT</td>
+                  <td style={{ padding: '14px 16px', textAlign: 'center', fontWeight: 800, color: '#16a34a' }}>8,90 €</td>
+                  <td style={{ padding: '14px 16px', textAlign: 'center', fontWeight: 800, color: '#16a34a' }}>dès 6,39 €/u</td>
+                  <td style={{ padding: '14px 16px', textAlign: 'center', fontWeight: 800, color: '#2563eb', background: '#eff6ff' }}>dès 16,50 €/mois</td>
+                  <td style={{ padding: '14px 16px', textAlign: 'center', fontWeight: 800, color: '#1a3a5c' }}>10,00 €</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* FAQ OBJECTIONS */}
-        <div style={{ marginTop: 40 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, textAlign: 'center', marginBottom: 20, color: '#111827' }}>Questions fréquentes</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 720, margin: '0 auto' }}>
+        {/* ══ GARANTIES ══ */}
+        <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 16, padding: '28px 32px', marginBottom: 48, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 32 }}>
             {[
-              { q: 'Est-ce que je reçois mon accès immédiatement ?', a: 'Oui. Dès le paiement validé par SumUp, vous recevez un email avec un lien de connexion. Vous pouvez générer votre premier bulletin en moins de 2 minutes.' },
-              { q: 'Puis-je utiliser Bulletin Facile pour plusieurs salariés ?', a: 'Oui. Avec un pack ou un abonnement, vous pouvez créer autant de bulletins que vous voulez pour des salariés différents ou plusieurs entreprises.' },
-              { q: 'Les taux URSSAF et AGIRC-ARRCO 2026 sont-ils à jour ?', a: 'Oui. Tous les taux officiels 2026 sont intégrés : PMSS 4 005 €, SMIC 1 801,80 €, réduction Fillon, AGIRC-ARRCO T1/T2, CSG/CRDS. Mises à jour incluses.' },
-              { q: 'Et si je ne suis pas satisfait ?', a: 'Remboursement intégral sous 30 jours, sans condition, sans question. Contactez-nous par email.' },
+              { icon: '🛡️', titre: 'Satisfait ou remboursé', desc: '30 jours sans condition' },
+              { icon: '⚡', titre: 'Accès immédiat', desc: 'Dès le paiement confirmé' },
+              { icon: '🔒', titre: 'Paiement sécurisé', desc: 'SumUp · Conforme PCI DSS' },
+              { icon: '📋', titre: 'Taux officiels 2026', desc: 'URSSAF · SMIC · PMSS' },
+              { icon: '♻️', titre: 'Sans abonnement forcé', desc: 'Payez ce que vous utilisez' },
+            ].map(({ icon, titre, desc }) => (
+              <div key={titre} style={{ textAlign: 'center', minWidth: 140 }}>
+                <div style={{ fontSize: 26, marginBottom: 6 }}>{icon}</div>
+                <div style={{ fontWeight: 700, fontSize: 13, color: '#111827', marginBottom: 2 }}>{titre}</div>
+                <div style={{ fontSize: 12, color: '#9ca3af' }}>{desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ══ FAQ ══ */}
+        <div style={{ marginBottom: 56 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 800, textAlign: 'center', marginBottom: 24 }}>Questions fréquentes</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 740, margin: '0 auto' }}>
+            {[
+              { q: 'Quelle différence entre le bulletin unitaire et l\'abonnement ?', a: 'Le bulletin unitaire (8,90 €) est idéal pour un besoin ponctuel ou pour tester. L\'abonnement donne accès à des bulletins illimités pour 1 à 49 salariés — rentable dès 2 bulletins par mois.' },
+              { q: 'Puis-je générer des bulletins pour plusieurs entreprises ?', a: 'Oui, avec un pack ou un abonnement. Vous pouvez saisir des informations d\'entreprise différentes pour chaque bulletin, sans surcoût.' },
+              { q: 'Le contrat de travail est-il juridiquement valable ?', a: 'Oui. Les modèles respectent le Code du travail (articles L1221-1 et suivants) pour les CDI, CDD, contrats d\'apprentissage et conventions de stage. Nous vous recommandons de le faire relire par un professionnel pour les situations complexes.' },
+              { q: 'Les taux URSSAF 2026 sont-ils bien à jour ?', a: 'Oui. Tous les taux officiels 2026 sont intégrés : PMSS 4 005 €, SMIC 1 801,80 €, réduction Fillon, AGIRC-ARRCO T1/T2, CSG/CRDS 2,90 %. Les abonnés bénéficient des mises à jour automatiques.' },
+              { q: 'Comment fonctionne le remboursement ?', a: 'Remboursement intégral sous 30 jours, sans condition, sans question. Contactez-nous par email et nous remboursons sous 48h.' },
+              { q: 'Puis-je annuler mon abonnement ?', a: 'Oui, à tout moment depuis votre espace client ou par email. Aucune période de préavis. Vous conservez l\'accès jusqu\'à la fin de la période payée.' },
             ].map(({ q, a }) => (
-              <details key={q} style={{ background: 'white', borderRadius: 10, border: '1px solid #e5e7eb', overflow: 'hidden' }}>
-                <summary style={{ padding: '14px 20px', fontWeight: 600, fontSize: 14, cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#111827' }}>
+              <details key={q} style={{ background: 'white', borderRadius: 12, border: '1px solid #e5e7eb', overflow: 'hidden' }}>
+                <summary style={{ padding: '16px 20px', fontWeight: 600, fontSize: 14, cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#111827' }}>
                   {q}
-                  <span style={{ color: '#94a3b8', fontSize: 18, fontWeight: 300, flexShrink: 0, marginLeft: 16 }}>+</span>
+                  <span style={{ color: '#94a3b8', fontSize: 20, fontWeight: 300, flexShrink: 0, marginLeft: 16 }}>+</span>
                 </summary>
                 <p style={{ padding: '0 20px 16px', margin: 0, color: '#6b7280', fontSize: 14, lineHeight: 1.7 }}>{a}</p>
               </details>
@@ -223,24 +329,23 @@ export default function TarifsPage() {
           </div>
         </div>
 
-        {/* CTA FINAL */}
-        <div style={{ marginTop: 48, background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', borderRadius: 20, padding: '40px 32px', textAlign: 'center', color: 'white' }}>
-          <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 12 }}>
-            Prêt à générer votre premier bulletin ?
-          </h2>
-          <p style={{ color: '#93c5fd', marginBottom: 28, fontSize: 15 }}>
-            Accès immédiat · Sans engagement · Dès 8,90 € HT
+        {/* ══ CTA FINAL ══ */}
+        <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', borderRadius: 20, padding: '48px 32px', textAlign: 'center', color: 'white' }}>
+          <h2 style={{ fontSize: 26, fontWeight: 900, marginBottom: 12 }}>Prêt à commencer ?</h2>
+          <p style={{ color: '#93c5fd', marginBottom: 32, fontSize: 15, maxWidth: 440, margin: '0 auto 32px' }}>
+            Bulletin de salaire en 2 minutes · Contrat de travail professionnel · Accès immédiat
           </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
-            <a href="#top" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              style={{ background: '#fbbf24', color: '#0f172a', fontWeight: 800, fontSize: 16, padding: '14px 36px', borderRadius: 10, textDecoration: 'none' }}>
-              Choisir mon offre ↑
-            </a>
-            <a href="/dashboard" style={{ border: '1px solid rgba(255,255,255,0.3)', color: 'white', fontWeight: 600, fontSize: 16, padding: '14px 28px', borderRadius: 10, textDecoration: 'none' }}>
-              Déjà client →
-            </a>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'center' }}>
+            <Link href="/generateur"
+              style={{ background: '#22c55e', color: 'white', fontWeight: 800, fontSize: 15, padding: '14px 32px', borderRadius: 12, textDecoration: 'none' }}>
+              Créer un bulletin →
+            </Link>
+            <Link href="/contrat"
+              style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.25)', color: 'white', fontWeight: 700, fontSize: 15, padding: '14px 32px', borderRadius: 12, textDecoration: 'none' }}>
+              Créer un contrat →
+            </Link>
           </div>
-          <p style={{ color: '#475569', fontSize: 12, marginTop: 16 }}>🛡️ Remboursé si non satisfait sous 30 jours</p>
+          <p style={{ color: '#475569', fontSize: 12, marginTop: 20 }}>🛡️ Satisfait ou remboursé sous 30 jours · Sans engagement</p>
         </div>
 
       </div>
