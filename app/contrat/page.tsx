@@ -3,8 +3,8 @@ import Footer from '@/components/Footer';
 import ContratForm from '@/components/ContratForm';
 
 export const metadata = {
-  title: 'Générateur de contrat de travail gratuit — CDI, CDD, Apprentissage | Bulletin Facile',
-  description: 'Créez votre contrat de travail (CDI, CDD, apprentissage, stage) en quelques minutes. Conforme au Code du travail 2025/2026. Gratuit et sans inscription.',
+  title: 'Contrat de travail en ligne — CDI, CDD, Apprentissage | Bulletin Facile',
+  description: 'Générez votre contrat de travail (CDI, CDD, apprentissage) conforme au Code du travail 2026. Document professionnel prêt à signer. 10 € HT — accès immédiat.',
 };
 
 export default function ContratPage() {

@@ -1,11 +1,12 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import ContratDisplay from './ContratDisplay';
+import PayButton from './PayButton';
 
 interface EntrepriseResult {
   nom_complet: string;
   siren: string;
-  siege?: { siret?: string; adresse?: string; activite_principale?: string; code_postal?: string; commune?: string };
+  siege?: { siret?: string; adresse?: string; activite_principale?: string; libelle_commune?: string; code_postal?: string };
   activite_principale?: string;
 }
 
@@ -132,6 +133,7 @@ export default function ContratForm() {
   const [form, setForm] = useState<ContratData>(defaultData);
   const [tab, setTab] = useState<TabType>('employeur');
   const [generated, setGenerated] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
   const displayRef = useRef<HTMLDivElement>(null);
 
   // Autocomplete entreprise
@@ -146,7 +148,7 @@ export default function ContratForm() {
     if (q.length < 2) { setSuggestions([]); return; }
     setSearching(true);
     try {
-      const res = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(q)}&page=1&per_page=8`);
+      const res = await fetch(`/api/search-entreprise?q=${encodeURIComponent(q)}`);
       const data = await res.json();
       setSuggestions(data.results || []);
       setShowSuggestions(true);
@@ -162,7 +164,7 @@ export default function ContratForm() {
   };
 
   const selectEntreprise = (e: EntrepriseResult) => {
-    const adresse = [e.siege?.adresse, e.siege?.code_postal, e.siege?.commune].filter(Boolean).join(', ') || '';
+    const adresse = e.siege?.adresse || '';
     setForm(f => ({
       ...f,
       employeurNom: e.nom_complet || '',
@@ -194,7 +196,6 @@ export default function ContratForm() {
     setTimeout(() => displayRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
-  const handlePrint = () => window.print();
 
   const TabBtn = ({ t, label }: { t: TabType; label: string }) => (
     <button type="button" onClick={() => setTab(t)}
@@ -549,14 +550,8 @@ export default function ContratForm() {
           <div className="mt-6 flex gap-3">
             <button type="submit"
               className="flex-1 bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-bold text-base transition-colors">
-              Générer le contrat
+              Prévisualiser mon contrat →
             </button>
-            {generated && (
-              <button type="button" onClick={handlePrint}
-                className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-bold text-base transition-colors">
-                Imprimer / PDF
-              </button>
-            )}
           </div>
         </form>
       </div>
@@ -564,7 +559,38 @@ export default function ContratForm() {
       {/* CONTRAT GÉNÉRÉ */}
       {generated && (
         <div ref={displayRef}>
-          <ContratDisplay data={form} />
+          {/* Bloc paiement / impression */}
+          <div className="no-print mb-6">
+            {!isPaid ? (
+              <div style={{ border: '2px solid #1a3a5c', borderRadius: 12, padding: '20px 24px', background: '#f0f4ff', maxWidth: 520, margin: '0 auto' }}>
+                <p style={{ fontWeight: 700, fontSize: 15, color: '#1a3a5c', margin: '0 0 6px' }}>
+                  🔒 Votre contrat est prêt — débloquez-le pour 10 € HT
+                </p>
+                <p style={{ fontSize: 13, color: '#4b5563', margin: '0 0 16px' }}>
+                  Téléchargement immédiat · Document professionnel · Conforme Code du travail 2026
+                </p>
+                <PayButton
+                  amount={10}
+                  description="Bulletin Facile — Contrat de travail"
+                  label="Débloquer mon contrat — 10 € HT"
+                  onSuccess={() => setIsPaid(true)}
+                  style={{ background: '#16a34a', color: 'white', fontWeight: 700, padding: '12px 24px', borderRadius: 8, border: 'none', fontSize: 15, cursor: 'pointer', width: '100%' }}
+                />
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  style={{ background: '#1a3a5c', color: 'white', fontWeight: 700, padding: '12px 32px', borderRadius: 8, border: 'none', fontSize: 15, cursor: 'pointer' }}
+                >
+                  Imprimer / Télécharger PDF
+                </button>
+              </div>
+            )}
+          </div>
+
+          <ContratDisplay data={form} isPaid={isPaid} />
         </div>
       )}
     </div>

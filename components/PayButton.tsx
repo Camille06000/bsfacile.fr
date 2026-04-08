@@ -7,6 +7,7 @@ interface PayButtonProps {
   label: string;
   style?: React.CSSProperties;
   className?: string;
+  onSuccess?: () => void;
 }
 
 declare global {
@@ -28,7 +29,7 @@ declare global {
   }
 }
 
-export default function PayButton({ amount, description, label, style, className }: PayButtonProps) {
+export default function PayButton({ amount, description, label, style, className, onSuccess }: PayButtonProps) {
   const [step, setStep] = useState<'button' | 'email' | 'loading' | 'widget' | 'success' | 'error'>('button');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -70,6 +71,7 @@ export default function PayButton({ amount, description, label, style, className
               await fetch(`/api/checkout/verify?id=${checkoutId}`);
             } catch { /* ok */ }
             setStep('success');
+            onSuccess?.();
             window.SumUpCard.unmount();
           } else if (type === 'fail' || type === 'error') {
             setError('Paiement refusé ou annulé. Veuillez réessayer.');
