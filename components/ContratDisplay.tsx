@@ -137,7 +137,7 @@ export default function ContratDisplay({ data, isPaid }: { data: ContratData; is
         fontSize: '11px',
       }}>
         <span style={{ opacity: 0.8 }}>Généré le {dateGeneration}</span>
-        <span style={{ fontWeight: 700, fontSize: '13px', letterSpacing: '1px' }}>BULLETIN FACILE</span>
+        <span style={{ opacity: 0.8 }}>Document confidentiel</span>
       </div>
 
       {/* ══ INFO ENTREPRISE ══ */}
@@ -433,9 +433,9 @@ export default function ContratDisplay({ data, isPaid }: { data: ContratData; is
         display: 'flex',
         justifyContent: 'space-between',
       }}>
-        <span>Contrat généré par BulletinFacile.fr</span>
-        <span>Conforme Code du travail 2026 — Conservez ce document</span>
-        <span>bulletinfacile.fr</span>
+        <span>Conforme Code du travail — Articles L1221-1 et suivants</span>
+        <span>Document original à conserver par chaque partie</span>
+        <span>Établi en deux exemplaires</span>
       </div>
 
       {/* ══ BANDEAU PAYWALL ══ */}
