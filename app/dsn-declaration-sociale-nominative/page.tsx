@@ -214,6 +214,7 @@ export default function DSNPage() {
               <li>Bulletins PDF prêts en 2 minutes</li>
               <li>Mise à jour SMIC et taux URSSAF</li>
               <li>Conformité légale droit commun</li>
+              <li><strong>Génération du fichier DSN Phase 3</strong> prêt à déposer sur Net-Entreprises ou à remettre à votre expert-comptable</li>
             </ul>
           </div>
           <div style={{ border: '2px solid #e5e7eb', borderRadius: 14, padding: '24px', background: '#f9fafb' }}>
