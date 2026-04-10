@@ -55,7 +55,7 @@ const FEATURES = [
   },
   {
     title: 'Paramètres légaux 2025 et 2026',
-    desc: 'PMSS 3 925 € (2025) / 4 005 € (2026), SMIC 1 801,80 €, réduction Fillon — tout bascule automatiquement.',
+    desc: 'PMSS 4 005 € (2026), SMIC 1 823,03 €, réduction Fillon — taux URSSAF et plafonds mis à jour automatiquement chaque année.',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round">
         <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
@@ -93,7 +93,7 @@ const FEATURES = [
   },
   {
     title: 'DSN & Contrats de travail',
-    desc: 'Export DSN Phase 3 pour Net-Entreprises. Générateur de contrats CDI, CDD, apprentissage, stage et intérim.',
+    desc: 'Fichier DSN Phase 3 généré automatiquement — à déposer sur Net-Entreprises ou à remettre à votre expert-comptable. Contrats CDI, CDD, apprentissage, stage et intérim inclus.',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round">
         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>

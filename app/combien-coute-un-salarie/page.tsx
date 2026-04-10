@@ -4,7 +4,7 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Combien coûte un salarié ? Charges patronales 2026 — Bulletin Facile',
+  title: 'Combien coûte un salarié ? Charges patronales 2026',
   description: 'Calculez le coût réel d\'un salarié en 2026 : charges patronales, cotisations employeur, réduction Fillon. Tableau détaillé du coût employeur brut vs net.',
   alternates: { canonical: 'https://bulletinfacile.fr/combien-coute-un-salarie' },
 };
@@ -31,7 +31,7 @@ const FAQ = [
 const COTISATIONS_PAT = [
   { label: 'Maladie-maternité (sal. ≤ 2,5 SMIC)', taux: '7,00 %', base: 'Brut total' },
   { label: 'Maladie-maternité (sal. > 2,5 SMIC)', taux: '13,00 %', base: 'Brut total' },
-  { label: 'Vieillesse plafonnée', taux: '8,55 %', base: 'Jusqu\'au PMSS (3 925 €)' },
+  { label: 'Vieillesse plafonnée', taux: '8,55 %', base: 'Jusqu\'au PMSS (4 005 €)' },
   { label: 'Vieillesse déplafonnée', taux: '1,90 %', base: 'Brut total' },
   { label: 'AT/MP (taux moyen)', taux: '≈ 1,50 %', base: 'Brut total' },
   { label: 'Allocations familiales (sal. ≤ 3,5 SMIC)', taux: '3,45 %', base: 'Brut total' },
@@ -143,7 +143,7 @@ export default function CombienCouteUnSalariePage() {
               </tbody>
             </table>
           </div>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 10 }}>PMSS 2026 : 3 925 €/mois. AT/MP : taux variable selon l'activité et l'historique de sinistralité de l'entreprise.</p>
+          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 10 }}>PMSS 2026 : 4 005 €/mois. AT/MP : taux variable selon l'activité et l'historique de sinistralité de l'entreprise.</p>
         </section>
 
         {/* Réduction Fillon */}

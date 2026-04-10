@@ -4,7 +4,7 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Créer une fiche de paie en ligne 2026 : Guide complet — Bulletin Facile',
+  title: 'Créer une fiche de paie en ligne 2026 : Guide complet',
   description: 'Comment créer une fiche de paie conforme en 2026 ? Guide étape par étape : mentions obligatoires, calcul des cotisations, prélèvement à la source. Générateur en ligne gratuit.',
   alternates: { canonical: 'https://bulletinfacile.fr/creer-une-fiche-de-paie' },
 };
@@ -205,7 +205,7 @@ export default function CreerFicheDePayePage() {
               </tbody>
             </table>
           </div>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 10 }}>PMSS 2026 : 3 925 €/mois. Les taux de maladie et allocations familiales dépendent du niveau de salaire par rapport au SMIC.</p>
+          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 10 }}>PMSS 2026 : 4 005 €/mois. Les taux de maladie et allocations familiales dépendent du niveau de salaire par rapport au SMIC.</p>
         </section>
 
         {/* FAQ */}

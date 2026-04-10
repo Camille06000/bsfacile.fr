@@ -217,16 +217,16 @@ export default function DSNPage() {
             </ul>
           </div>
           <div style={{ border: '2px solid #e5e7eb', borderRadius: 14, padding: '24px', background: '#f9fafb' }}>
-            <div style={{ fontWeight: 800, fontSize: 16, color: '#6b7280', marginBottom: 16 }}>⚙️ Fonctionnalité avancée (à déléguer)</div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: '#6b7280', marginBottom: 16 }}>⚙️ Envoi automatisé (logiciel lourd)</div>
             <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 2.2, color: '#6b7280', fontSize: 14 }}>
-              <li>Transmission DSN mensuelle à l'URSSAF</li>
-              <li>Déclarations de fin de contrat (signalement)</li>
-              <li>Gestion des arrêts maladie DSN</li>
-              <li>Interface N4DS / CRM organismes</li>
+              <li>Dépôt automatique sur Net-Entreprises via API</li>
+              <li>Signalement de fin de contrat automatisé</li>
+              <li>Gestion des arrêts maladie en temps réel</li>
+              <li>Interface N4DS / CRM organismes sociaux</li>
               <li>Archivage automatisé multi-dossiers</li>
             </ul>
             <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 12, lineHeight: 1.5 }}>
-              Ces fonctionnalités relèvent d'un logiciel de paie complet (Silae, Cegid, etc.) ou d'un expert-comptable. Elles ne sont pas nécessaires pour une TPE utilisant notre outil.
+              Ces automatisations (PayFit, Silae, Cegid) sont utiles pour les grandes structures. Pour une TPE, déposer soi-même son fichier DSN sur Net-Entreprises prend moins de 2 minutes.
             </p>
           </div>
         </div>
@@ -234,10 +234,10 @@ export default function DSNPage() {
         {/* CTA */}
         <div style={{ background: 'linear-gradient(135deg,#1a3a8f 0%,#2563eb 100%)', borderRadius: 16, padding: '36px 32px', textAlign: 'center', marginBottom: 56, color: 'white' }}>
           <h3 style={{ margin: '0 0 12px', fontSize: 22, fontWeight: 900 }}>
-            Votre bulletin, prêt en 2 minutes — sans DSN à gérer
+            Bulletin + fichier DSN prêts en 2 minutes
           </h3>
           <p style={{ margin: '0 0 24px', color: 'rgba(255,255,255,0.85)', fontSize: 15 }}>
-            Calculs URSSAF 2026 inclus. Vous transmettez les données à votre comptable, il s'occupe du reste.
+            Calculs URSSAF 2026 inclus. Votre fichier DSN Phase 3 est généré automatiquement — déposez-le vous-même sur Net-Entreprises ou remettez-le à votre expert-comptable.
           </p>
           <Link
             href="/generateur"
