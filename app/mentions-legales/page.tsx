@@ -21,6 +21,7 @@ export default function MentionsLegalesPage() {
           <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>1. Éditeur du site</h2>
           <p style={{ lineHeight: 1.8, color: '#374151' }}>
             Le site <strong>bulletinfacile.fr</strong> est édité par <strong>Hub Center</strong>, société immatriculée en France.<br />
+            SIRET : 953 893 161 00018<br />
             Adresse : 18 rue de la Buffa, 06000 Nice, France.<br />
             Email de contact : <a href="mailto:contact@bulletinfacile.fr" style={{ color: '#1a3a8f' }}>contact@bulletinfacile.fr</a>
           </p>
