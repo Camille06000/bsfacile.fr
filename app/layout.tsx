@@ -85,7 +85,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 'Droit du travail français',
                 'Paie en France',
               ],
-              sameAs: [],
+              sameAs: [
+                'https://bulletinfacile.fr',
+                'https://www.linkedin.com/company/bulletin-facile',
+              ],
+              contactPoint: {
+                '@type': 'ContactPoint',
+                email: 'contact@bulletinfacile.fr',
+                contactType: 'customer support',
+                availableLanguage: 'French',
+                areaServed: 'FR',
+              },
+              slogan: 'Bulletin de salaire conforme en 30 secondes, dès 8,90 € HT',
+              priceRange: '8,90 € – 998 €',
             }),
           }}
         />

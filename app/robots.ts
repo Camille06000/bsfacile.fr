@@ -11,8 +11,11 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: 'PerplexityBot',  allow: '/' },
       { userAgent: 'ClaudeBot',      allow: '/' },
       { userAgent: 'anthropic-ai',   allow: '/' },
+      { userAgent: 'OAI-SearchBot',   allow: '/' },
       { userAgent: 'Google-Extended', allow: '/' },
       { userAgent: 'Bingbot',        allow: '/' },
+      { userAgent: 'Bytespider',     allow: '/' },
+      { userAgent: 'cohere-ai',      allow: '/' },
       // Block AI training scrapers (but not search citation bots)
       { userAgent: 'CCBot',          disallow: '/' },
       { userAgent: 'omgili',         disallow: '/' },
