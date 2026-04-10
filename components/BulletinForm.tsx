@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import BulletinDisplay from './BulletinDisplay';
 import type { ResultBS } from '@/lib/cotisations';
+import { searchConventions, getConventionsByNaf, type Convention } from '@/data/conventions';
 
 const MOIS = [
   { v: 1, l: 'Janvier' }, { v: 2, l: 'Février' }, { v: 3, l: 'Mars' },
@@ -149,6 +150,11 @@ export default function BulletinForm() {
     entrepriseAdresse: '',
     entrepriseNaf: '',
     entrepriseConvention: '',
+    entrepriseIdcc: '',
+    mutuelleCotisation: '',
+    mutuellePartPatronale: '50',
+    prevoyanceTauxSal: '',
+    prevoyanceTauxPatr: '',
     salariéNom: '',
     salariéPrenom: '',
     salariéNss: '',
@@ -183,6 +189,12 @@ export default function BulletinForm() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Convention collective
+  const [convQuery, setConvQuery] = useState('');
+  const [convSuggestions, setConvSuggestions] = useState<Convention[]>([]);
+  const [showConvSuggestions, setShowConvSuggestions] = useState(false);
+  const convRef = useRef<HTMLDivElement>(null);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
@@ -239,22 +251,67 @@ export default function BulletinForm() {
   };
 
   const selectEntreprise = (e: EntrepriseResult) => {
-    // siege.adresse contient déjà l'adresse complète (numéro, rue, CP, ville)
     const adresse = e.siege?.adresse || '';
+    const naf = e.siege?.activite_principale || e.activite_principale || '';
     setForm(f => ({
       ...f,
       entrepriseNom: e.nom_complet || '',
       entrepriseSiret: e.siege?.siret || '',
       entrepriseAdresse: adresse,
-      entrepriseNaf: e.siege?.activite_principale || e.activite_principale || '',
+      entrepriseNaf: naf,
     }));
+    // Auto-suggest convention depuis le code NAF
+    if (naf) {
+      const suggested = getConventionsByNaf(naf);
+      if (suggested.length === 1) {
+        // Si une seule convention, on la pré-remplit automatiquement
+        selectConvention(suggested[0]);
+      } else if (suggested.length > 1) {
+        setConvSuggestions(suggested);
+        setShowConvSuggestions(true);
+      }
+    }
     setSearchQuery(''); setSuggestions([]); setShowSuggestions(false);
+  };
+
+  const selectConvention = (conv: Convention) => {
+    const isCadre = form.statut === 'cadre';
+    const tauxSal = conv.prevoyance
+      ? String(isCadre ? (conv.prevoyance.tauxSalCadre ?? conv.prevoyance.tauxSalNonCadre ?? 0) : (conv.prevoyance.tauxSalNonCadre ?? 0))
+      : '';
+    const tauxPatr = conv.prevoyance
+      ? String(isCadre ? (conv.prevoyance.tauxPatrCadre ?? conv.prevoyance.tauxPatrNonCadre ?? 0) : (conv.prevoyance.tauxPatrNonCadre ?? 0))
+      : '';
+    setForm(f => ({
+      ...f,
+      entrepriseConvention: `${conv.idcc} – ${conv.nomCourt}`,
+      entrepriseIdcc: conv.idcc,
+      mutuelleCotisation: conv.mutuelle ? String(conv.mutuelle.cotisationMensuelle) : f.mutuelleCotisation,
+      mutuellePartPatronale: conv.mutuelle ? String(conv.mutuelle.partPatronale) : f.mutuellePartPatronale,
+      prevoyanceTauxSal: tauxSal || f.prevoyanceTauxSal,
+      prevoyanceTauxPatr: tauxPatr || f.prevoyanceTauxPatr,
+    }));
+    setConvQuery('');
+    setConvSuggestions([]);
+    setShowConvSuggestions(false);
+  };
+
+  const handleNafChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const naf = e.target.value;
+    setForm(f => ({ ...f, entrepriseNaf: naf }));
+    if (naf.replace(/\D/g, '').length >= 4) {
+      const suggested = getConventionsByNaf(naf);
+      setConvSuggestions(suggested);
+      setShowConvSuggestions(suggested.length > 0);
+    }
   };
 
   useEffect(() => {
     const handler = (ev: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(ev.target as Node))
         setShowSuggestions(false);
+      if (convRef.current && !convRef.current.contains(ev.target as Node))
+        setShowConvSuggestions(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -285,6 +342,14 @@ export default function BulletinForm() {
     try {
       const payload = {
         ...form,
+        mutuelle: parseFloat(form.mutuelleCotisation) > 0 ? {
+          cotisationMensuelle: parseFloat(form.mutuelleCotisation),
+          partPatronale: parseFloat(form.mutuellePartPatronale) || 50,
+        } : undefined,
+        prevoyance: (parseFloat(form.prevoyanceTauxSal) > 0 || parseFloat(form.prevoyanceTauxPatr) > 0) ? {
+          tauxSalarial: parseFloat(form.prevoyanceTauxSal) || 0,
+          tauxPatronal: parseFloat(form.prevoyanceTauxPatr) || 0,
+        } : undefined,
         heuresMajorees: heureMajorees
           .filter(hm => parseFloat(hm.heures) > 0)
           .map(hm => ({ intitule: hm.intitule, heures: parseFloat(hm.heures), majoration: parseFloat(hm.majoration) || 100 })),
@@ -532,11 +597,96 @@ export default function BulletinForm() {
                   <input value={form.entrepriseAdresse} onChange={set('entrepriseAdresse')} className={inp} />
                 </Field>
                 <Field label="Code NAF / APE">
-                  <input value={form.entrepriseNaf} onChange={set('entrepriseNaf')} className={inp} placeholder="ex : 6201Z" />
+                  <input value={form.entrepriseNaf} onChange={handleNafChange} className={inp} placeholder="ex : 6201Z" />
                 </Field>
-                <Field label="Convention collective (IDCC)" hint="Optionnel">
-                  <input value={form.entrepriseConvention} onChange={set('entrepriseConvention')} className={inp} placeholder="ex : 1596 – BTP" />
-                </Field>
+
+                {/* Convention collective — dropdown avec recherche */}
+                <div ref={convRef} className="relative">
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    Convention collective
+                    {form.entrepriseIdcc && (
+                      <span className="ml-2 text-blue-600 font-normal">IDCC {form.entrepriseIdcc}</span>
+                    )}
+                  </label>
+                  <input
+                    value={convQuery || form.entrepriseConvention}
+                    onChange={(e) => {
+                      const q = e.target.value;
+                      setConvQuery(q);
+                      if (q === '') {
+                        setForm(f => ({ ...f, entrepriseConvention: '', entrepriseIdcc: '' }));
+                        setShowConvSuggestions(false);
+                      } else if (q.length >= 2) {
+                        setConvSuggestions(searchConventions(q));
+                        setShowConvSuggestions(true);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (convQuery.length >= 2 || convSuggestions.length > 0) setShowConvSuggestions(true);
+                    }}
+                    className={inp}
+                    placeholder="Tapez un secteur, IDCC ou nom…"
+                  />
+                  {showConvSuggestions && convSuggestions.length > 0 && (
+                    <div className="absolute z-50 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-60 overflow-y-auto">
+                      {convSuggestions.map(c => (
+                        <button key={c.idcc} type="button" onClick={() => selectConvention(c)}
+                          className="w-full text-left px-4 py-2 hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors">
+                          <div className="text-xs font-bold text-blue-700">IDCC {c.idcc} · {c.secteur}</div>
+                          <div className="text-sm text-gray-800">{c.nomCourt}</div>
+                          {c.mutuelle && (
+                            <div className="text-xs text-green-600 mt-0.5">
+                              Mutuelle ≈ {c.mutuelle.cotisationMensuelle}€/mois · {c.mutuelle.partPatronale}% patronal
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Auto-suggérée depuis le code NAF · Les taux mutuelle et prévoyance se remplissent automatiquement
+                  </p>
+                </div>
+
+                {/* Mutuelle & Prévoyance */}
+                {(form.entrepriseIdcc || form.mutuelleCotisation) && (
+                  <div className="bg-green-50 border border-green-200 rounded-md p-4 space-y-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-green-700 font-bold text-sm">🏥 Mutuelle & Prévoyance</span>
+                      <span className="text-xs text-green-600">(pré-rempli selon la convention — modifiable)</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Mutuelle — cotisation totale (€/mois)" hint="Pour un salarié isolé">
+                        <input type="number" min="0" step="0.01"
+                          value={form.mutuelleCotisation} onChange={set('mutuelleCotisation')}
+                          className={inp} placeholder="ex : 50" />
+                      </Field>
+                      <Field label="Part patronale (%)" hint="Min légal : 50%">
+                        <input type="number" min="50" max="100" step="1"
+                          value={form.mutuellePartPatronale} onChange={set('mutuellePartPatronale')}
+                          className={inp} placeholder="50" />
+                      </Field>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Prévoyance — taux salarial (% du brut)">
+                        <input type="number" min="0" step="0.01"
+                          value={form.prevoyanceTauxSal} onChange={set('prevoyanceTauxSal')}
+                          className={inp} placeholder="ex : 0.5" />
+                      </Field>
+                      <Field label="Prévoyance — taux patronal (% du brut)">
+                        <input type="number" min="0" step="0.01"
+                          value={form.prevoyanceTauxPatr} onChange={set('prevoyanceTauxPatr')}
+                          className={inp} placeholder="ex : 1.0" />
+                      </Field>
+                    </div>
+                    {parseFloat(form.mutuelleCotisation) > 0 && (
+                      <div className="text-xs text-green-700 bg-green-100 rounded px-3 py-2">
+                        Mutuelle : <strong>{(parseFloat(form.mutuelleCotisation) * parseFloat(form.mutuellePartPatronale) / 100).toFixed(2)}€</strong> patronal
+                        · <strong>{(parseFloat(form.mutuelleCotisation) * (1 - parseFloat(form.mutuellePartPatronale) / 100)).toFixed(2)}€</strong> salarial
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {form.entrepriseNom && (

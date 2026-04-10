@@ -2,7 +2,7 @@
 
 export const PARAMS = {
   2025: { pmss: 3925, smicMensuel: 1801.80, smicAnnuel: 21621.60 },
-  2026: { pmss: 4005, smicMensuel: 1801.80, smicAnnuel: 21621.60 },
+  2026: { pmss: 4005, smicMensuel: 1823.03, smicAnnuel: 21876.36 },
 } as const;
 
 export interface ElementVariable {
@@ -26,6 +26,17 @@ export interface InputBS {
   entrepriseAdresse?: string;
   entrepriseNaf?: string;
   entrepriseConvention?: string;
+  entrepriseIdcc?: string;           // Code IDCC (ex: "1596")
+  // Mutuelle obligatoire (complémentaire santé)
+  mutuelle?: {
+    cotisationMensuelle: number;     // Cotisation totale mensuelle en € (ex: 50)
+    partPatronale: number;           // % à charge patronale (ex: 50 = 50%, min légal)
+  };
+  // Prévoyance
+  prevoyance?: {
+    tauxSalarial: number;            // % du brut à charge salarié
+    tauxPatronal: number;            // % du brut à charge patronal
+  };
   // Infos salarié
   salariéNom?: string;
   salariéPrenom?: string;
@@ -125,7 +136,7 @@ export function calculerBS(input: InputBS): ResultBS {
   const salaireBase = r(tauxH > 0 ? tauxH * heures : input.brutMensuel);
   if (tauxH > 0) {
     elementsSalaire.push({
-      intitule: `Salaire de base (${heures.toFixed(2)} h × ${tauxH.toFixed(4)} €/h)`,
+      intitule: `Salaire de base — ${heures.toFixed(2)} h`,
       heures,
       taux: tauxH,
       montant: salaireBase,
@@ -138,7 +149,7 @@ export function calculerBS(input: InputBS): ResultBS {
   if (input.heuresSupp25 && input.heuresSupp25 > 0 && tauxH > 0) {
     montantHS25 = r(input.heuresSupp25 * tauxH * 1.25);
     elementsSalaire.push({
-      intitule: `Heures supplémentaires 25% (${input.heuresSupp25}h × ${tauxH.toFixed(4)} × 1,25)`,
+      intitule: `Heures supplémentaires 25% — ${input.heuresSupp25} h`,
       heures: input.heuresSupp25,
       taux: 25,
       montant: montantHS25,
@@ -151,7 +162,7 @@ export function calculerBS(input: InputBS): ResultBS {
   if (input.heuresSupp50 && input.heuresSupp50 > 0 && tauxH > 0) {
     montantHS50 = r(input.heuresSupp50 * tauxH * 1.50);
     elementsSalaire.push({
-      intitule: `Heures supplémentaires 50% (${input.heuresSupp50}h × ${tauxH.toFixed(4)} × 1,50)`,
+      intitule: `Heures supplémentaires 50% — ${input.heuresSupp50} h`,
       heures: input.heuresSupp50,
       taux: 50,
       montant: montantHS50,
@@ -221,7 +232,7 @@ export function calculerBS(input: InputBS): ResultBS {
     brutMensuel = r(input.brutMensuel + montantPrime + montantAN);
     if (elementsSalaire.length === 0) {
       elementsSalaire.unshift({
-        intitule: `Salaire de base (${heures.toFixed(2)} h)`,
+        intitule: `Salaire de base — ${heures.toFixed(2)} h`,
         heures,
         montant: input.brutMensuel,
         exonereeIR: false,
@@ -449,6 +460,35 @@ export function calculerBS(input: InputBS): ResultBS {
     tauxPatronal: null, montantPatronal: 0,
     section: 'csg',
   });
+
+  // ── Mutuelle obligatoire (complémentaire santé)
+  if (input.mutuelle && input.mutuelle.cotisationMensuelle > 0) {
+    const totalMutuelle = r(input.mutuelle.cotisationMensuelle);
+    const partPatr = Math.max(50, Math.min(100, input.mutuelle.partPatronale)); // min 50% légal
+    const montantPatronal = r(totalMutuelle * partPatr / 100);
+    const montantSalarial = r(totalMutuelle - montantPatronal);
+    lignes.push({
+      intitule: 'Mutuelle / Complémentaire santé',
+      base: totalMutuelle, tauxSalarial: null, montantSalarial,
+      tauxPatronal: null, montantPatronal,
+      section: 'sante',
+    });
+  }
+
+  // ── Prévoyance
+  if (input.prevoyance && (input.prevoyance.tauxSalarial > 0 || input.prevoyance.tauxPatronal > 0)) {
+    const montantSalarial = r(brutCotisations * input.prevoyance.tauxSalarial / 100);
+    const montantPatronal = r(brutCotisations * input.prevoyance.tauxPatronal / 100);
+    lignes.push({
+      intitule: 'Prévoyance',
+      base: brutCotisations,
+      tauxSalarial: input.prevoyance.tauxSalarial || null,
+      montantSalarial,
+      tauxPatronal: input.prevoyance.tauxPatronal || null,
+      montantPatronal,
+      section: 'sante',
+    });
+  }
 
   // ── Réduction Fillon (basée sur brut avant absences pour le coefficient)
   const brutAnnuel = brutCotisations * 12;
