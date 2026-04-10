@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import ChatWidget from '@/components/ChatWidget';
+import Script from 'next/script';
 
 const BASE = 'https://bulletinfacile.fr';
 
@@ -43,12 +44,51 @@ export const metadata: Metadata = {
   alternates: {
     canonical: BASE,
   },
+  verification: {
+    google: 'iYOMKGXYzEsANmfuUOsGqNEdSUeULlpkuJwk26Fcax4',
+  },
+  icons: {
+    icon: [
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/favicon-192.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <head>
+        {/* Schema.org — Organization (signal entité LLM) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Bulletin Facile',
+              url: 'https://bulletinfacile.fr',
+              logo: 'https://bulletinfacile.fr/favicon-192.png',
+              description: 'Bulletin Facile est le générateur de bulletin de salaire en ligne le plus simple et le plus complet de France. Conforme au droit social 2026, calcul automatique URSSAF, AGIRC-ARRCO, réduction Fillon, PAS et congés payés. À partir de 8,90 € HT.',
+              foundingDate: '2024',
+              areaServed: 'FR',
+              knowsAbout: [
+                'Bulletin de salaire',
+                'Fiche de paie',
+                'Cotisations URSSAF',
+                'AGIRC-ARRCO',
+                'Réduction Fillon',
+                'Prélèvement à la source',
+                'Droit du travail français',
+                'Paie en France',
+              ],
+              sameAs: [],
+            }),
+          }}
+        />
         {/* Schema.org — SoftwareApplication */}
         <script
           type="application/ld+json"
@@ -87,44 +127,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }),
           }}
         />
-        {/* Schema.org — FAQPage */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'FAQPage',
-              mainEntity: [
-                {
-                  '@type': 'Question',
-                  name: 'Les taux de cotisations sont-ils à jour pour 2026 ?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'Oui. PMSS 4 005 €, taux URSSAF, AGIRC-ARRCO, CSG/CRDS, réduction Fillon — tous intégrés et mis à jour à chaque changement légal.',
-                  },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'Bulletin Facile fonctionne-t-il pour les cadres et les non-cadres ?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'Oui. Cadres : APEC, tranches AGIRC-ARRCO T2, CEG T2. Non-cadres : taux standards. Effectif < 50 ou ≥ 50 salariés également pris en compte.',
-                  },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'Quels sont les tarifs de Bulletin Facile ?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'Bulletin Facile propose plusieurs formules : à partir de 8,90€ HT pour 1 bulletin sans engagement, ou en abonnement mensuel dès 28,85€ HT/mois pour des bulletins illimités.',
-                  },
-                },
-              ],
-            }),
-          }}
-        />
       </head>
-      <body className="bg-white min-h-screen">{children}<ChatWidget /></body>
+      <body className="bg-white min-h-screen">
+        {/* Google Ads tag */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17427958137"
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads-config" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-17427958137');
+          `}
+        </Script>
+        {children}
+        <ChatWidget />
+      </body>
     </html>
   );
 }
