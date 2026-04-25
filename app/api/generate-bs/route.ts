@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { calculerBS } from '@/lib/cotisations';
-import { getUserById, getActiveSubscription, incrementBulletinUsed, saveBulletin, getFreeBulletinsCount } from '@/lib/db';
+import { getUserById, getActiveSubscription, incrementBulletinUsed, saveBulletin } from '@/lib/db';
 
 const COOKIE_NAME = 'session';
 
@@ -39,16 +39,12 @@ export async function POST(req: NextRequest) {
   }
 
   const subscription = getActiveSubscription(userId);
-  const isFreeUser = !subscription;
 
-  if (isFreeUser) {
-    const freeBulletins = getFreeBulletinsCount(userId);
-    if (freeBulletins >= 3) {
-      return NextResponse.json(
-        { error: 'Vous avez utilisé vos 3 bulletins gratuits. Choisissez une offre pour continuer.', redirect: '/tarifs' },
-        { status: 403 }
-      );
-    }
+  if (!subscription) {
+    return NextResponse.json(
+      { error: 'Abonnement requis. Choisissez une offre pour générer vos bulletins.', redirect: '/tarifs' },
+      { status: 403 }
+    );
   }
   // ---
   const body = await req.json();
@@ -91,16 +87,14 @@ export async function POST(req: NextRequest) {
     absences: Array.isArray(absences) ? absences : undefined,
   });
 
-  // Track usage
-  if (!isFreeUser && subscription) {
-    if (subscription.bulletins_total > 0) {
-      incrementBulletinUsed(subscription.id);
-    }
-    saveBulletin({ userId, subscriptionId: subscription.id, data: body });
-    return NextResponse.json({ ...result, isFree: false });
-  } else {
-    // Free bulletin (no subscription)
-    saveBulletin({ userId, subscriptionId: null, data: body });
-    return NextResponse.json({ ...result, isFree: true });
+  // Incrément atomique — bloque si quota épuisé entre le check et l'update (race condition)
+  const incremented = incrementBulletinUsed(subscription.id, subscription.bulletins_total);
+  if (!incremented) {
+    return NextResponse.json(
+      { error: 'Quota épuisé. Veuillez recharger la page et choisir une nouvelle offre.', redirect: '/tarifs' },
+      { status: 403 }
+    );
   }
+  saveBulletin({ userId, subscriptionId: subscription.id, data: body });
+  return NextResponse.json({ ...result, isFree: false });
 }

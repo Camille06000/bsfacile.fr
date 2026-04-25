@@ -168,10 +168,24 @@ export function getActiveSubscription(userId: number): DbSubscription | undefine
   `).get(userId, now) as DbSubscription | undefined;
 }
 
-export function incrementBulletinUsed(subscriptionId: number): void {
-  getDb()
-    .prepare('UPDATE subscriptions SET bulletins_used = bulletins_used + 1 WHERE id = ?')
-    .run(subscriptionId);
+/**
+ * Incrémente le quota de manière atomique.
+ * Pour les abonnements limités (bulletins_total > 0), utilise un UPDATE conditionnel
+ * qui ne s'exécute que si bulletins_used < bulletins_total au moment de l'écriture.
+ * Retourne true si l'incrément a réussi, false si le quota était déjà épuisé (race condition).
+ */
+export function incrementBulletinUsed(subscriptionId: number, bulletinsTotal: number): boolean {
+  const db = getDb();
+  if (bulletinsTotal === 0) {
+    // Illimité — pas besoin d'incrémenter, toujours OK
+    return true;
+  }
+  const result = db.prepare(`
+    UPDATE subscriptions
+    SET bulletins_used = bulletins_used + 1
+    WHERE id = ? AND bulletins_used < bulletins_total
+  `).run(subscriptionId);
+  return result.changes > 0; // false = quota épuisé entre le check et l'update
 }
 
 // ---------------------------------------------------------------------------
