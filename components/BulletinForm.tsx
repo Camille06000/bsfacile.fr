@@ -949,24 +949,46 @@ export default function BulletinForm() {
             <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded text-sm">{error}</div>
           )}
 
-          <div className="mt-6 flex gap-3">
+          <div className="mt-6 flex gap-3 no-print">
             <button type="submit" disabled={loading}
               className="flex-1 bg-blue-700 hover:bg-blue-800 disabled:bg-blue-400 text-white px-6 py-3 rounded-lg font-bold text-base transition-colors">
               {loading ? 'Calcul en cours…' : 'Générer le bulletin'}
             </button>
-            {result && (
-              <button type="button" onClick={handlePrint}
-                className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-bold text-base transition-colors">
-                Imprimer / PDF
-              </button>
-            )}
           </div>
         </form>
       </div>
 
       {result && (
         <section id="bulletin-section">
+          {/* Bouton PDF — HAUT */}
+          <div className="no-print flex justify-center mb-4">
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-bold text-base shadow-md transition-colors"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Télécharger en PDF
+            </button>
+          </div>
+
           <BulletinDisplay data={result} logoDataUrl={logoDataUrl} isFree={isFree} />
+
+          {/* Bouton PDF — BAS */}
+          <div className="no-print flex justify-center mt-6 mb-4">
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-bold text-base shadow-md transition-colors"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Télécharger en PDF
+            </button>
+          </div>
         </section>
       )}
     </div>
