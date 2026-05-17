@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { findOrCreateUser, createSubscription, getDb } from '@/lib/db';
+import { findOrCreateUser, createSubscription, attachRecurringToSubscription, getDb } from '@/lib/db';
 import { resolveSubscription } from '@/lib/subscription-tiers';
+import { getLatestActiveToken } from '@/lib/sumup-recurring';
 
 // ---------------------------------------------------------------------------
 // SumUp webhook — CHECKOUT_STATUS_CHANGED
@@ -19,11 +20,22 @@ async function verifyCheckoutWithSumUp(checkoutId: string) {
   return res.json();
 }
 
-async function activateSubscription(checkoutId: string, email: string, amountCents: number) {
+// Date du 1er du mois prochain (timestamp Unix sec) — pour next_renewal_at
+function firstOfNextMonth(): number {
+  const now = new Date();
+  return Math.floor(new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0).getTime() / 1000);
+}
+
+async function activateSubscription(
+  checkoutId: string,
+  email: string,
+  amountCents: number,
+  pending?: { recurring: number; sumup_customer_id: string | null } | null,
+) {
   const user = findOrCreateUser(email);
   const meta = resolveSubscription(amountCents);
 
-  createSubscription({
+  const subId = createSubscription({
     userId: user.id,
     type: meta.type,
     checkoutId,
@@ -32,7 +44,22 @@ async function activateSubscription(checkoutId: string, email: string, amountCen
     expiresAt: meta.expiresAt,
   });
 
-  console.log(`[Webhook] Abonnement créé — userId: ${user.id}, type: ${meta.type}, email: ${email}`);
+  console.log(`[Webhook] Abonnement créé #${subId} — userId: ${user.id}, type: ${meta.type}, email: ${email}`);
+
+  // Si c'était un setup recurring : on récupère le token de carte et on l'attache
+  if (pending?.recurring === 1 && pending.sumup_customer_id) {
+    try {
+      const token = await getLatestActiveToken(pending.sumup_customer_id);
+      if (token) {
+        attachRecurringToSubscription(subId, pending.sumup_customer_id, token, firstOfNextMonth());
+        console.log(`[Webhook] Recurring activé sub #${subId} → next_renewal_at = 1er du mois prochain`);
+      } else {
+        console.warn(`[Webhook] Aucun token actif trouvé pour customer ${pending.sumup_customer_id} (recurring sub #${subId} non activé)`);
+      }
+    } catch (err) {
+      console.error('[Webhook] Erreur récup token recurring:', err);
+    }
+  }
 
   // Nettoie pending_checkouts
   try { getDb().prepare('DELETE FROM pending_checkouts WHERE checkout_id = ?').run(checkoutId); } catch { /* ok */ }
@@ -76,22 +103,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true, status: checkout.status });
     }
 
-    // 2. Récupérer l'email : depuis l'API ou depuis pending_checkouts
+    // 2. Récupérer l'email + flag recurring depuis pending_checkouts (source de vérité côté app)
     let email: string = checkout.personal_details?.email || '';
     const amountCents = Math.round((checkout.amount ?? 0) * 100);
+    let pending: { email: string; amount_cents: number; recurring?: number; sumup_customer_id?: string | null } | undefined;
 
-    if (!email) {
-      try {
-        const row = getDb()
-          .prepare('SELECT email, amount_cents FROM pending_checkouts WHERE checkout_id = ?')
-          .get(checkoutId) as { email: string; amount_cents: number } | undefined;
-        if (row) {
-          email = row.email;
-          console.log(`[Webhook] Email récupéré depuis pending_checkouts: ${email}`);
-        }
-      } catch (dbErr) {
-        console.error('[Webhook] pending_checkouts lookup error:', dbErr);
+    try {
+      pending = getDb()
+        .prepare('SELECT email, amount_cents, recurring, sumup_customer_id FROM pending_checkouts WHERE checkout_id = ?')
+        .get(checkoutId) as typeof pending;
+      if (pending && !email) {
+        email = pending.email;
+        console.log(`[Webhook] Email récupéré depuis pending_checkouts: ${email}`);
       }
+    } catch (dbErr) {
+      console.error('[Webhook] pending_checkouts lookup error:', dbErr);
     }
 
     if (!email) {
@@ -99,9 +125,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true, warning: 'email_absent' });
     }
 
-    // 3. Créer l'abonnement + envoyer le magic link
+    // 3. Créer l'abonnement + (si recurring) attacher le token + envoyer le magic link
     try {
-      await activateSubscription(checkoutId, email, amountCents);
+      await activateSubscription(checkoutId, email, amountCents, pending ? {
+        recurring: pending.recurring ?? 0,
+        sumup_customer_id: pending.sumup_customer_id ?? null,
+      } : null);
     } catch (err) {
       console.error('[Webhook] Erreur activation abonnement:', err);
     }

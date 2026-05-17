@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { findOrCreateUser, getDb } from '@/lib/db';
+import { ensureSumupCustomer, createRecurringSetupCheckout } from '@/lib/sumup-recurring';
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.SUMUP_API_KEY;
@@ -14,6 +15,48 @@ export async function POST(req: NextRequest) {
   const amount: number = body.amount ?? 8.90;
   const description: string = body.description ?? 'Bulletin Facile — Bulletin de salaire';
   const email: string = (body.email ?? '').trim().toLowerCase();
+  const recurring: boolean = body.recurring === true;
+
+  // ── Flux RECURRING (setup + charge 1er mois + tokenisation carte) ──
+  if (recurring) {
+    if (!email) {
+      return NextResponse.json({ error: 'Email requis pour activer le renouvellement auto' }, { status: 400 });
+    }
+    try {
+      const user = findOrCreateUser(email);
+      const customerId = await ensureSumupCustomer(user.id, email);
+      const checkout = await createRecurringSetupCheckout({
+        customerId,
+        amountEur: amount,
+        description,
+        returnUrl: `${baseUrl}/api/webhook`,
+      });
+      // Track le checkout pour que le webhook sache que c'est un setup recurring
+      try {
+        const db = getDb();
+        db.exec(`CREATE TABLE IF NOT EXISTS pending_checkouts (
+          checkout_id TEXT PRIMARY KEY,
+          email TEXT NOT NULL,
+          amount_cents INTEGER NOT NULL,
+          created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+          recurring INTEGER NOT NULL DEFAULT 0,
+          sumup_customer_id TEXT
+        )`);
+        // Migration idempotente — ajoute les colonnes si pas déjà là
+        try { db.exec('ALTER TABLE pending_checkouts ADD COLUMN recurring INTEGER NOT NULL DEFAULT 0'); } catch { /* ok */ }
+        try { db.exec('ALTER TABLE pending_checkouts ADD COLUMN sumup_customer_id TEXT'); } catch { /* ok */ }
+        db.prepare(`INSERT OR REPLACE INTO pending_checkouts
+          (checkout_id, email, amount_cents, recurring, sumup_customer_id) VALUES (?, ?, ?, 1, ?)`)
+          .run(checkout.id, email, Math.round(amount * 100), customerId);
+      } catch (dbErr) {
+        console.error('pending_checkouts insert error (recurring):', dbErr);
+      }
+      return NextResponse.json({ url: checkout.payUrl, checkoutId: checkout.id, recurring: true });
+    } catch (err) {
+      console.error('Recurring checkout error:', err);
+      return NextResponse.json({ error: 'Erreur lors de la création du checkout récurrent', detail: String(err) }, { status: 500 });
+    }
+  }
 
   const checkoutRef = `bf-${Date.now()}`;
 

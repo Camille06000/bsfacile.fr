@@ -68,6 +68,19 @@ export function getDb(): Database.Database {
 
     _db.pragma('journal_mode = WAL');
     _db.pragma('foreign_keys = ON');
+
+    // ── Migration idempotente : ajout colonnes recurring SumUp ──
+    // ALTER TABLE échoue si la colonne existe → on swallow l'erreur.
+    const alters = [
+      "ALTER TABLE subscriptions ADD COLUMN sumup_customer_id TEXT",
+      "ALTER TABLE subscriptions ADD COLUMN card_token TEXT",
+      "ALTER TABLE subscriptions ADD COLUMN next_renewal_at INTEGER",
+      "ALTER TABLE subscriptions ADD COLUMN recurring_status TEXT", // null=non-recurring, 'active'|'cancelled'|'failed'
+      "ALTER TABLE subscriptions ADD COLUMN parent_subscription_id INTEGER", // chaîne les renouvellements
+    ];
+    for (const sql of alters) {
+      try { _db.exec(sql); } catch { /* colonne existe déjà */ }
+    }
   }
   return _db;
 }
@@ -131,6 +144,11 @@ export interface DbSubscription {
   bulletins_used: number;
   expires_at: number | null;
   created_at: number;
+  sumup_customer_id: string | null;
+  card_token: string | null;
+  next_renewal_at: number | null;
+  recurring_status: string | null; // null|'active'|'cancelled'|'failed'
+  parent_subscription_id: number | null;
 }
 
 export function createSubscription(params: {
@@ -140,11 +158,17 @@ export function createSubscription(params: {
   amountCents: number;
   bulletinsTotal: number;
   expiresAt?: number;
-}): void {
+  sumupCustomerId?: string;
+  cardToken?: string;
+  nextRenewalAt?: number;
+  recurringStatus?: string;
+  parentSubscriptionId?: number;
+}): number {
   const db = getDb();
-  db.prepare(`
-    INSERT INTO subscriptions (user_id, type, checkout_id, amount_cents, bulletins_total, expires_at)
-    VALUES (?, ?, ?, ?, ?, ?)
+  const result = db.prepare(`
+    INSERT INTO subscriptions (user_id, type, checkout_id, amount_cents, bulletins_total, expires_at,
+                               sumup_customer_id, card_token, next_renewal_at, recurring_status, parent_subscription_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     params.userId,
     params.type,
@@ -152,7 +176,59 @@ export function createSubscription(params: {
     params.amountCents,
     params.bulletinsTotal,
     params.expiresAt ?? null,
+    params.sumupCustomerId ?? null,
+    params.cardToken ?? null,
+    params.nextRenewalAt ?? null,
+    params.recurringStatus ?? null,
+    params.parentSubscriptionId ?? null,
   );
+  return result.lastInsertRowid as number;
+}
+
+// ── Helpers recurring ─────────────────────────────────────────────────────
+export function attachRecurringToSubscription(
+  subscriptionId: number,
+  sumupCustomerId: string,
+  cardToken: string,
+  nextRenewalAt: number,
+): void {
+  getDb().prepare(`
+    UPDATE subscriptions
+    SET sumup_customer_id = ?, card_token = ?, next_renewal_at = ?, recurring_status = 'active'
+    WHERE id = ?
+  `).run(sumupCustomerId, cardToken, nextRenewalAt, subscriptionId);
+}
+
+export function getSumupCustomerIdForUser(userId: number): string | null {
+  // Réutilise le customer_id SumUp existant pour cet user (1 user = 1 customer SumUp)
+  const row = getDb().prepare(`
+    SELECT sumup_customer_id FROM subscriptions
+    WHERE user_id = ? AND sumup_customer_id IS NOT NULL
+    ORDER BY created_at DESC LIMIT 1
+  `).get(userId) as { sumup_customer_id: string } | undefined;
+  return row?.sumup_customer_id ?? null;
+}
+
+export function getDueRenewals(now: number = Math.floor(Date.now() / 1000)): DbSubscription[] {
+  // Subs dont le renouvellement est dû ET qui n'ont PAS déjà été renouvelées (pas d'enfant créé après next_renewal_at)
+  return getDb().prepare(`
+    SELECT s.* FROM subscriptions s
+    WHERE s.recurring_status = 'active'
+      AND s.next_renewal_at IS NOT NULL
+      AND s.next_renewal_at <= ?
+      AND NOT EXISTS (
+        SELECT 1 FROM subscriptions c
+        WHERE c.parent_subscription_id = s.id
+      )
+  `).all(now) as DbSubscription[];
+}
+
+export function markRecurringFailed(subscriptionId: number): void {
+  getDb().prepare(`UPDATE subscriptions SET recurring_status = 'failed' WHERE id = ?`).run(subscriptionId);
+}
+
+export function cancelRecurring(subscriptionId: number): void {
+  getDb().prepare(`UPDATE subscriptions SET recurring_status = 'cancelled' WHERE id = ?`).run(subscriptionId);
 }
 
 function startOfCurrentMonthUnix(): number {
