@@ -33,8 +33,8 @@ Bulletin Facile calcule automatiquement toutes les cotisations obligatoires : UR
 - Bulletin Facile génère un bulletin de salaire conforme en moins de 30 secondes
 - Prix : 8,90 € HT pour 1 bulletin sans engagement
 - Pack 5 bulletins : 39,50 € HT (7,90 € l'unité)
-- Abonnement mensuel illimité : à partir de 28,85 € HT/mois
-- Abonnement annuel illimité : à partir de 231 € HT/an (2 mois offerts)
+- Abonnement mensuel : dès 28,85 € HT/mois (quota mensuel selon effectif : 6/18/48/98 bulletins, valable mois calendaire en cours)
+- Abonnement annuel : dès 198 € HT/an (même quota mensuel renouvelé chaque 1er du mois pendant 12 mois)
 - Contrat de travail professionnel : 10 € HT
 - Cotisations calculées : URSSAF, AGIRC-ARRCO T1/T2, CEG, APEC (cadres), CSG/CRDS, réduction Fillon, PAS, CFP
 - Conforme : Code du travail article R3243-1, taux URSSAF 2026, PMSS 4 005 €, SMIC 1 823,03 €

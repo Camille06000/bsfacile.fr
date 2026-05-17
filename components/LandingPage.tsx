@@ -12,17 +12,17 @@ const PACK_OPTIONS = [
 ];
 
 const MENSUEL_OPTIONS = [
-  { label: '1 à 3 salariés',   prix: 28.85 },
-  { label: '4 à 9 salariés',   prix: 44.85 },
-  { label: '10 à 24 salariés', prix: 74.85 },
-  { label: '25 à 49 salariés', prix: 134.85 },
+  { label: '1 à 3 salariés',   prix: 28.85,  quota: 6  },
+  { label: '4 à 9 salariés',   prix: 44.85,  quota: 18 },
+  { label: '10 à 24 salariés', prix: 74.85,  quota: 48 },
+  { label: '25 à 49 salariés', prix: 134.85, quota: 98 },
 ];
 
 const ANNUEL_OPTIONS = [
-  { label: '1 à 3 salariés',   prix: 198.00, parMois: 16.50 },
-  { label: '4 à 9 salariés',   prix: 328.00, parMois: 27.33 },
-  { label: '10 à 24 salariés', prix: 598.00, parMois: 49.83 },
-  { label: '25 à 49 salariés', prix: 998.00, parMois: 83.17 },
+  { label: '1 à 3 salariés',   prix: 198.00, parMois: 16.50, quota: 6  },
+  { label: '4 à 9 salariés',   prix: 328.00, parMois: 27.33, quota: 18 },
+  { label: '10 à 24 salariés', prix: 598.00, parMois: 49.83, quota: 48 },
+  { label: '25 à 49 salariés', prix: 998.00, parMois: 83.17, quota: 98 },
 ];
 
 function IconCheck({ color = '#16a34a' }: { color?: string }) {
@@ -427,7 +427,7 @@ export default function LandingPage() {
                   <PayButton amount={mensuel.prix} description={`Bulletin Facile — Abonnement mensuel ${mensuel.label}`} label="S'abonner"
                     style={{ width: '100%', background: '#2563eb', color: 'white', fontWeight: 700, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 13, cursor: 'pointer', marginBottom: 14 }} />
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
-                    {['Bulletins illimités', 'Mises à jour légales', 'Support prioritaire'].map(f => (
+                    {[`${mensuel.quota} bulletins / mois en cours`, 'Mises à jour légales', 'Support prioritaire'].map(f => (
                       <li key={f} style={{ display: 'flex', gap: 8, fontSize: 12, color: '#374151', alignItems: 'center' }}><IconCheck color="#2563eb" />{f}</li>
                     ))}
                   </ul>
@@ -451,7 +451,7 @@ export default function LandingPage() {
                   <PayButton amount={annuel.prix} description={`Bulletin Facile — Abonnement annuel ${annuel.label}`} label="S'abonner annuel"
                     style={{ width: '100%', background: '#2563eb', color: 'white', fontWeight: 700, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 13, cursor: 'pointer', marginBottom: 14 }} />
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
-                    {['Bulletins illimités', 'Mises à jour légales', 'Support prioritaire'].map(f => (
+                    {[`${annuel.quota} bulletins / mois (renouvelé chaque 1er du mois)`, 'Mises à jour légales', 'Support prioritaire'].map(f => (
                       <li key={f} style={{ display: 'flex', gap: 8, fontSize: 12, color: '#374151', alignItems: 'center' }}><IconCheck color="#2563eb" />{f}</li>
                     ))}
                   </ul>
@@ -485,7 +485,7 @@ export default function LandingPage() {
               { q: 'Les taux URSSAF et AGIRC-ARRCO 2026 sont-ils intégrés ?', a: 'Oui. Tous les taux officiels 2025 et 2026 sont intégrés : vieillesse plafonnée (6,90%), AGIRC-ARRCO T1 (3,15%), T2 (8,64%), CEG, CET (0,14%), CSG déductible (6,80%), CSG/CRDS non déductible (2,90%), allocations familiales, AT/MP, chômage, AGS.' },
               { q: 'La réduction Fillon est-elle calculée automatiquement ?', a: 'Oui. Le coefficient et le montant apparaissent dans le tableau des cotisations patronales dès que le salaire est inférieur à 1,6 × SMIC annuel.' },
               { q: 'Bulletin Facile gère-t-il les absences et heures supplémentaires ?', a: 'Oui. Les absences (maladie, AT, CP, RTT, sans solde) sont déduites avec calcul IJSS. Les heures supplémentaires 25%/50% sont calculées avec exonération IR (Loi TEPA).' },
-              { q: 'Quelle est la différence entre sans engagement et abonnement ?', a: 'Sans engagement : vous achetez à l\'unité ou en pack — idéal jusqu\'à 20 bulletins/mois. Abonnement mensuel ou annuel : bulletins illimités — idéal pour employeurs avec plusieurs salariés.' },
+              { q: 'Quelle est la différence entre sans engagement et abonnement ?', a: 'Sans engagement : vous achetez à l\'unité ou en pack. Abonnement mensuel ou annuel : quota mensuel selon l\'effectif (6/18/48/98 bulletins). Pour l\'annuel, le quota se renouvelle chaque 1er du mois.' },
             ].map(({ q, a }) => (
               <details key={q} style={{ background: 'white', borderRadius: 10, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
                 <summary style={{ padding: '16px 20px', fontWeight: 600, fontSize: 14, cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

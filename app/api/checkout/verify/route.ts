@@ -4,23 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { findOrCreateUser, createSubscription, getActiveSubscription, getDb } from '@/lib/db';
-
-function resolveSubscription(amountCents: number) {
-  const now = Math.floor(Date.now() / 1000);
-  switch (amountCents) {
-    case 890:   return { type: 'single',  bulletinsTotal: 1 };
-    case 2900:  return { type: 'pack5',   bulletinsTotal: 5 };
-    case 2885:  return { type: 'monthly', bulletinsTotal: 0, expiresAt: now + 31 * 24 * 3600 };
-    case 28800: return { type: 'annual',  bulletinsTotal: 0, expiresAt: now + 366 * 24 * 3600 };
-    default: {
-      const euros = amountCents / 100;
-      if (euros <= 9)               return { type: 'single',  bulletinsTotal: 1 };
-      if (euros >= 28 && euros <= 30) return { type: 'monthly', bulletinsTotal: 0, expiresAt: now + 31 * 24 * 3600 };
-      if (euros > 9 && euros <= 35)  return { type: 'pack5',   bulletinsTotal: 5 };
-      return { type: 'annual', bulletinsTotal: 0, expiresAt: now + 366 * 24 * 3600 };
-    }
-  }
-}
+import { resolveSubscription } from '@/lib/subscription-tiers';
 
 export async function GET(req: NextRequest) {
   const checkoutId = req.nextUrl.searchParams.get('id') ?? '';

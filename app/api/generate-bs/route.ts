@@ -88,10 +88,10 @@ export async function POST(req: NextRequest) {
   });
 
   // Incrément atomique — bloque si quota épuisé entre le check et l'update (race condition)
-  const incremented = incrementBulletinUsed(subscription.id, subscription.bulletins_total);
+  const incremented = incrementBulletinUsed(subscription.id, subscription.bulletins_total, subscription.type);
   if (!incremented) {
     return NextResponse.json(
-      { error: 'Quota épuisé. Veuillez recharger la page et choisir une nouvelle offre.', redirect: '/tarifs' },
+      { error: 'Quota mensuel épuisé. Le quota se renouvelle le 1er du mois prochain (abo annuel) ou vous pouvez choisir une nouvelle offre.', redirect: '/tarifs' },
       { status: 403 }
     );
   }

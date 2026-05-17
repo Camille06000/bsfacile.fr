@@ -155,10 +155,22 @@ export function createSubscription(params: {
   );
 }
 
+function startOfCurrentMonthUnix(): number {
+  const now = new Date();
+  return Math.floor(new Date(now.getFullYear(), now.getMonth(), 1).getTime() / 1000);
+}
+
+export function getBulletinsThisCalendarMonth(subscriptionId: number): number {
+  const row = getDb()
+    .prepare('SELECT COUNT(*) AS cnt FROM bulletins WHERE subscription_id = ? AND created_at >= ?')
+    .get(subscriptionId, startOfCurrentMonthUnix()) as { cnt: number };
+  return row?.cnt ?? 0;
+}
+
 export function getActiveSubscription(userId: number): DbSubscription | undefined {
   const db = getDb();
   const now = Math.floor(Date.now() / 1000);
-  return db.prepare(`
+  const sub = db.prepare(`
     SELECT * FROM subscriptions
     WHERE user_id = ?
       AND status = 'active'
@@ -166,26 +178,46 @@ export function getActiveSubscription(userId: number): DbSubscription | undefine
       AND (bulletins_total = 0 OR bulletins_used < bulletins_total)
     ORDER BY created_at DESC LIMIT 1
   `).get(userId, now) as DbSubscription | undefined;
+
+  if (!sub) return undefined;
+
+  // Abos annuels : le quota mensuel se renouvelle chaque 1er du mois.
+  // On vérifie dynamiquement le nb de bulletins générés sur le mois calendaire en cours.
+  if (sub.type === 'annual' && sub.bulletins_total > 0) {
+    const usedThisMonth = getBulletinsThisCalendarMonth(sub.id);
+    if (usedThisMonth >= sub.bulletins_total) return undefined;
+    // Expose le compteur mensuel au caller (dashboard) plutôt que le compteur lifetime.
+    return { ...sub, bulletins_used: usedThisMonth };
+  }
+
+  return sub;
 }
 
 /**
  * Incrémente le quota de manière atomique.
- * Pour les abonnements limités (bulletins_total > 0), utilise un UPDATE conditionnel
- * qui ne s'exécute que si bulletins_used < bulletins_total au moment de l'écriture.
- * Retourne true si l'incrément a réussi, false si le quota était déjà épuisé (race condition).
+ * - Mensuel limité : UPDATE conditionnel sur bulletins_used (compteur lifetime, OK car expires_at = fin du mois).
+ * - Annuel limité : compte les bulletins du mois calendaire en cours (race condition acceptable).
+ * - Illimité (bulletins_total = 0) : toujours OK (comptes legacy / cadeau).
+ * Retourne true si l'incrément a réussi, false si quota épuisé.
  */
-export function incrementBulletinUsed(subscriptionId: number, bulletinsTotal: number): boolean {
-  const db = getDb();
-  if (bulletinsTotal === 0) {
-    // Illimité — pas besoin d'incrémenter, toujours OK
-    return true;
+export function incrementBulletinUsed(
+  subscriptionId: number,
+  bulletinsTotal: number,
+  type: string,
+): boolean {
+  if (bulletinsTotal === 0) return true;
+
+  if (type === 'annual') {
+    const used = getBulletinsThisCalendarMonth(subscriptionId);
+    return used < bulletinsTotal;
   }
-  const result = db.prepare(`
+
+  const result = getDb().prepare(`
     UPDATE subscriptions
     SET bulletins_used = bulletins_used + 1
     WHERE id = ? AND bulletins_used < bulletins_total
   `).run(subscriptionId);
-  return result.changes > 0; // false = quota épuisé entre le check et l'update
+  return result.changes > 0;
 }
 
 // ---------------------------------------------------------------------------

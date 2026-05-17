@@ -139,7 +139,7 @@ export default function MeilleurGenerateurPage() {
             { icon: '📄', titre: 'PDF officiel conforme', desc: 'Le bulletin généré respecte toutes les mentions obligatoires du Code du travail (art. R3243-1).' },
             { icon: '📧', titre: 'Envoi par email intégré', desc: 'Envoyez le bulletin directement par email au salarié depuis l\'interface, en un clic.' },
             { icon: '📊', titre: 'Cumul et congés payés', desc: 'Cumul annuel automatique (brut, net, cotisations) et suivi des congés payés selon la période de référence juin-mai.' },
-            { icon: '💰', titre: 'Tarif accessible', desc: 'À partir de 8,90 € HT par bulletin. Abonnement illimité dès 28,85 €/mois pour les structures avec plusieurs salariés.' },
+            { icon: '💰', titre: 'Tarif accessible', desc: 'À partir de 8,90 € HT par bulletin. Abonnement mensuel dès 28,85 €/mois (6 bulletins/mois pour 1-3 salariés).' },
           ].map((f, i) => (
             <div key={i} style={{ background: '#f8fafc', borderRadius: 12, padding: '20px', border: '1px solid #e2e8f0' }}>
               <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
@@ -190,7 +190,7 @@ export default function MeilleurGenerateurPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14, marginBottom: 48 }}>
           {[
             { icon: '🏪', titre: 'TPE & artisans', desc: 'Boulangeries, restaurants, commerces : générez vos bulletins sans logiciel de paie lourd.' },
-            { icon: '🏢', titre: 'PME & startups', desc: 'Jusqu\'à plusieurs salariés, avec suivi des cumuls et abonnement illimité disponible.' },
+            { icon: '🏢', titre: 'PME & startups', desc: 'Jusqu\'à 49 salariés, avec suivi des cumuls et abonnement adapté à votre effectif.' },
             { icon: '👤', titre: 'Auto-entrepreneurs', desc: 'Particuliers employeurs et indépendants avec un ou deux salariés.' },
             { icon: '📋', titre: 'Cabinets comptables', desc: 'Générez des bulletins pour vos clients en quelques clics, conformes et prêts à transmettre.' },
           ].map((u, i) => (
