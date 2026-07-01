@@ -427,7 +427,7 @@ export default function LandingPage() {
                   <PayButton amount={mensuel.prix} description={`Bulletin Facile — Abonnement mensuel ${mensuel.label}`} label="S'abonner"
                     style={{ width: '100%', background: '#2563eb', color: 'white', fontWeight: 700, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 13, cursor: 'pointer', marginBottom: 14 }} />
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
-                    {[`${mensuel.quota} bulletins / mois en cours`, 'Mises à jour légales', 'Support prioritaire'].map(f => (
+                    {[`${mensuel.quota} bulletins / mois en cours`, 'Contrats de travail illimités', 'Mises à jour légales', 'Support prioritaire'].map(f => (
                       <li key={f} style={{ display: 'flex', gap: 8, fontSize: 12, color: '#374151', alignItems: 'center' }}><IconCheck color="#2563eb" />{f}</li>
                     ))}
                   </ul>
@@ -451,7 +451,7 @@ export default function LandingPage() {
                   <PayButton amount={annuel.prix} description={`Bulletin Facile — Abonnement annuel ${annuel.label}`} label="S'abonner annuel"
                     style={{ width: '100%', background: '#2563eb', color: 'white', fontWeight: 700, padding: '10px 0', borderRadius: 8, border: 'none', fontSize: 13, cursor: 'pointer', marginBottom: 14 }} />
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
-                    {[`${annuel.quota} bulletins / mois (renouvelé chaque 1er du mois)`, 'Mises à jour légales', 'Support prioritaire'].map(f => (
+                    {[`${annuel.quota} bulletins / mois (renouvelé chaque 1er du mois)`, 'Contrats de travail illimités', 'Mises à jour légales', 'Support prioritaire'].map(f => (
                       <li key={f} style={{ display: 'flex', gap: 8, fontSize: 12, color: '#374151', alignItems: 'center' }}><IconCheck color="#2563eb" />{f}</li>
                     ))}
                   </ul>

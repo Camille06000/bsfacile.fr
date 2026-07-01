@@ -204,7 +204,7 @@ export default function TarifsPage() {
               <div style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginBottom: 24, marginTop: 4 }}>/mois · sans engagement</div>
               <PayButton amount={mensuel.prix} description={`Bulletin Facile — Abonnement mensuel ${mensuel.label}`} label="S'abonner au mois" style={btnBlue} />
               <ul style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 9, listStyle: 'none', padding: 0, margin: '20px 0 0' }}>
-                {[`${mensuel.quota} bulletins / mois en cours`, 'Multi-salariés & multi-entreprises', 'Taux URSSAF mis à jour auto', 'Réduction Fillon calculée', 'PDF immédiat · 3 thèmes', 'Support par email'].map(f => (
+                {[`${mensuel.quota} bulletins / mois en cours`, 'Contrats de travail illimités inclus', 'Multi-salariés & multi-entreprises', 'Taux URSSAF mis à jour auto', 'Réduction Fillon calculée', 'PDF immédiat · 3 thèmes', 'Support par email'].map(f => (
                   <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4b5563' }}><Check color="#2563eb" />{f}</li>
                 ))}
               </ul>
@@ -227,7 +227,7 @@ export default function TarifsPage() {
               </div>
               <PayButton amount={annuel.prix} description={`Bulletin Facile — Abonnement annuel ${annuel.label}`} label="S'abonner à l'année" style={btnBlue} />
               <ul style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 9, listStyle: 'none', padding: 0, margin: '20px 0 0' }}>
-                {[`${annuel.quota} bulletins / mois (renouvelé chaque 1er du mois)`, 'Multi-salariés & multi-entreprises', 'Taux URSSAF mis à jour auto', 'Réduction Fillon calculée', 'PDF immédiat · 3 thèmes', 'Support prioritaire', 'Mises à jour légales incluses'].map(f => (
+                {[`${annuel.quota} bulletins / mois (renouvelé chaque 1er du mois)`, 'Contrats de travail illimités inclus', 'Multi-salariés & multi-entreprises', 'Taux URSSAF mis à jour auto', 'Réduction Fillon calculée', 'PDF immédiat · 3 thèmes', 'Support prioritaire', 'Mises à jour légales incluses'].map(f => (
                   <li key={f} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#4b5563' }}><Check color="#2563eb" />{f}</li>
                 ))}
               </ul>
@@ -262,7 +262,7 @@ export default function TarifsPage() {
                   ['Logo & thèmes visuels', '✅', '✅', '✅', '—'],
                   ['Taux mis à jour auto', '—', '—', '✅', '—'],
                   ['Support prioritaire', '—', '—', '✅', '—'],
-                  ['Contrat CDI/CDD/App.', '—', '—', '—', '✅'],
+                  ['Contrat CDI/CDD/App.', '—', '—', '✅ illimités', '✅'],
                   ['Conforme Code travail', '—', '—', '—', '✅'],
                   ['Clauses personnalisées', '—', '—', '—', '✅'],
                 ].map(([feat, ...vals], i) => (
@@ -311,7 +311,7 @@ export default function TarifsPage() {
           <h2 style={{ fontSize: 22, fontWeight: 800, textAlign: 'center', marginBottom: 24 }}>Questions fréquentes</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 740, margin: '0 auto' }}>
             {[
-              { q: 'Quelle différence entre le bulletin unitaire et l\'abonnement ?', a: 'Le bulletin unitaire (8,90 €) est idéal pour un besoin ponctuel ou pour tester. L\'abonnement donne accès à un quota mensuel adapté à votre effectif : 6 bulletins/mois (1-3 salariés), 18/mois (4-9), 48/mois (10-24) ou 98/mois (25-49). Pour l\'annuel, le quota se renouvelle chaque 1er du mois.' },
+              { q: 'Quelle différence entre le bulletin unitaire et l\'abonnement ?', a: 'Le bulletin unitaire (8,90 €) est idéal pour un besoin ponctuel ou pour tester. L\'abonnement donne accès à un quota mensuel adapté à votre effectif : 6 bulletins/mois (1-3 salariés), 18/mois (4-9), 48/mois (10-24) ou 98/mois (25-49). Pour l\'annuel, le quota se renouvelle chaque 1er du mois. Les contrats de travail (CDI, CDD, apprentissage) sont également inclus en illimité dans tous les abonnements.' },
               { q: 'Puis-je générer des bulletins pour plusieurs entreprises ?', a: 'Oui, avec un pack ou un abonnement. Vous pouvez saisir des informations d\'entreprise différentes pour chaque bulletin, sans surcoût.' },
               { q: 'Le contrat de travail est-il juridiquement valable ?', a: 'Oui. Les modèles respectent le Code du travail (articles L1221-1 et suivants) pour les CDI, CDD, contrats d\'apprentissage et conventions de stage. Nous vous recommandons de le faire relire par un professionnel pour les situations complexes.' },
               { q: 'Les taux URSSAF 2026 sont-ils bien à jour ?', a: 'Oui. Tous les taux officiels 2026 sont intégrés : PMSS 4 005 €, SMIC 1 801,80 €, réduction Fillon, AGIRC-ARRCO T1/T2, CSG/CRDS 2,90 %. Les abonnés bénéficient des mises à jour automatiques.' },

@@ -134,7 +134,26 @@ export default function ContratForm() {
   const [tab, setTab] = useState<TabType>('employeur');
   const [generated, setGenerated] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
+  const [includedInSub, setIncludedInSub] = useState(false); // true si l'user a un abo mensuel/annuel actif
   const displayRef = useRef<HTMLDivElement>(null);
+
+  // Vérifie si l'user connecté a un abonnement mensuel/annuel actif → contrat inclus, paywall skip.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const sub = data?.subscription;
+        if (!cancelled && sub && (sub.type === 'monthly' || sub.type === 'annual')) {
+          setIncludedInSub(true);
+          setIsPaid(true);
+        }
+      } catch { /* silencieux — fallback au paywall */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Autocomplete entreprise
   const [searchQuery, setSearchQuery] = useState('');
@@ -579,13 +598,20 @@ export default function ContratForm() {
               </div>
             ) : (
               <div style={{ textAlign: 'center' }}>
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  style={{ background: '#1a3a5c', color: 'white', fontWeight: 700, padding: '12px 32px', borderRadius: 8, border: 'none', fontSize: 15, cursor: 'pointer' }}
-                >
-                  Imprimer / Télécharger PDF
-                </button>
+                {includedInSub && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#dcfce7', border: '1px solid #86efac', borderRadius: 999, padding: '6px 14px', fontSize: 13, fontWeight: 700, color: '#15803d', marginBottom: 14 }}>
+                    ✅ Contrat inclus dans votre abonnement
+                  </div>
+                )}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    style={{ background: '#1a3a5c', color: 'white', fontWeight: 700, padding: '12px 32px', borderRadius: 8, border: 'none', fontSize: 15, cursor: 'pointer' }}
+                  >
+                    Imprimer / Télécharger PDF
+                  </button>
+                </div>
               </div>
             )}
           </div>
