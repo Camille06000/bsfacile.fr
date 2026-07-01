@@ -46,6 +46,14 @@ export async function POST(req: NextRequest) {
       { status: 403 }
     );
   }
+
+  // Type contract_only ne couvre PAS les bulletins de salaire (uniquement contrats)
+  if (subscription.type === 'contract_only') {
+    return NextResponse.json(
+      { error: 'Votre abonnement couvre uniquement les contrats de travail. Ajoutez une offre bulletins pour continuer.', redirect: '/tarifs' },
+      { status: 403 }
+    );
+  }
   // ---
   const body = await req.json();
   const {

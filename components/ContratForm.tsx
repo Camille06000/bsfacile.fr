@@ -146,7 +146,7 @@ export default function ContratForm() {
         if (!res.ok) return;
         const data = await res.json();
         const sub = data?.subscription;
-        if (!cancelled && sub && (sub.type === 'monthly' || sub.type === 'annual')) {
+        if (!cancelled && sub && (sub.type === 'monthly' || sub.type === 'annual' || sub.type === 'contract_only')) {
           setIncludedInSub(true);
           setIsPaid(true);
         }

@@ -37,9 +37,13 @@ interface User {
 
 const TYPE_LABELS: Record<string, string> = {
   single: 'Bulletin unique',
+  pack3: 'Pack 3 bulletins',
   pack5: 'Pack 5 bulletins',
+  pack10: 'Pack 10 bulletins',
+  pack20: 'Pack 20 bulletins',
   monthly: 'Abonnement mensuel',
   annual: 'Abonnement annuel',
+  contract_only: 'Accès contrats de travail',
 };
 
 function formatDate(ts: number): string {
