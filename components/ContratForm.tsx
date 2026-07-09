@@ -146,7 +146,9 @@ export default function ContratForm() {
         if (!res.ok) return;
         const data = await res.json();
         const sub = data?.subscription;
-        if (!cancelled && sub && (sub.type === 'monthly' || sub.type === 'annual' || sub.type === 'contract_only')) {
+        // 'unlimited' = ancien type legacy pour les comps admin (ex: ADMIN_UNLIMITED)
+        const eligibleTypes = ['monthly', 'annual', 'contract_only', 'unlimited'];
+        if (!cancelled && sub && eligibleTypes.includes(sub.type)) {
           setIncludedInSub(true);
           setIsPaid(true);
         }

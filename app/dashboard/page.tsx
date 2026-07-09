@@ -43,6 +43,7 @@ const TYPE_LABELS: Record<string, string> = {
   pack20: 'Pack 20 bulletins',
   monthly: 'Abonnement mensuel',
   annual: 'Abonnement annuel',
+  unlimited: 'Accès illimité (admin)',
   contract_only: 'Accès contrats de travail',
 };
 

@@ -62,7 +62,12 @@
       "Bash(ssh root@72.60.233.11 \"grep -r ''pruna\\\\|PRUNA\\\\|prunai'' /var/www/ /root/ /etc/ /home/ 2>/dev/null | grep -v Binary | grep -v ''.git'' | head -20\")",
       "Bash(ssh root@72.60.233.11 \"grep -q PRUNA_KEY /var/www/bsfacile/.env.local && echo ''already set'' || echo ''PRUNA_KEY=pru_YdwyangHCUMp6rN8efbG9cicDD_8vU-I'' >> /var/www/bsfacile/.env.local && echo ''added''\")",
       "Bash(ssh root@72.60.233.11 \"openssl rand -base64 32\")",
-      "Bash(ssh root@72.60.233.11:*)"
+      "Bash(ssh root@72.60.233.11:*)",
+      "Bash(ssh -o ConnectTimeout=15 root@72.60.233.11 \"echo alive && uptime\")",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -A \"Mozilla/5.0\" -H \"Authorization: Bearer 1O0zqYZ4vkmYU6VJ2VEujKgDBqCKeSxkVuXQVFvz91ee62e9\" -H \"Accept: application/json\" https://developers.hostinger.com/api/vps/v1/virtual-machines --max-time 15)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

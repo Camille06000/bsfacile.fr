@@ -246,13 +246,19 @@ export function getBulletinsThisCalendarMonth(subscriptionId: number): number {
 export function getActiveSubscription(userId: number): DbSubscription | undefined {
   const db = getDb();
   const now = Math.floor(Date.now() / 1000);
+  // Prefer les subs qui couvrent les bulletins ET les contrats (monthly/annual/unlimited/pack*)
+  // sur les subs 'contract_only' qui ne couvrent que les contrats.
+  // Cela évite qu'un user avec un abo bulletins + une comp contract_only perde l'accès aux bulletins.
   const sub = db.prepare(`
     SELECT * FROM subscriptions
     WHERE user_id = ?
       AND status = 'active'
       AND (expires_at IS NULL OR expires_at > ?)
       AND (bulletins_total = 0 OR bulletins_used < bulletins_total)
-    ORDER BY created_at DESC LIMIT 1
+    ORDER BY
+      CASE WHEN type = 'contract_only' THEN 1 ELSE 0 END,
+      created_at DESC
+    LIMIT 1
   `).get(userId, now) as DbSubscription | undefined;
 
   if (!sub) return undefined;
